@@ -1,0 +1,22 @@
+[project]
+name = "fast-gov-uk"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "python-fasthtml>=0.12.19",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-cov>=6.2.1",
+]
+
+[tool.ruff]
+extend-exclude = ["fast_gov_uk/design_system/__init__.py"]
+
+[tool.ruff.format]
+quote-style = "double"
+exclude = ["fast_gov_uk/tests/*"]

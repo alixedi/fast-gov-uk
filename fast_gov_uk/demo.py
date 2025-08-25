@@ -1,0 +1,188 @@
+import fasthtml.common as fh
+
+import fast_gov_uk.design_system as ds
+
+DEMO_PAGE = (
+    ds.H1("H1 Heading"),
+    ds.H2("H2 Heading"),
+    ds.H3("H3 Heading"),
+    ds.P("Paragraph"),
+    ds.A("Link"),
+    ds.Ul(
+        ds.Li("Item 1"),
+        ds.Li("Item 2"),
+        ds.Li("Item 3"),
+    ),
+    ds.Ul(
+        ds.Li("Item 1"),
+        ds.Li("Item 2"),
+        ds.Li("Item 3"),
+        bullet=True,
+    ),
+    ds.Ul(
+        ds.Li("Item 1"),
+        ds.Li("Item 2"),
+        ds.Li("Item 3"),
+        numbered=True,
+    ),
+    ds.Ul(
+        ds.Li("Item 1"),
+        ds.Li("Item 2"),
+        ds.Li("Item 3"),
+        spaced=True,
+    ),
+    ds.Inset("This is an inset paragraph."),
+    ds.Detail("A detail component", ds.P("Here is some content.")),
+    ds.Panel(ds.P("Here is some content"), title="Panel component"),
+    ds.Tag("A Tag"),
+    fh.Nbsp(),
+    ds.Tag("Green Tag", color="green"),
+    fh.Nbsp(),
+    ds.Tag("Red Tag", color="red"),
+    fh.Nbsp(),
+    ds.Tag("Yellow Tag", color="yellow"),
+    fh.Nbsp(),
+    ds.Tag("Grey Tag", color="grey"),
+    fh.Nbsp(),
+    ds.PhaseBanner(ds.P("Phase Banner"), phase="apha"),
+    ds.Warning(ds.P("Here is a Warning")),
+    ds.Notification(ds.P("Here is some content"), "A Notification"),
+    ds.Notification(ds.P("Here is some content"), "A Notification", success=True),
+    ds.Accordian(
+        {"heading": "An Accordian Section", "content": "Some content"},
+        {"heading": "Another Accordian Section", "content": "Some more content"},
+    ),
+    ds.Tab(
+        {"heading": "Tab 1", "content": "Some content"},
+        {"heading": "Tab 2", "content": "Some more content"},
+    ),
+    ds.Breadcrumbs(
+        ("A breadcrumb link", "#"),
+        ("Another breadcrumb link", "#"),
+    ),
+    ds.Select(
+        name="color",
+        options=[("Blue", "blue"), ("Red", "red"), ("Green", "green")],
+        label="A Select:",
+        hint="With a hint",
+    ),
+    ds.Textarea(
+        "detail",
+        label="A Textarea",
+        hint="With a hint",
+        heading=True,
+    ),
+    ds.PasswordInput("pass", label="A Password input", hint="with a helpful hint"),
+    ds.CharacterCount(
+        "char",
+        label="Character Count",
+        hint="with a helpful hint",
+        maxchars=10,
+        heading=True,
+    ),
+    ds.ErrorSummary("An Error Summary", ds.A("A link")),
+    ds.Table(
+        "A Table",
+        [
+            {"Fruit": "Apple", "Price": "£0.5"},
+            {"Fruit": "Orange", "Price": "£0.75"},
+            {"Fruit": "Banana", "Price": "£0.25"},
+        ],
+        row_headers=["Fruit"],
+    ),
+    ds.Button("A Button"),
+    fh.Nbsp(),
+    ds.Button("Secondary Button", style=ds.ButtonStyle.SECONDARY),
+    fh.Nbsp(),
+    ds.Button("Warning Button", style=ds.ButtonStyle.WARNING),
+    fh.Nbsp(),
+    ds.Button("Inverse Button", style=ds.ButtonStyle.INVERSE),
+    fh.Nbsp(),
+    ds.TextInput(
+        "input",
+        label="A text input",
+        hint="With a hint",
+        heading=True,
+        prefix="£",
+        suffix="Only",
+    ),
+    ds.Checkboxes(
+        name="check",
+        checkboxes=[
+            ds.Checkbox("check", "1", "Apple", hint="Choose Apple"),
+            ds.Checkbox("check", "2", "Orange", hint="Choose Orange"),
+            ds.Checkbox("check", "3", "Banana", hint="Choose Banana"),
+        ],
+        label="Checkboxes",
+        hint="With a hint",
+        heading=True,
+    ),
+    ds.Radios(
+        name="radio",
+        radios=[
+            ds.Radio("radio", "1", "Apple", hint="Choose Apple"),
+            ds.Radio("radio", "2", "Orange", hint="Choose Orange"),
+            ds.Radio("radio", "3", "Banana", hint="Choose Banana"),
+        ],
+        label="Radios",
+        hint="With a hint",
+        heading=True,
+    ),
+    ds.FileUpload(
+        "file_upload",
+        "File Upload",
+        hint="With a hint",
+        heading=True,
+    ),
+    ds.ExitPage(text="Exit Page component"),
+    ds.Navigation(
+        ds.NavigationLink("A link", "#"),
+        ds.NavigationLink("Another link", "#"),
+        service_name="Name of the service",
+    ),
+    ds.Pagination(
+        ds.PaginationLink("1", "/test?page=1"),
+        ds.PaginationLink("2", "/test?page=2"),
+        ds.PaginationLink("3", "/test?page=3", active=True),
+        ds.PaginationLink("4", "/test?page=4"),
+        ds.PaginationLink("5", "/test?page=5"),
+        prev_link="/test?page=2",
+        next_link="/test?page=4",
+    ),
+    ds.DateInput("date_input", "A Date Input", hint="With a hint", heading=True),
+    ds.SummaryList(
+        [
+            ("Name", "John Doe", []),
+            ("Date of Birth", "13/10/2010", [ds.A("Change", "/change-dob")]),
+            (
+                "Email",
+                "test@test.com",
+                [ds.A("Add", "/add-email"), ds.A("Change", "/change-email")],
+            ),
+        ]
+    ),
+    ds.SummaryCard(
+        "A Summary Card",
+        ds.SummaryList(
+            [
+                ("Name", "John Doe", []),
+                ("Date of Birth", "13/10/2010", []),
+                (
+                    "Email",
+                    "test@test.com",
+                    [ds.A("Add", "/add-email"), ds.A("Change", "/change-email")],
+                ),
+            ]
+        ),
+        actions=[ds.A("Delete", "/delete-card")],
+    ),
+    ds.CookieBanner(
+        "Test Service",
+        ds.P("Here is a cookie banner"),
+        ds.P("We use cookies for analytics."),
+    ),
+)
+
+
+def demo():
+    return ds.Page(*DEMO_PAGE)

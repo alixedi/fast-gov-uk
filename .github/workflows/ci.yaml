@@ -1,0 +1,33 @@
+name: CI
+on: pull_request
+
+jobs:
+  ci:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Minimize uv cache
+        run: uv cache prune --ci
+
+      - name: "Ruff linting and formatting"
+        uses: astral-sh/ruff-action@v3
