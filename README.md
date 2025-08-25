@@ -57,7 +57,7 @@ def faqs():
 Hit the save button, go to your browser and type `127.0.0.1:5001/faqs`. You should see a brand
 new FAQs page on your service.
 
-# Building your first form
+## Building your first form
 
 I feel that gov.uk services have 2 very common interaction patterns - (1) giving information to users and (2) getting information from users.
 
@@ -97,7 +97,7 @@ Now put in a proper email address and submit the form. You should be redirected 
 
 Lets go a little deeper into `fast-gov-uk` and see what comes out of the box -
 
-# An Implementation of the gov.uk design system in Python
+## An Implementation of the gov.uk design system in Python
 
 If you have completed a Programming 101 course, chances are that you learned Python. If you work in gov.uk, the preferred application platform is the Web. With `fast-gov-uk`, my ambition is to enable new/junior developers who just know Python to build `gov.uk` services with confidence.
 
@@ -105,7 +105,7 @@ The foundation for this is an implementation of gov.uk design system in Python. 
 
 P.S. Note that all the components have type hints and are well-documented. This should help with (1) readability (2) autocomplete in VSCode and more excitingly (3) AI code agents.
 
-# Lightweight scafoolding for common gov.uk patterns
+## Lightweight scafoolding for common gov.uk patterns
 
 Most obvious example for this is that `fast-gov-uk` comes with a feedback form out of the box.
 
@@ -113,6 +113,6 @@ More interestingly, it lets you write functions that return a `Page` or a `Form`
 
 Finally, this "scaffolding" is fairly lightweight. If you do need to roll up your sleeves and e.g. start writing your endpoints, you can!
 
-# Designed from the ground up for AI
+## Designed from the ground up for AI
 
 Watch this [demo](https://youtu.be/r6OBRBT7aBU).
