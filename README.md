@@ -26,8 +26,9 @@ the best way to get started is the following -
 3) [Run the service](#first-page) on your computer and start noodling
 
 ## Building your first page
+<a name="first-page"></a>
 
-Fast-gov-uk comes with a few common pages built-in. Firstly, lets explore these -
+Fast-gov-uk comes with a few common pages built-in. Lets start here -
 
 Open VSCode editor - File > Open Folder > Choose the cloned `fast-gov-uk` repository.
 
@@ -41,7 +42,7 @@ Now in your VSCode editor, open the file called `app.py`. Take a look at the fun
 
 If you wanted to create a fresh page, you can do so by defining a function that returns a `Page` with whatever content you want to put in it and decorating it with `@fast.page` decorator. E.g. -
 
-```
+```python
 @fast.page
 def faqs():
     return ds.Page(
@@ -63,17 +64,17 @@ I feel that gov.uk services have 2 very common interaction patterns - (1) giving
 
 `fast-gov-uk` have some lightweight scaffolding for both. We have covered the former through `Page`. The latter is covered through forms. Lets take a peek -
 
-Make sure the development server is runnine. Go to your browser and type `127.0.0.1:5001/form/feedback`. You should see a standard gov.uk feedback form.
+Make sure the development server is running. Go to your browser and type `127.0.0.1:5001/form/feedback`. You should see a standard gov.uk feedback form.
 
 Try filling it in and hit Submit. This should take you to the home page. This means that the form was submitted and processed without errors. We will come back to this later.
 
-Also try breaking the form - leave it blank and hit submit, leave some fields blank and hit submit etc. You will note that the form has basic validation logic that helps ensure that the users cannot submit this form witohut filling the required fields with the right information.
+Also try breaking the form - leave it blank and hit submit, leave some fields blank and hit submit etc. You will note that the form has basic validation logic that helps ensure that the users cannot submit this form without filling the required fields with the right information.
 
 Try changing the form. E.g. you can change the `label` of the `CharacterCount` field to "Tell us how we are doing". Hit the save button. Go to your browser. Hit refresh. The `CharacterCount` field should have the new label.
 
 Finally, just like `Pages`, you can also create your own new `Forms` -
 
-```
+```python
 @fast.form
 def email(data=None):
     return forms.DBForm(
@@ -91,28 +92,42 @@ def email(data=None):
 
 Hit save. Go to your browser and type `127.0.0.1:5001/form/email`. You should see your brand new form.
 
-Try to break this - submit without an email address. Submit with something that is not a valid email address etc.
-
-Now put in a proper email address and submit the form. You should be redirected to the `demo` page. This means the form was submitted successfully.
-
 Lets go a little deeper into `fast-gov-uk` and see what comes out of the box -
 
 ## An Implementation of the gov.uk design system in Python
 
-If you have completed a Programming 101 course, chances are that you learned Python. If you work in gov.uk, the preferred application platform is the Web. With `fast-gov-uk`, my ambition is to enable new/junior developers who just know Python to build `gov.uk` services with confidence.
+The aim of this project is to make it as easy as possibly for people who know a little bit of Python to hack together gov.uk service MVPs quickly and confidently -
 
-The foundation for this is an implementation of gov.uk design system in Python. You can see the code for this in the [design_system](https://github.com/alixedi/fast-gov-uk/tree/main/fast_gov_uk/design_system) directory in this project.
+```python
+@fast.page
+def get_started():
+    return ds.Page(
+        # Heading -
+        ds.H1("Welcome to the service")
+        ds.P("You will need the following information handy:")
+        ds.Ul(
+            ds.Li("NI Number"),
+            ds.Li("Date of birth"),
+            ds.Li("Email"),
+        )
+        ds.StartButton("I am ready", "/form")
+    )
+```
 
-P.S. Note that all the components have type hints and are well-documented. This should help with (1) readability (2) autocomplete in VSCode and more excitingly (3) AI code agents.
+In order to do this, we wrote the entire [gov.uk design system](https://design-system.service.gov.uk) in Python using [FastHTML](https://www.fastht.ml).
 
-## Lightweight scafoolding for common gov.uk patterns
+The code for this is in the [design_system](https://github.com/alixedi/fast-gov-uk/tree/main/fast_gov_uk/design_system) directory in this project. Note that all the components have type hints and are documented. This should help with (1) readability (2) autocomplete in VSCode and more excitingly (3) AI code agents.
 
-Most obvious example for this is that `fast-gov-uk` comes with a feedback form out of the box.
+## Lightweight scaffolding for common gov.uk patterns
 
-More interestingly, it lets you write functions that return a `Page` or a `Form` and these pop up as real pages and forms in your browsers without having to do anything else.
+At the highest level, `fast-gov-uk` comes out of the box with things like - a feedback form, "Page not found", "There is a problem with this service" etc.
+
+More interestingly, `fast-gov-uk` lets you write simple functions that return a `Page` or a `Form` and these pop up as real pages and forms in your browsers without having to do anything else.
 
 Finally, this "scaffolding" is fairly lightweight. If you do need to roll up your sleeves and e.g. start writing your endpoints, you can!
 
 ## Designed from the ground up for AI
 
-Watch this [demo](https://youtu.be/r6OBRBT7aBU).
+You will need to setup the VSCode GitHub extension for this but once you do -
+
+You can do things like [this](https://youtu.be/r6OBRBT7aBU).
