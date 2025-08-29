@@ -74,20 +74,32 @@ class Fast(fh.FastHTML):
         self.route("/{fname:path}.{ext:static}")(assets)
         self.route("/form/{name}", methods=["GET", "POST"])(self.process_form)
 
-    def page(self, url: str = ""):
+    def page(self, url=None):
         def page_decorator(func):
-            _url = url or f"{func.__name__}"
+            _url = url or func.__name__
             self.route(_url)(func)
             return func
 
+        if callable(url):
+            # Used as @app.page
+            func = url
+            url = None
+            return page_decorator(func)
+        # Used as @app.page("/some-url")
         return page_decorator
 
-    def form(self, url: str = ""):
+    def form(self, url=None):
         def form_decorator(func):
-            _url = url or f"{func.__name__}"
+            _url = url or func.__name__
             self.forms[_url] = func
             return func
 
+        if callable(url):
+            # Used as @app.form
+            func = url
+            url = None
+            return form_decorator(func)
+        # Used as @app.form("/some-url")
         return form_decorator
 
     async def process_form(self, req, name: str, post: dict):

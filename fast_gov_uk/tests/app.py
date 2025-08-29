@@ -13,7 +13,7 @@ def home():
     return ds.Page(ds.P("Hello, world!"))
 
 
-@fast.form()
+@fast.form
 def profile(data=None):
     return forms.DBForm(
         title="Create a Profile",
