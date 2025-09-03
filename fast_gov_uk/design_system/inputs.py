@@ -289,6 +289,9 @@ class CharacterCount(Field):
     @Field.value.setter
     def value(self, value):
         self._value = value
+        if self.required and not value:
+            self.error = "This field is required."
+            return
         if self.maxchars:
             if len(self._value) > self.maxchars:
                 self.error = f"Characters exceed limit of {self.maxchars}."
