@@ -767,7 +767,7 @@ class DateInput(Field):
 
     @value.setter
     def value(self, value):
-        self._value = value
+        self._value = value or ("", "", "")
         day, month, year = self._value
         if self.required and (not day or not month or not year):
             self.error = "This field is required."
