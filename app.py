@@ -32,7 +32,7 @@ def home():
 
 # I can do @fast.form("foo") instead to make this page available
 # on /form/foo instead of the default /form/feedback
-@fast.form()
+@fast.form
 def feedback(data=None):
     """
     Feedback form is common and recommended in gov.uk services.
@@ -58,7 +58,7 @@ def feedback(data=None):
     """
     # A DBForm gets saved to the database when its valid
     return forms.DBForm(
-        title="Give feeback for Fast Gov UK",
+        title="Give feedback for Fast Gov UK",
         fields=[
             ds.Radios(
                 name="satisfaction",
@@ -76,7 +76,7 @@ def feedback(data=None):
                 label="How could we improve this service?",
                 maxchars=1200,
                 required=False,
-                hint="Do not include any personal or financial infrmation, for example your national insurance number.",
+                hint="Do not include any personal or financial information, for example your national insurance number.",
             ),
         ],
         data=data,
