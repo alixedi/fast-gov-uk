@@ -76,7 +76,7 @@ class Fast(fh.FastHTML):
 
     def page(self, url=None):
         def page_decorator(func):
-            _url = url or func.__name__
+            _url = url or f"/{func.__name__}"
             self.route(_url)(func)
             return func
 
