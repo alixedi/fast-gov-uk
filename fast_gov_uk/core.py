@@ -66,13 +66,16 @@ class Fast(fh.FastHTML):
         self.db = fh.database(db_url)
         # Set up flag for whether we are in dev mode
         self.dev = settings["DEV_MODE"]
-        # Initialize form registry
+        # Initialise form registry
         self.forms = {}
+        # Initialise wizard registry
+        self.questions = {}
         # Set up routes
         if self.dev:
             self.route("/demo")(demo)
         self.route("/{fname:path}.{ext:static}")(assets)
         self.route("/form/{name}", methods=["GET", "POST"])(self.process_form)
+        self.route("/questions/{name}/{step}", methods=["GET", "POST"])(self.process_questions)
 
     def page(self, url=None):
         def page_decorator(func):
@@ -102,18 +105,62 @@ class Fast(fh.FastHTML):
         # Used as @app.form("/some-url")
         return form_decorator
 
+    def question(self, url=None):
+        def question_decorator(func):
+            _url = url or func.__name__
+            self.questions[_url] = func
+            return func
+
+        if callable(url):
+            # Used as @app.form
+            func = url
+            url = None
+            return question_decorator(func)
+        # Used as @app.question("/some-url")
+        return question_decorator
+
     async def process_form(self, req, name: str, post: dict):
-        mkform = self.forms.get(name, None)
-        if not mkform:
+        mk_form = self.forms.get(name, None)
+        if not mk_form:
             raise fh.HTTPException(status_code=404)
         # If GET, just return the form
         if req.method == "GET":
-            form = mkform()
+            form = mk_form()
             return ds.Page(form)
         # If POST, fill the form
-        form = mkform(post)
+        form = mk_form(post)
         # If valid, process
         if form.valid:
             return await form.process()
         # Else return with errors
         return ds.Page(form)
+
+    async def process_questions(self, req, session: dict, name: str, step: str, post: dict):
+        try:
+            mk_question = self.questions[name]
+            _step = int(step or "0")
+        except (KeyError, ValueError):
+            raise fh.HTTPException(status_code=404)
+        # Get data from session
+        session_key = f"{name}_questions"
+        form_data = session.get(session_key, {})
+        # If GET, just return the form
+        if req.method == "GET":
+            # Reset the session on first step
+            if _step == 0:
+                session.pop(session_key, None)
+            question = mk_question(step=_step)
+            return ds.Page(question)
+        # If POST, fill the form
+        form_data.update(post)
+        session[session_key] = form_data
+        question = mk_question(step=_step, data=form_data)
+        # If step valid
+        if question.step_valid:
+            # Last step, process
+            if _step + 1 == len(question.fields):
+                return await question.process()
+            next_step = question.next_step
+            return fh.Redirect(f"/questions/{name}/{next_step}")
+        # Else return with errors
+        return ds.Page(question)

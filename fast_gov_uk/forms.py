@@ -148,11 +148,54 @@ class Form:
         )
 
 
+class Questions(Form):
+    """
+    Implements the question-protocol aka Wizard i.e. forms that step
+    through the fields one at a time.
+    """
+
+    def __init__(self, step: int = 0, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.step = step
+
+    @property
+    def step_valid(self):
+        field = self.fields[self.step]
+        return field.error == ""
+
+    @property
+    def next_step(self):
+        return self.step + 1
+
+    def __ft__(self) -> fh.FT:
+        try:
+            field = self.fields[self.step]
+        except IndexError:
+            raise fh.HTTPException(status_code=404)
+        return fh.Form(
+            Fieldset(self.title, field),
+            Button(self.cta),
+            method=self.method,
+            action=self.action,
+            **self.kwargs,
+        )
+
+
 class LogForm(Form, LogBackend):
     pass
 
 
+class LogQuestions(Questions, LogBackend):
+    pass
+
+
 class DBForm(Form, DBBackend):
+    def __init__(self, db, *args, **kwargs):
+        self.db = db
+        super().__init__(*args, **kwargs)
+
+
+class DBQuestions(Questions, DBBackend):
     def __init__(self, db, *args, **kwargs):
         self.db = db
         super().__init__(*args, **kwargs)

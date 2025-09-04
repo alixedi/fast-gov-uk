@@ -86,5 +86,186 @@ def feedback(data=None):
     )
 
 
+@fast.question()
+def equality(step=0, data=None):
+    """
+    This is an example of a question-protocol aka wizard form.
+    It steps through the fields one at a time.
+
+    It takes step as an argument to know which field to show.
+    It also takes data as an argument to fill in the fields
+    that have already been filled in.
+
+    Note that this form does not do anything with the data
+    when it is completed. You can add your own processing logic
+    in the process method of the Questions class.
+    """
+    return forms.DBQuestions(
+        title="Equality monitoring",
+        fields=[
+            ds.Radios(
+                name="permission",
+                label="Do you want to answer the equality questions?",
+                choices=[
+                    "Yes, answer the equality questions",
+                    "No, skip the equality questions"
+                ],
+            ),
+            ds.DateInput(
+                name="dob",
+                label="What is your date of birth?",
+            ),
+            ds.Radios(
+                name="health",
+                label=(
+                    "Do you have any physical or mental health conditions or illness "
+                    "lasting or expected to last 12 months or more?"
+                ),
+                choices=["Yes", "No", "Prefer not to say"],
+            ),
+            ds.Radios(
+                name="ability",
+                label=(
+                    "Do any of your conditions or illnesses reduce your ability "
+                    "to carry out day to day activities?"
+                ),
+                choices=["Yes, a lot", "Yes, a little", "Not at all", "Prefer not to say"],
+            ),
+            ds.Radios(
+                name="ethnic-group",
+                label="What is your ethnic group?",
+                choices=[
+                    "White",
+                    "Mixed or multiple ethnic groups",
+                    "Asian or Asian British",
+                    "Black, African, Caribbean or Black British",
+                    "Other ethnic group",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Radios(
+                name="white",
+                label="Which of the following best describes your White background?",
+                choices=[
+                    "English, Welsh, Scottish, Northern Irish or British",
+                    "Irish",
+                    "Gypsy or Irish Traveller",
+                    "Any other White background",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Radios(
+                name="multiple",
+                label=(
+                    "Which of the following best describes your "
+                    "multiple ethnic group background?"
+                ),
+                choices=[
+                    "White and Black Caribbean",
+                    "White and Black African",
+                    "White and Asian",
+                    "Any other mixed or multiple ethnic background",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Radios(
+                name="asian",
+                label=(
+                    "Which of the following best describes your "
+                    "Asian or Asian British background?"
+                ),
+                choices=[
+                    "Indian",
+                    "Pakistani",
+                    "Bangladeshi",
+                    "Chinese",
+                    "Any other Asian background",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Radios(
+                name="black",
+                label=(
+                    "Which of the following best describes your Black, African, "
+                    "Caribbean or Black British background?"
+                ),
+                choices=[
+                    "African",
+                    "Caribbean",
+                    "Any other Black, African or Caribbean background",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Radios(
+                name="other",
+                label="Which of the following best describes your background?",
+                choices=["Arab", "Any other ethnic group", "Prefer not to say"],
+            ),
+            ds.Radios(
+                name="marital-status",
+                label="What is your legal marital or registered civil partnership status?",
+                choices=[
+                    "Never married and never registered in a civil partnership",
+                    "Married",
+                    "In a registered civil partnership",
+                    "Separated, but still legally married",
+                    "Separated, but still legally in a civil partnership",
+                    "Divorced",
+                    "Formerly in a civil partnership which is now legally dissolved",
+                    "Widowed",
+                    "Surviving partner from a registered civil partnership",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Radios(
+                name="religion",
+                label="What is your religion?",
+                choices=[
+                    "No religion",
+                    "Christian",
+                    "Buddhist",
+                    "Hindu",
+                    "Jewish",
+                    "Muslim",
+                    "Sikh",
+                    "Any other religion",
+                    "Prefer not to say",
+                ],
+            ),
+            ds.Fieldset(
+                "Sex and gender identity",
+                ds.Radios(
+                    name="sex",
+                    label="What is your sex?",
+                    choices=["Female", "Male", "Prefer not to say"],
+                ),
+                ds.Radios(
+                    name="gender",
+                    label=(
+                        "Is the gender you identify with the same as "
+                        "your sex registered at birth?"
+                    ),
+                    choices=["Yes", "No", "Prefer not to say"],
+                )
+            ),
+            ds.Radios(
+                name="sexual-orientation",
+                label="Which of the following best describes your sexual orientation?",
+                choices=[
+                    "Heterosexual or straight",
+                    "Gay or lesbian",
+                    "Bisexual",
+                    "Other",
+                    "Prefer not to say",
+                ],
+            ),
+        ],
+        data=data,
+        step=step,
+        success_url="/",
+        cta="Continue",
+        db=fast.db,
+    )
+
 # Serves the app
 fh.serve(app="fast")
