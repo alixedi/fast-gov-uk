@@ -13,14 +13,14 @@ import fast_gov_uk.design_system as ds
         ),
     ),
 )
-def test_inset(kwargs, expected):
+def test_inset(kwargs, expected, html):
     """Test Inset text with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Inset.
         expected (str): The expected HTML output.
     """
     text = ds.Inset(**kwargs)
-    assert str(text) == expected
+    assert html(text) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -30,8 +30,12 @@ def test_inset(kwargs, expected):
             ["Test Content"],
             (
                 '<details class="govuk-details">'
-                    '<summary class="govuk-details__summary">Test</summary>'
-                    'Test Content'
+                    '<summary class="govuk-details__summary">'
+                    '<span class="govuk-details__summary-text">Test</span>'
+                    '</summary>'
+                    '<div class="govuk-details__text">'
+                        'Test Content'
+                    '</div>'
                 '</details>'
             ),
         ),
@@ -39,8 +43,12 @@ def test_inset(kwargs, expected):
             [ds.A("Test Link")],
             (
                 '<details class="govuk-details">'
-                    '<summary class="govuk-details__summary">Test</summary>'
-                    '<a href="#" class="govuk-link">Test Link</a>'
+                    '<summary class="govuk-details__summary">'
+                        '<span class="govuk-details__summary-text">Test</span>'
+                    '</summary>'
+                    '<div class="govuk-details__text">'
+                        '<a href="#" class="govuk-link">Test Link</a>'
+                    '</div>'
                 '</details>'
             ),
         ),
@@ -48,22 +56,26 @@ def test_inset(kwargs, expected):
             [ds.A("Test Link"), ds.P("Test para")],
             (
                 '<details class="govuk-details">'
-                    '<summary class="govuk-details__summary">Test</summary>'
-                    '<a href="#" class="govuk-link">Test Link</a>'
-                    '<p class="govuk-body">Test para</p>'
+                    '<summary class="govuk-details__summary">'
+                        '<span class="govuk-details__summary-text">Test</span>'
+                    '</summary>'
+                    '<div class="govuk-details__text">'
+                        '<a href="#" class="govuk-link">Test Link</a>'
+                        '<p class="govuk-body">Test para</p>'
+                    '</div>'
                 '</details>'
             ),
         ),
     ),
 )
-def test_detail(content, expected):
+def test_detail(content, expected, html):
     """Test Detail with various parameters.
     Args:
         args (dict): The arguments to pass to Detail.
         expected (str): The expected HTML output.
     """
     detail = ds.Detail("Test", *content)
-    assert str(detail) == expected
+    assert html(detail) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -113,7 +125,7 @@ def test_detail(content, expected):
         ),
     ),
 )
-def test_panel(kwargs, expected):
+def test_panel(kwargs, expected, html):
     """Test Panel with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Panel.
@@ -121,7 +133,7 @@ def test_panel(kwargs, expected):
     """
     content = kwargs.pop("content")
     panel = ds.Panel(*content, **kwargs)
-    assert str(panel) == expected
+    assert html(panel) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -153,14 +165,14 @@ def test_panel(kwargs, expected):
         ),
     ),
 )
-def test_tag(kwargs, expected):
+def test_tag(kwargs, expected, html):
     """Test Panel with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Tag.
         expected (str): The expected HTML output.
     """
     tag = ds.Tag(**kwargs)
-    assert str(tag) == expected
+    assert html(tag) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -180,7 +192,7 @@ def test_tag(kwargs, expected):
         ),
     ),
 )
-def test_warning(kwargs, expected):
+def test_warning(kwargs, expected, html):
     """Test Warning with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Warning.
@@ -188,16 +200,16 @@ def test_warning(kwargs, expected):
     """
     content = kwargs.pop("content")
     banner = ds.Warning(*content, **kwargs)
-    assert str(banner) == expected
+    assert html(banner) == html(expected)
 
 
 @pytest.mark.parametrize(
     "kwargs, expected",
     (
         (
-            {"title": "Important", "content": "Test Content"},
+            {"title": "Important", "content": ["Test Content"]},
             (
-                '<div role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" class="govuk-notification-banner">'
+                '<div role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" class="govuk-notification-banner">'
                     '<div class="govuk-notification-banner__header">'
                         '<h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Important</h2>'
                     "</div>"
@@ -208,9 +220,9 @@ def test_warning(kwargs, expected):
             ),
         ),
         (
-            {"title": "Success", "content": "Test Content", "success": True},
+            {"title": "Success", "content": ["Test Content"], "success": True},
             (
-                '<div role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" class="govuk-notification-banner govuk-notification-banner--success">'
+                '<div role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" class="govuk-notification-banner govuk-notification-banner--success">'
                     '<div class="govuk-notification-banner__header">'
                         '<h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Success</h2>'
                     "</div>"
@@ -221,9 +233,9 @@ def test_warning(kwargs, expected):
             ),
         ),
         (
-            {"title": "Important", "content": ds.A("Test Link")},
+            {"title": "Important", "content": [ds.A("Test Link")]},
             (
-                '<div role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" class="govuk-notification-banner">'
+                '<div role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" class="govuk-notification-banner">'
                     '<div class="govuk-notification-banner__header">'
                         '<h2 id="govuk-notification-banner-title" class="govuk-notification-banner__title">Important</h2>'
                     "</div>"
@@ -235,14 +247,15 @@ def test_warning(kwargs, expected):
         ),
     ),
 )
-def test_notification(kwargs, expected):
+def test_notification(kwargs, expected, html):
     """Test Notification with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Notification.
         expected (str): The expected HTML output.
     """
-    notification = ds.Notification(**kwargs)
-    assert str(notification) == expected
+    content = kwargs.pop("content")
+    notification = ds.Notification(*content, **kwargs)
+    assert html(notification) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -251,17 +264,19 @@ def test_notification(kwargs, expected):
         (
             [{"heading": "Test 1", "content": "Test Content"}],
             (
-                '<div data-module="govuk-accordion" class="govuk-accordion">'
-                    '<div class="govuk-accordion__section">'
-                        '<div class="govuk-accordion__section-header">'
-                            '<h2 class="govuk-accordion__section-heading">'
-                                '<span id="accordion-section-heading-1" class="govuk-accordion__section-button">'
-                                    "Test 1"
-                                "</span>"
-                            "</h2>"
-                        "</div>"
-                        '<div id="accordion-section-content-1" class="govuk-accordion__section-content">'
-                            "Test Content"
+                "<div>"
+                    '<div data-module="govuk-accordion" class="govuk-accordion" id="accordion">'
+                        '<div class="govuk-accordion__section">'
+                            '<div class="govuk-accordion__section-header">'
+                                '<h2 class="govuk-accordion__section-heading">'
+                                    '<span id="accordion-heading-1" class="govuk-accordion__section-button">'
+                                        "Test 1"
+                                    "</span>"
+                                "</h2>"
+                            "</div>"
+                            '<div id="accordion-content-1" class="govuk-accordion__section-content">'
+                                "Test Content"
+                            "</div>"
                         "</div>"
                     "</div>"
                 "</div>"
@@ -273,29 +288,31 @@ def test_notification(kwargs, expected):
                 {"heading": "Test 2", "content": "Test Content 2"},
             ],
             (
-                '<div data-module="govuk-accordion" class="govuk-accordion">'
-                    '<div class="govuk-accordion__section">'
-                        '<div class="govuk-accordion__section-header">'
-                            '<h2 class="govuk-accordion__section-heading">'
-                                '<span id="accordion-section-heading-1" class="govuk-accordion__section-button">'
-                                    "Test 1"
-                                "</span>"
-                            "</h2>"
+                "<div>"
+                    '<div data-module="govuk-accordion" class="govuk-accordion" id="accordion">'
+                        '<div class="govuk-accordion__section">'
+                            '<div class="govuk-accordion__section-header">'
+                                '<h2 class="govuk-accordion__section-heading">'
+                                    '<span id="accordion-heading-1" class="govuk-accordion__section-button">'
+                                        "Test 1"
+                                    "</span>"
+                                "</h2>"
+                            "</div>"
+                            '<div id="accordion-content-1" class="govuk-accordion__section-content">'
+                                "Test Content 1"
+                            "</div>"
                         "</div>"
-                        '<div id="accordion-section-content-1" class="govuk-accordion__section-content">'
-                            "Test Content 1"
-                        "</div>"
-                    "</div>"
-                    '<div class="govuk-accordion__section">'
-                        '<div class="govuk-accordion__section-header">'
-                            '<h2 class="govuk-accordion__section-heading">'
-                                '<span id="accordion-section-heading-2" class="govuk-accordion__section-button">'
-                                    "Test 2"
-                                "</span>"
-                            "</h2>"
-                        "</div>"
-                        '<div id="accordion-section-content-2" class="govuk-accordion__section-content">'
-                            "Test Content 2"
+                        '<div class="govuk-accordion__section">'
+                            '<div class="govuk-accordion__section-header">'
+                                '<h2 class="govuk-accordion__section-heading">'
+                                    '<span id="accordion-heading-2" class="govuk-accordion__section-button">'
+                                        "Test 2"
+                                    "</span>"
+                                "</h2>"
+                            "</div>"
+                            '<div id="accordion-content-2" class="govuk-accordion__section-content">'
+                                "Test Content 2"
+                            "</div>"
                         "</div>"
                     "</div>"
                 "</div>"
@@ -303,14 +320,14 @@ def test_notification(kwargs, expected):
         ),
     ),
 )
-def test_accordian(sections, expected):
-    """Test Accordian with various parameters.
+def test_accordion(sections, expected, html):
+    """Test accordion with various parameters.
     Args:
-        sections (list): The sections to pass to Accordian.
+        sections (list): The sections to pass to accordion.
         expected (str): The expected HTML output.
     """
-    accordian = ds.Accordian(*sections)
-    assert str(accordian) == expected
+    accordion = ds.Div(ds.accordion(*sections))
+    assert html(accordion) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -323,19 +340,20 @@ def test_accordian(sections, expected):
             ],
             (
                 '<div data-module="govuk-tabs" class="govuk-tabs">'
+                    '<h2 class="govuk-tabs__title"></h2>'
                     '<ul class="govuk-tabs__list">'
                         '<li class="govuk-tabs__list-item govuk-tabs__list-item--selected">'
-                            '<a href="#tab-panel-0" class="govuk-tabs__tab">Test 1</a>'
+                            '<a href="#test-1" class="govuk-tabs__tab">Test 1</a>'
                         "</li>"
                         '<li class="govuk-tabs__list-item">'
-                            '<a href="#tab-panel-1" class="govuk-tabs__tab">Test 2</a>'
+                            '<a href="#test-2" class="govuk-tabs__tab">Test 2</a>'
                         "</li>"
                     "</ul>"
-                    '<div id="tab-panel-0" class="govuk-tabs__panel">'
+                    '<div id="test-1" class="govuk-tabs__panel">'
                         '<h2 class="govuk-heading-l">Test 1</h2>'
                         "Test Content 1"
                     "</div>"
-                    '<div id="tab-panel-1" class="govuk-tabs__panel govuk-tabs__panel--hidden">'
+                    '<div id="test-2" class="govuk-tabs__panel govuk-tabs__panel--hidden">'
                         '<h2 class="govuk-heading-l">Test 2</h2>'
                         "Test Content 2"
                     "</div>"
@@ -344,17 +362,17 @@ def test_accordian(sections, expected):
         ),
     ),
 )
-def test_tabs(panels, expected):
+def test_tabs(panels, expected, html):
     """Test Tab with various parameters.
     Args:
         panels (list): The panels to pass to Tab.
         expected (str): The expected HTML output.
     """
     tab = ds.Tab(*panels)
-    assert str(tab) == expected
+    assert html(tab) == html(expected)
 
 
-def test_errorsummary():
+def test_errorsummary(html):
     """Test ErrorSummary with various parameters."""
     summary = ds.ErrorSummary(
         "Test Legend",
@@ -366,7 +384,7 @@ def test_errorsummary():
             '<div role="alert">'
                 '<h2 class="govuk-error-summary__title">Test Legend</h2>'
                 '<div class="govuk-error-summary__body">'
-                    "<ul>"
+                    '<ul class="govuk-list govuk-error-summary__list">'
                         '<li><a href="/test1">Test 1</a></li>'
                         '<li><a href="/test2">Test 2</a></li>'
                     "</ul>"
@@ -374,21 +392,21 @@ def test_errorsummary():
             "</div>"
         "</div>"
     )
-    assert str(summary) == expected
+    assert html(summary) == html(expected)
 
 
-def test_table():
+def test_table(html):
     """
     Test Table with various parameters.
     """
     table = ds.Table(
-        "Test",
         [
             {"Fruit": "Apple", "Price": "£0.25"},
             {"Fruit": "Orange", "Price": "£0.5"},
             {"Fruit": "Banana", "Price": "£0.1"},
         ],
-        row_headers=["Fruit"],
+        caption="Test",
+        header_cols=["Fruit"],
     )
     expected = (
         '<table class="govuk-table">'
@@ -401,21 +419,21 @@ def test_table():
             "</thead>"
             '<tbody class="govuk-table__body">'
                 '<tr class="govuk-table__row">'
-                    '<th class="govuk-table__header">Apple</th>'
+                    '<th class="govuk-table__header" scope="row">Apple</th>'
                     '<td class="govuk-table__cell">£0.25</td>'
                 "</tr>"
                 '<tr class="govuk-table__row">'
-                    '<th class="govuk-table__header">Orange</th>'
+                    '<th class="govuk-table__header" scope="row">Orange</th>'
                     '<td class="govuk-table__cell">£0.5</td>'
                 "</tr>"
                 '<tr class="govuk-table__row">'
-                    '<th class="govuk-table__header">Banana</th>'
+                    '<th class="govuk-table__header" scope="row">Banana</th>'
                     '<td class="govuk-table__cell">£0.1</td>'
                 "</tr>"
             "</tbody>"
         "</table>"
     )
-    assert str(table) == expected
+    assert html(table) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -427,9 +445,9 @@ def test_table():
                 '<li class="govuk-task-list__item govuk-task-list__item--with-link">'
                     '<div class="govuk-task-list__name-and-hint">'
                         '<a href="/test" aria-describedby="test-status" class="govuk-link govuk-task-list__link">test</a>'
-                        '<div id="test-status" class="govuk-task-list__status">'
-                            '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>'
-                        "</div>"
+                    "</div>"
+                    '<div id="test-status" class="govuk-task-list__status">'
+                        '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>'
                     "</div>"
                 "</li>"
             ),
@@ -440,8 +458,8 @@ def test_table():
                 '<li class="govuk-task-list__item govuk-task-list__item--with-link">'
                     '<div class="govuk-task-list__name-and-hint">'
                         '<a href="/test" aria-describedby="test-status" class="govuk-link govuk-task-list__link">test</a>'
-                        '<div id="test-status" class="govuk-task-list__status">Completed</div>'
                     "</div>"
+                    '<div id="test-status" class="govuk-task-list__status">Completed</div>'
                 "</li>"
             ),
         ),
@@ -450,23 +468,23 @@ def test_table():
             (
                 '<li class="govuk-task-list__item govuk-task-list__item--with-link">'
                     '<div class="govuk-task-list__name-and-hint">'
-                        '<a href="/test" aria-describedby="test-status" class="govuk-link govuk-task-list__link">test</a>'
+                        '<a href="/test" aria-describedby="test-hint test-status" class="govuk-link govuk-task-list__link">test</a>'
                         '<div id="test-hint" class="govuk-task-list__hint">Test Hint</div>'
-                        '<div id="test-status" class="govuk-task-list__status">Completed</div>'
                     "</div>"
+                    '<div id="test-status" class="govuk-task-list__status">Completed</div>'
                 "</li>"
             ),
         ),
     ),
 )
-def test_task(kwargs, expected):
+def test_task(kwargs, expected, html):
     """Test Task with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Task.
         expected (str): The expected HTML output.
     """
     task = ds.Task(**kwargs)
-    assert str(task) == expected
+    assert html(task) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -479,17 +497,17 @@ def test_task(kwargs, expected):
                     '<li class="govuk-task-list__item govuk-task-list__item--with-link">'
                         '<div class="govuk-task-list__name-and-hint">'
                             '<a href="/test1" aria-describedby="test-label-1-status" class="govuk-link govuk-task-list__link">Test Label 1</a>'
-                            '<div id="test-label-1-status" class="govuk-task-list__status">'
-                                '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>'
-                            "</div>"
+                        "</div>"
+                        '<div id="test-label-1-status" class="govuk-task-list__status">'
+                            '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>'
                         "</div>"
                     "</li>"
                     '<li class="govuk-task-list__item govuk-task-list__item--with-link">'
                         '<div class="govuk-task-list__name-and-hint">'
                             '<a href="/test2" aria-describedby="test-label-2-status" class="govuk-link govuk-task-list__link">Test Label 2</a>'
-                            '<div id="test-label-2-status" class="govuk-task-list__status">'
-                                '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>'
-                            "</div>"
+                        "</div>"
+                        '<div id="test-label-2-status" class="govuk-task-list__status">'
+                            '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>'
                         "</div>"
                     "</li>"
                 "</ul>"
@@ -497,14 +515,14 @@ def test_task(kwargs, expected):
         ),
     ),
 )
-def test_tasklist(args, expected):
+def test_tasklist(args, expected, html):
     """Test TaskList with various parameters.
     Args:
         args (list): The arguments to pass to TaskList.
         expected (str): The expected HTML output.
     """
     tl = ds.TaskList(*args)
-    assert str(tl) == expected
+    assert html(tl) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -512,32 +530,27 @@ def test_tasklist(args, expected):
     (
         (
             [
-                ("Name", "John Doe", []),
-                ("DOB", "", [ds.A("Test Label 1", "/test1")]),
-                (
+                ds.SummaryItem("Name", "John Doe"),
+                ds.SummaryItem("DOB", "", ds.A("Test Label 1", "/test1")),
+                ds.SummaryItem(
                     "Email",
                     "test@test.com",
-                    [ds.A("Test Label 2", "/test2"), ds.A("Test Label 2", "/test2")],
+                    ds.A("Test Label 2", "/test2"), ds.A("Test Label 2", "/test2"),
                 ),
             ],
             (
-                '<div class="govuk-summary-list">'
-                    '<div class="govuk-summary-list__row">'
+                '<dl class="govuk-summary-list">'
+                    '<div class="govuk-summary-list__row govuk-summary-list__row--no-actions">'
                         '<dt class="govuk-summary-list__key">Name</dt>'
                         '<dd class="govuk-summary-list__value">John Doe</dd>'
-                        '<dd class="govuk-summary-list__actions">'
-                            '<ul class="govuk-summary-list__actions-list"></ul>'
-                        "</dd>"
                     "</div>"
                     '<div class="govuk-summary-list__row">'
                         '<dt class="govuk-summary-list__key">DOB</dt>'
                         '<dd class="govuk-summary-list__value"></dd>'
                         '<dd class="govuk-summary-list__actions">'
-                            '<ul class="govuk-summary-list__actions-list">'
-                                '<li class="govuk-summary-list__actions-list-item">'
-                                    '<a href="/test1" class="govuk-link">Test Label 1</a>'
-                                "</li>"
-                            "</ul>"
+                            '<a href="/test1" class="govuk-link">'
+                                'Test Label 1 <span class="govuk-visually-hidden">dob</span>'
+                            '</a>'
                         "</dd>"
                     "</div>"
                     '<div class="govuk-summary-list__row">'
@@ -546,10 +559,14 @@ def test_tasklist(args, expected):
                         '<dd class="govuk-summary-list__actions">'
                             '<ul class="govuk-summary-list__actions-list">'
                                 '<li class="govuk-summary-list__actions-list-item">'
-                                    '<a href="/test2" class="govuk-link">Test Label 2</a>'
+                                    '<a href="/test2" class="govuk-link">'
+                                        'Test Label 2 <span class="govuk-visually-hidden">email</span>'
+                                    '</a>'
                                 "</li>"
                                 '<li class="govuk-summary-list__actions-list-item">'
-                                    '<a href="/test2" class="govuk-link">Test Label 2</a>'
+                                    '<a href="/test2" class="govuk-link">'
+                                        'Test Label 2 <span class="govuk-visually-hidden">email</span>'
+                                    '</a>'
                                 "</li>"
                             "</ul>"
                         "</dd>"
@@ -559,14 +576,14 @@ def test_tasklist(args, expected):
         ),
     ),
 )
-def test_summary_list(args, expected):
+def test_summary_list(args, expected, html):
     """Test SummaryList with various parameters.
     Args:
         args (list): The arguments to pass to SummaryList.
         expected (str): The expected HTML output.
     """
-    summary = ds.SummaryList(args)
-    assert str(summary) == expected
+    summary = ds.SummaryList(*args)
+    assert html(summary) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -574,10 +591,11 @@ def test_summary_list(args, expected):
     (
         (
             [
-                (
+                ds.SummaryItem(
                     "Email",
                     "test@test.com",
-                    [ds.A("Test Label 2", "/test2"), ds.A("Test Label 2", "/test2")],
+                    ds.A("Test Label 1", "/test1"),
+                    ds.A("Test Label 2", "/test2"),
                 ),
             ],
             (
@@ -585,23 +603,29 @@ def test_summary_list(args, expected):
                     '<div class="govuk-summary-card__title-wrapper">'
                         '<h2 class="govuk-summary-card__title">Test</h2>'
                         '<ul class="govuk-summary-card__actions">'
-                            '<li class="govuk-summary-card__actio">'
-                                '<a href="/test1" class="govuk-link">Test Action 1</a>'
+                            '<li class="govuk-summary-card__action">'
+                                '<a href="/test1" class="govuk-link">'
+                                    'Test Action 1 <span class="govuk-visually-hidden">(Test)</span>'
+                                '</a>'
                             "</li>"
                         "</ul>"
                     "</div>"
                     '<div class="govuk-summary-card__content">'
-                        '<div class="govuk-summary-list">'
+                        '<dl class="govuk-summary-list">'
                             '<div class="govuk-summary-list__row">'
                                 '<dt class="govuk-summary-list__key">Email</dt>'
                                 '<dd class="govuk-summary-list__value">test@test.com</dd>'
                                 '<dd class="govuk-summary-list__actions">'
                                     '<ul class="govuk-summary-list__actions-list">'
                                         '<li class="govuk-summary-list__actions-list-item">'
-                                            '<a href="/test2" class="govuk-link">Test Label 2</a>'
+                                            '<a href="/test1" class="govuk-link">'
+                                                'Test Label 1 <span class="govuk-visually-hidden">email</span>'
+                                            '</a>'
                                         "</li>"
                                         '<li class="govuk-summary-list__actions-list-item">'
-                                            '<a href="/test2" class="govuk-link">Test Label 2</a>'
+                                            '<a href="/test2" class="govuk-link">'
+                                                'Test Label 2 <span class="govuk-visually-hidden">email</span>'
+                                            '</a>'
                                         "</li>"
                                     "</ul>"
                                 "</dd>"
@@ -613,7 +637,7 @@ def test_summary_list(args, expected):
         ),
     ),
 )
-def test_summary_card(args, expected):
+def test_summary_card(args, expected, html):
     """Test SummaryCard with various parameters.
     Args:
         args (list): The arguments to pass to SummaryCard.
@@ -621,7 +645,7 @@ def test_summary_card(args, expected):
     """
     summary = ds.SummaryCard(
         title="Test",
-        summary_list=ds.SummaryList(args),
+        summary_list=ds.SummaryList(*args),
         actions=[ds.A("Test Action 1", "/test1")],
     )
-    assert str(summary) == expected
+    assert html(summary) == html(expected)

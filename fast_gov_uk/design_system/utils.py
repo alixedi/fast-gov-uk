@@ -1,6 +1,15 @@
 import fasthtml.common as fh
 
 
+def mkid(name: str):
+    """
+    We should be able to compute a good id from field name.
+    This function tries to do this.
+    """
+    # Google recommends using "-" in ids
+    return name.lower().replace(" ", "-")
+
+
 def Logo() -> str:
     """
     Gov.UK logo

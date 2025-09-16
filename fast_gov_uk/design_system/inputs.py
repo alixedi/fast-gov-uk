@@ -7,15 +7,7 @@ from typing import List, Optional, Tuple
 import fasthtml.common as fh
 
 from .typography import H2, A
-
-
-def mkid(name: str):
-    """
-    We should be able to compute a good id from field name.
-    This function tries to do this.
-    """
-    # Google recommends using "-" in ids
-    return name.lower().replace(" ", "-")
+from .utils import mkid
 
 
 def Label(

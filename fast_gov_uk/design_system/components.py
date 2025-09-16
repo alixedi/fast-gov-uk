@@ -1,5 +1,7 @@
 import fasthtml.common as fh
 
+from .utils import mkid
+
 
 def Inset(text: str) -> fh.FT:
     """
@@ -14,7 +16,7 @@ def Inset(text: str) -> fh.FT:
 
 def Detail(
     summary: str,
-    *content: fh.FT,
+    *content: fh.FT | str,
     open: bool = False,
 ) -> fh.FT:
     """
@@ -27,15 +29,21 @@ def Detail(
         FT: A FastHTML Detail component.
     """
     return fh.Details(
-        fh.Summary(summary, cls="govuk-details__summary"),
-        *content,
+        fh.Summary(
+            fh.Span(summary, cls="govuk-details__summary-text"),
+            cls="govuk-details__summary",
+        ),
+        fh.Div(
+            *content,
+            cls="govuk-details__text",
+        ),
         cls="govuk-details",
         open=open,
     )
 
 
 def Panel(
-    *content: fh.FT,
+    *content: fh.FT | str,
     title: str = "",
 ) -> fh.FT:
     """
@@ -72,12 +80,17 @@ def Tag(
         "red": " govuk-tag--red",
         "yellow": " govuk-tag--yellow",
         "grey": " govuk-tag--grey",
+        "turquoise": " govuk-tag--turquoise",
+        "light-blue": " govuk-tag--light-blue",
+        "purple": " govuk-tag--purple",
+        "pink": " govuk-tag--pink",
+        "orange": " govuk-tag--orange",
     }
     return fh.Strong(text, cls=f"govuk-tag{colors.get(color)}")
 
 
 def Warning(
-    *content: fh.FT,
+    *content: fh.FT | str,
 ) -> fh.FT:
     """
     Warning component.
@@ -101,16 +114,46 @@ def Warning(
     )
 
 
+def NotificatonLink(
+    text: str,
+    href: str = "#",
+) -> fh.FT:
+    """
+    NotificationLink component.
+    Args:
+        text (str): The text to display in the link.
+        href (str): The URL the link points to. Defaults to "#".
+    Returns:
+        FT: A FastHTML NotificationLink component.
+    """
+    cls = "govuk-notification-banner__link"
+    return fh.A(text, href=href, cls=cls)
+
+
+def NotificatonHeading(*content: fh.FT | str) -> fh.FT:
+    """
+    H1 component.
+    Args:
+        text (FT): The content to display in the heading.
+    Returns:
+        FT: A FastHTML H2 component.
+    """
+    return fh.P(
+        *content,
+        cls="govuk-notification-banner__heading",
+    )
+
+
 def Notification(
-    content: fh.FT,
-    title: str,
+    *content: fh.FT,
+    title: str = "Important",
     success: bool = False,
 ) -> fh.FT:
     """
     Notification banner component.
     Args:
         content (FT): The content to display in the phase banner.
-        title (str): The title of the notification.
+        title (str): The title of the notification. Defaults to "Important".
         success (bool): If True, applies a success style. Defaults to False.
     Returns:
         FT: A FastHTML Notification component.
@@ -127,18 +170,20 @@ def Notification(
         ),
         fh.Div(content, cls="govuk-notification-banner__content"),
         cls=f"govuk-notification-banner{success_cls}",
-        role="region",
+        role="alert",
         aria_labelledby="govuk-notification-banner-title",
         data_module="govuk-notification-banner",
     )
 
 
-def _accordian_section(n, heading, content, open=False):
+def _accordion_section(accordion_id, n, heading, summary, content, open=False):
     """
     Helper function to create an accordion section.
     Args:
+        accordion_id (str): Id for accordion.
         n (int): The section number.
         heading (str): The heading of the section.
+        summary (str): The summary of the section.
         content (str): The content of the section.
         open (bool): If True, the section is initially open. Defaults to False.
     Returns:
@@ -150,101 +195,117 @@ def _accordian_section(n, heading, content, open=False):
                 fh.Span(
                     heading,
                     cls="govuk-accordion__section-button",
-                    id=f"accordion-section-heading-{n}",
+                    id=f"{accordion_id}-heading-{n}",
                 ),
                 cls="govuk-accordion__section-heading",
             ),
+            fh.Div(
+                summary,
+                cls="govuk-accordion__section-summary govuk-body",
+                id=f"{accordion_id}-summary-{n}",
+            )
+            if summary
+            else "",
             cls="govuk-accordion__section-header",
         ),
         fh.Div(
             content,
             cls="govuk-accordion__section-content",
-            id=f"accordion-section-content-{n}",
+            id=f"{accordion_id}-content-{n}",
         ),
         cls="govuk-accordion__section",
         open=open,
     )
 
 
-def Accordian(*sections: dict) -> fh.FT:
+def accordion(*sections: dict, accordion_id="accordion") -> fh.FT:
     """
     Accordion component.
     Args:
         *sections (dict): Sections to include in the accordion.
+        accordion_id (str): Id for accordion. Defaults to "accordion".
     Returns:
         FT: A FastHTML Accordion component.
     """
     return fh.Div(
         *[
-            _accordian_section(
+            _accordion_section(
+                accordion_id,
                 n + 1,
                 section["heading"],
+                section.get("summary", ""),
                 section["content"],
                 open=section.get("open", False),
             )
             for n, section in enumerate(sections)
         ],
+        id=accordion_id,
         cls="govuk-accordion",
         data_module="govuk-accordion",
     )
 
 
-def _tab_panel(n, heading, content):
+def _tab_panel(heading, content, active=False):
     """
     Helper function to create a tab panel.
     Args:
-        n (int): The panel number.
         heading (str): The heading of the panel.
         content (str): The content of the panel.
+        active (bool): Tab is active. Defaults to False.
     Returns:
         FT: A FastHTML tab section component.
     """
-    active = n == 0  # The first tab is active by default
+    tab_id = mkid(heading)
     active_cls = "" if active else " govuk-tabs__panel--hidden"
     return fh.Div(
         fh.H2(heading, cls="govuk-heading-l"),
         content,
         cls=f"govuk-tabs__panel{active_cls}",
-        id=f"tab-panel-{n}",
+        id=f"{tab_id}",
     )
 
 
-def _tab_li(n, heading):
+def _tab_li(heading, active=False):
     """
     Helper function to create a tab list item.
     Args:
-        n (int): The list item number.
         heading (str): The heading of the tab.
+        active (bool): Tab is active. Defaults to False.
     Returns:
         FT: A FastHTML tab list item component.
     """
-    active = n == 0  # The first tab is active by default
+    tab_id = mkid(heading)
     active_cls = " govuk-tabs__list-item--selected" if active else ""
     return fh.Li(
         fh.A(
             heading,
-            href=f"#tab-panel-{n}",
+            href=f"#{tab_id}",
             cls="govuk-tabs__tab",
         ),
         cls=f"govuk-tabs__list-item{active_cls}",
     )
 
 
-def Tab(*panels: dict) -> fh.FT:
+def Tab(*panels: dict, title="") -> fh.FT:
     """
     Tab component.
     Args:
         *panels (dict): Panels to include in the tab.
+        title (str): Title of the tab. Defaults to "".
     Returns:
         FT: A FastHTML Tab component.
     """
     return fh.Div(
+        fh.H2(title, cls="govuk-tabs__title"),
         fh.Ul(
-            *[_tab_li(n, panel["heading"]) for n, panel in enumerate(panels)],
+            *[
+                _tab_li(panel["heading"], active=(n == 0))
+                for n, panel in enumerate(panels)
+            ],
             cls="govuk-tabs__list",
         ),
         *[
-            _tab_panel(n, panel["heading"], panel["content"])
+            _tab_panel(panel["heading"], panel["content"], active=(n == 0))
             for n, panel in enumerate(panels)
         ],
         cls="govuk-tabs",
@@ -268,7 +329,10 @@ def ErrorSummary(title: str, *links: fh.FT) -> fh.FT:
                 cls="govuk-error-summary__title",
             ),
             fh.Div(
-                fh.Ul(*[fh.Li(link) for link in links]),
+                fh.Ul(
+                    *[fh.Li(link) for link in links],
+                    cls="govuk-list govuk-error-summary__list",
+                ),
                 cls="govuk-error-summary__body",
             ),
             role="alert",
@@ -278,45 +342,73 @@ def ErrorSummary(title: str, *links: fh.FT) -> fh.FT:
     )
 
 
-def Table(caption: str, data: list[dict], row_headers: list = []):
+def _table_head(headers, numeric_cols, col_width):
+    ths = []
+    for header in headers:
+        cls = "govuk-table__header"
+        if header in col_width:
+            width_cls = col_width.get(header, "")
+            cls += f" govuk-!-width-{width_cls}"
+        if header in numeric_cols:
+            cls += " govuk-table__header--numeric"
+        th = fh.Th(header, scope="col", cls=cls)
+        ths.append(th)
+    return fh.Thead(
+        fh.Tr(*ths, cls="govuk-table__row"),
+        cls="govuk-table__head",
+    )
+
+
+def _table_body(data, header_cols, numeric_cols):
+    trs = []
+    for row in data:
+        tds = []
+        for col, val in row.items():
+            if col in header_cols:
+                cls = "govuk-table__header"
+                if col in numeric_cols:
+                    cls += " govuk-table__header--numeric"
+                td = fh.Th(val, cls=cls, scope="row")
+            else:
+                cls = "govuk-table__cell"
+                if col in numeric_cols:
+                    cls += " govuk-table__cell--numeric"
+                td = fh.Td(val, cls=cls)
+            tds.append(td)
+        trs.append(fh.Tr(*tds, cls="govuk-table__row"))
+    return fh.Tbody(*trs, cls="govuk-table__body")
+
+
+def Table(
+    data: list[dict],
+    caption: str = "",
+    header_cols: list | None = None,
+    numeric_cols: list | None = None,
+    col_width: dict | None = None,
+    small_text: bool = False,
+) -> fh.FT:
     """
     Table component.
     Args:
-        caption (str): The caption of the Table component.
         data (list[dict]): Data for the Table component.
-        headers (list): List of columns that should be headers in each row
+        caption (str): The caption of the Table component. Defaults to "".
+        headers_cols (list): List of columns that should be headers in each row. Defaults to None.
+        numeric_cols (list): List of columns that are numeric. Defaults to None.
+        col_width (dict): Override column widths. Defaults to False.
+        small_text (bool): Render a more compact table. Defaults to False.
     Returns:
         FT: A FastHTML Table component.
     """
-    headers = data[0].keys()
+    header_cols = header_cols or []
+    numeric_cols = numeric_cols or []
+    col_width = col_width or {}
+    small_text_cls = " govuk-table--small-text-until-tablet" if small_text else ""
+    _caption = fh.Caption(caption, cls="govuk-table__caption govuk-table__caption--m")
     return fh.Table(
-        fh.Caption(caption, cls="govuk-table__caption govuk-table__caption--m"),
-        fh.Thead(
-            fh.Tr(
-                *[
-                    fh.Th(header, scope="col", cls="govuk-table__header")
-                    for header in headers
-                ],
-                cls="govuk-table__row",
-            ),
-            cls="govuk-table__head",
-        ),
-        fh.Tbody(
-            *[
-                fh.Tr(
-                    *[
-                        fh.Th(row[key], cls="govuk-table__header")
-                        if key in row_headers
-                        else fh.Td(row[key], cls="govuk-table__cell")
-                        for key in row
-                    ],
-                    cls="govuk-table__row",
-                )
-                for row in data
-            ],
-            cls="govuk-table__body",
-        ),
-        cls="govuk-table",
+        _caption if caption else "",
+        _table_head(data[0].keys(), numeric_cols, col_width),
+        _table_body(data, header_cols, numeric_cols),
+        cls=f"govuk-table{small_text_cls}",
     )
 
 
@@ -336,37 +428,40 @@ def Task(
     Returns:
         FT: A FastHTML Task component.
     """
-    _id = label.lower().replace(" ", "-")
+    _id = mkid(label)
+    status_id = f"{_id}-status"
+    hint_id = f"{_id}-hint"
+    aria_hint_id = f"{hint_id} " if hint else ""
     return fh.Li(
         fh.Div(
             fh.A(
                 label,
                 href=href,
                 cls="govuk-link govuk-task-list__link",
-                aria_describedby=f"{_id}-status",
+                aria_describedby=f"{aria_hint_id}{status_id}",
             ),
             fh.Div(
                 hint,
                 cls="govuk-task-list__hint",
-                _id=f"{_id}-hint",
+                _id=hint_id,
             )
             if hint
             else "",
-            fh.Div(
-                "Completed",
-                cls="govuk-task-list__status",
-                _id=f"{_id}-status",
-            )
-            if completed
-            else fh.Div(
-                fh.Strong(
-                    "Incomplete",
-                    cls="govuk-tag govuk-tag--blue",
-                ),
-                cls="govuk-task-list__status",
-                _id=f"{_id}-status",
-            ),
             cls="govuk-task-list__name-and-hint",
+        ),
+        fh.Div(
+            "Completed",
+            cls="govuk-task-list__status",
+            _id=status_id,
+        )
+        if completed
+        else fh.Div(
+            fh.Strong(
+                "Incomplete",
+                cls="govuk-tag govuk-tag--blue",
+            ),
+            cls="govuk-task-list__status",
+            _id=status_id,
         ),
         cls="govuk-task-list__item govuk-task-list__item--with-link",
     )
@@ -388,35 +483,59 @@ def TaskList(
     )
 
 
-def SummaryList(rows: list[tuple[str, str, list[fh.FT]]], border: bool = True) -> fh.FT:
+def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT):
+    """
+    SummaryRow component - a list of these goes in to form a SummaryList.
+    Args:
+        key (str): Key for the SummaryRow.
+        value (str | fh.FT): Content of the SummaryRow.
+        *actions (fh.FT): Action/s assigned to the SummaryRow.
+    """
+    for action in actions:
+        action.children = (
+            *action.children,
+            fh.Span(key.lower(), cls="govuk-visually-hidden"),
+        )
+
+    if not actions:
+        actions_component = ""
+    else:
+        if len(actions) == 1:
+            actions_component = fh.Dd(*actions, cls="govuk-summary-list__actions")
+        else:
+            actions_component = fh.Dd(
+                fh.Ul(
+                    *[
+                        fh.Li(action, cls="govuk-summary-list__actions-list-item")
+                        for action in actions
+                    ],
+                    cls="govuk-summary-list__actions-list",
+                ),
+                cls="govuk-summary-list__actions",
+            )
+    no_actions_cls = "" if actions else " govuk-summary-list__row--no-actions"
+
+    return fh.Div(
+        fh.Dt(key, cls="govuk-summary-list__key"),
+        fh.Dd(value, cls="govuk-summary-list__value"),
+        actions_component,
+        cls=f"govuk-summary-list__row{no_actions_cls}",
+    )
+
+
+def SummaryList(*items: fh.FT, border: bool = True) -> fh.FT:
     """
     SummaryList component.
     Args:
-        rows (list): List of key (str), value (str), action (A) tuples.
+        items (list): List of SummaryItems.
         border (bool): Choose if a border should be drawn.
     Returns:
         FT: A FastHTML SummaryList component
     """
-    return fh.Div(
-        *[
-            fh.Div(
-                fh.Dt(key, cls="govuk-summary-list__key"),
-                fh.Dd(value, cls="govuk-summary-list__value"),
-                fh.Dd(
-                    fh.Ul(
-                        *[
-                            fh.Li(action, cls="govuk-summary-list__actions-list-item")
-                            for action in actions
-                        ],
-                        cls="govuk-summary-list__actions-list",
-                    ),
-                    cls="govuk-summary-list__actions",
-                ),
-                cls="govuk-summary-list__row",
-            )
-            for key, value, actions in rows
-        ],
-        cls=f"govuk-summary-list{'' if border else ' govuk-summary-list--no-border'}",
+    no_border_cls = "" if border else " govuk-summary-list--no-border"
+    return fh.Dl(
+        *items,
+        cls=f"govuk-summary-list{no_border_cls}",
     )
 
 
@@ -433,13 +552,26 @@ def SummaryCard(
         FT: A FastHTML component.
     """
     actions = actions or []
+
+    for action in actions:
+        action.children = (
+            *action.children,
+            fh.Span(f"({title})", cls="govuk-visually-hidden"),
+        )
+
+    actions_component = (
+        fh.Ul(
+            *[fh.Li(action, cls="govuk-summary-card__action") for action in actions],
+            cls="govuk-summary-card__actions",
+        )
+        if actions
+        else ""
+    )
+
     return fh.Div(
         fh.Div(
             fh.H2(title, cls="govuk-summary-card__title"),
-            fh.Ul(
-                *[fh.Li(action, cls="govuk-summary-card__actio") for action in actions],
-                cls="govuk-summary-card__actions",
-            ),
+            actions_component,
             cls="govuk-summary-card__title-wrapper",
         ),
         fh.Div(

@@ -46,11 +46,11 @@ DEMO_PAGE = (
     fh.Nbsp(),
     ds.PhaseBanner(ds.P("Phase Banner"), phase="apha"),
     ds.Warning(ds.P("Here is a Warning")),
-    ds.Notification(ds.P("Here is some content"), "A Notification"),
-    ds.Notification(ds.P("Here is some content"), "A Notification", success=True),
-    ds.Accordian(
-        {"heading": "An Accordian Section", "content": "Some content"},
-        {"heading": "Another Accordian Section", "content": "Some more content"},
+    ds.Notification(ds.P("Here is some content"), title="A Notification"),
+    ds.Notification(ds.P("Here is some content"), title="A Notification", success=True),
+    ds.accordion(
+        {"heading": "An accordion Section", "content": "Some content"},
+        {"heading": "Another accordion Section", "content": "Some more content"},
     ),
     ds.Tab(
         {"heading": "Tab 1", "content": "Some content"},
@@ -82,13 +82,13 @@ DEMO_PAGE = (
     ),
     ds.ErrorSummary("An Error Summary", ds.A("A link")),
     ds.Table(
-        "A Table",
         [
             {"Fruit": "Apple", "Price": "£0.5"},
             {"Fruit": "Orange", "Price": "£0.75"},
             {"Fruit": "Banana", "Price": "£0.25"},
         ],
-        row_headers=["Fruit"],
+        caption="A Table",
+        header_cols=["Fruit"],
     ),
     ds.Button("A Button"),
     fh.Nbsp(),
@@ -151,28 +151,26 @@ DEMO_PAGE = (
     ),
     ds.DateInput("date_input", "A Date Input", hint="With a hint", heading=True),
     ds.SummaryList(
-        [
-            ("Name", "John Doe", []),
-            ("Date of Birth", "13/10/2010", [ds.A("Change", "/change-dob")]),
-            (
-                "Email",
-                "test@test.com",
-                [ds.A("Add", "/add-email"), ds.A("Change", "/change-email")],
-            ),
-        ]
+        ds.SummaryItem("Name", "John Doe"),
+        ds.SummaryItem("Date of Birth", "13/10/2010", ds.A("Change", "/change-dob")),
+        ds.SummaryItem(
+            "Email",
+            "test@test.com",
+            ds.A("Add", "/add-email"),
+            ds.A("Change", "/change-email"),
+        ),
     ),
     ds.SummaryCard(
         "A Summary Card",
         ds.SummaryList(
-            [
-                ("Name", "John Doe", []),
-                ("Date of Birth", "13/10/2010", []),
-                (
-                    "Email",
-                    "test@test.com",
-                    [ds.A("Add", "/add-email"), ds.A("Change", "/change-email")],
-                ),
-            ]
+            ds.SummaryItem("Name", "John Doe"),
+            ds.SummaryItem("Date of Birth", "13/10/2010"),
+            ds.SummaryItem(
+                "Email",
+                "test@test.com",
+                ds.A("Add", "/add-email"),
+                ds.A("Change", "/change-email"),
+            ),
         ),
         actions=[ds.A("Delete", "/delete-card")],
     ),
