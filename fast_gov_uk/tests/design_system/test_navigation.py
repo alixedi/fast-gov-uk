@@ -27,14 +27,14 @@ from fast_gov_uk.design_system import Next, Previous
         ),
     ),
 )
-def test_backlink(kwargs, expected):
+def test_backlink(kwargs, expected, html):
     """Test backlink with various parameters.
     Args:
         kwargs (dict): The arguments to pass to backlink.
         expected (str): The expected HTML output.
     """
     backlink = ds.Backlink(**kwargs)
-    assert str(backlink) == expected
+    assert html(backlink) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -46,14 +46,14 @@ def test_backlink(kwargs, expected):
         ),
     ),
 )
-def test_skip_link(kwargs, expected):
+def test_skip_link(kwargs, expected, html):
     """Test SkipLink with various parameters.
     Args:
         kwargs (dict): The arguments to pass to SkipLink.
         expected (str): The expected HTML output.
     """
     link = ds.SkipLink(**kwargs)
-    assert str(link) == expected
+    assert html(link) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -76,14 +76,14 @@ def test_skip_link(kwargs, expected):
         ),
     ),
 )
-def test_breadcrumb(args, expected):
+def test_breadcrumb(args, expected, html):
     """Test Breadcrumb with various parameters.
     Args:
         args (list): The args to pass to Breadcrumb.
         expected (str): The expected HTML output.
     """
     bc = ds.Breadcrumbs(*args)
-    assert str(bc) == expected
+    assert html(bc) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -93,9 +93,9 @@ def test_breadcrumb(args, expected):
             {},
             (
                 '<div data-module="govuk-exit-this-page" class="govuk-exit-this-page">'
-                    '<a href="https://www.bbc.co.uk/weather" role="button" data-module="govuk-button" rel="nofollow noreferrer" class="govuk-button govuk-button--warning govuk-exit-this-page__button govuk-js-exit-this-page-button">'
+                    '<a href="https://www.bbc.co.uk/weather" role="button" draggable="false" data-module="govuk-button" rel="nofollow noreferrer" class="govuk-button govuk-button--warning govuk-exit-this-page__button govuk-js-exit-this-page-button">'
                         '<span class="govuk-visually-hidden">Emergency</span>'
-                        "Exit Page"
+                        "Exit this page"
                     "</a>"
                 "</div>"
             ),
@@ -104,7 +104,7 @@ def test_breadcrumb(args, expected):
             {"text": "Test", "href": "/test"},
             (
                 '<div data-module="govuk-exit-this-page" class="govuk-exit-this-page">'
-                    '<a href="/test" role="button" data-module="govuk-button" rel="nofollow noreferrer" class="govuk-button govuk-button--warning govuk-exit-this-page__button govuk-js-exit-this-page-button">'
+                    '<a href="/test" role="button" draggable="false" data-module="govuk-button" rel="nofollow noreferrer" class="govuk-button govuk-button--warning govuk-exit-this-page__button govuk-js-exit-this-page-button">'
                         '<span class="govuk-visually-hidden">Emergency</span>'
                         "Test"
                     "</a>"
@@ -113,14 +113,14 @@ def test_breadcrumb(args, expected):
         ),
     ),
 )
-def test_exit_page(kwargs, expected):
+def test_exit_page(kwargs, expected, html):
     """Test Exit Page with various parameters.
     Args:
         kwargs (dict): The arguments to pass to ExitPage.
         expected (str): The expected HTML output.
     """
     exit = ds.ExitPage(**kwargs)
-    assert str(exit) == expected
+    assert html(exit) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -138,7 +138,7 @@ def test_exit_page(kwargs, expected):
             {"text": "test", "href": "/test", "active": True},
             (
                 '<li class="govuk-service-navigation__item govuk-service-navigation__item--active">'
-                    '<a href="/test" aria-current class="govuk-service-navigation__link">'
+                    '<a href="/test" aria-current="true" class="govuk-service-navigation__link">'
                         '<strong class="govuk-service-navigation__active-fallback">test</strong>'
                     "</a>"
                 "</li>"
@@ -146,14 +146,14 @@ def test_exit_page(kwargs, expected):
         ),
     ),
 )
-def test_navigation_link(kwargs, expected):
+def test_navigation_link(kwargs, expected, html):
     """Test NavigationLink with various parameters.
     Args:
         kwargs (dict): The arguments to pass to NvigationLink.
         expected (str): The expected HTML output.
     """
     link = ds.NavigationLink(**kwargs)
-    assert str(link) == expected
+    assert html(link) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -165,7 +165,7 @@ def test_navigation_link(kwargs, expected):
                 ds.NavigationLink("Test Label 2", "/test2"),
             ],
             (
-                '<div data-module="govuk-service-navigation" class="govuk-service-navigation">'
+                '<section aria-label="Service information" data-module="govuk-service-navigation" class="govuk-service-navigation">'
                     '<div class="govuk-width-container">'
                         '<div class="govuk-service-navigation__container">'
                             '<span class="govuk-service-navigation__service-name">'
@@ -184,19 +184,19 @@ def test_navigation_link(kwargs, expected):
                             "</nav>"
                         "</div>"
                     "</div>"
-                "</div>"
+                "</section>"
             ),
         ),
     ),
 )
-def test_navigation(args, expected):
+def test_navigation(args, expected, html):
     """Test Navigation with various parameters.
     Args:
         args (list): The arguments to pass to Navigation.
         expected (str): The expected HTML output.
     """
     nav = ds.Navigation(*args, service_name="Test")
-    assert str(nav) == expected
+    assert html(nav) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -219,10 +219,10 @@ def test_navigation(args, expected):
                             '<a href="/test?page=1" aria-label="Page 1" aria-current="page" class="govuk-link govuk-pagination__link">1</a>'
                         "</li>"
                         '<li class="govuk-pagination__item">'
-                            '<a href="/test?page=2" aria-label="Page 2" aria-current="page" class="govuk-link govuk-pagination__link">2</a>'
+                            '<a href="/test?page=2" aria-label="Page 2" class="govuk-link govuk-pagination__link">2</a>'
                         "</li>"
                         '<li class="govuk-pagination__item">'
-                            '<a href="/test?page=3" aria-label="Page 3" aria-current="page" class="govuk-link govuk-pagination__link">3</a>'
+                            '<a href="/test?page=3" aria-label="Page 3" class="govuk-link govuk-pagination__link">3</a>'
                         "</li>"
                     "</ul>"
                     '<div class="govuk-pagination__next">'
@@ -255,13 +255,13 @@ def test_navigation(args, expected):
                     "</div>"
                     '<ul class="govuk-pagination__list">'
                         '<li class="govuk-pagination__item">'
-                            '<a href="/test?page=1" aria-label="Page 1" aria-current="page" class="govuk-link govuk-pagination__link">1</a>'
+                            '<a href="/test?page=1" aria-label="Page 1" class="govuk-link govuk-pagination__link">1</a>'
                         "</li>"
                         '<li class="govuk-pagination__item govuk-pagination__item--current">'
                             '<a href="/test?page=2" aria-label="Page 2" aria-current="page" class="govuk-link govuk-pagination__link">2</a>'
                         "</li>"
                         '<li class="govuk-pagination__item">'
-                            '<a href="/test?page=3" aria-label="Page 3" aria-current="page" class="govuk-link govuk-pagination__link">3</a>'
+                            '<a href="/test?page=3" aria-label="Page 3" class="govuk-link govuk-pagination__link">3</a>'
                         "</li>"
                     "</ul>"
                     '<div class="govuk-pagination__next">'
@@ -293,10 +293,10 @@ def test_navigation(args, expected):
                     "</div>"
                     '<ul class="govuk-pagination__list">'
                         '<li class="govuk-pagination__item">'
-                            '<a href="/test?page=1" aria-label="Page 1" aria-current="page" class="govuk-link govuk-pagination__link">1</a>'
+                            '<a href="/test?page=1" aria-label="Page 1" class="govuk-link govuk-pagination__link">1</a>'
                         "</li>"
                         '<li class="govuk-pagination__item">'
-                            '<a href="/test?page=2" aria-label="Page 2" aria-current="page" class="govuk-link govuk-pagination__link">2</a>'
+                            '<a href="/test?page=2" aria-label="Page 2" class="govuk-link govuk-pagination__link">2</a>'
                         "</li>"
                         '<li class="govuk-pagination__item govuk-pagination__item--current">'
                             '<a href="/test?page=3" aria-label="Page 3" aria-current="page" class="govuk-link govuk-pagination__link">3</a>'
@@ -307,7 +307,7 @@ def test_navigation(args, expected):
         ),
     ),
 )
-def test_pagination(kwargs, expected):
+def test_pagination(kwargs, expected, html):
     """Test Pagination with various parameters.
     Args:
         kwargs (dict): The kwargs to pass to Pagination.
@@ -315,4 +315,4 @@ def test_pagination(kwargs, expected):
     """
     links = kwargs.pop("links")
     page = ds.Pagination(*links, **kwargs)
-    assert str(page) == expected
+    assert html(page) == html(expected)

@@ -38,14 +38,17 @@ def SkipLink(
 
 def Breadcrumbs(
     *links: tuple[str, str],
+    collapse_on_mobile: bool = False,
 ) -> fh.FT:
     """
     Breadcrumbs component.
     Args:
         *links (tuple[str, str]): Text & URL for breadcrumb links.
+        collapse_on_mobile (boo): Make breadcrumbls responsive. Defaults to False.
     Returns:
         FT: A FastHTML Breadcrumbs component.
     """
+    collapse_cls = " govuk-breadcrumbs--collapse-on-mobile" if collapse_on_mobile else ""
     return fh.Nav(
         fh.Ol(
             *[
@@ -57,13 +60,13 @@ def Breadcrumbs(
             ],
             cls="govuk-breadcrumbs__list",
         ),
-        cls="govuk-breadcrumbs",
+        cls=f"govuk-breadcrumbs{collapse_cls}",
         aria_label="Breadcrumb",
     )
 
 
 def ExitPage(
-    text: str = "Exit Page",
+    text: str = "Exit this page",
     href: str = "https://www.bbc.co.uk/weather",
 ) -> fh.FT:
     """
@@ -83,7 +86,7 @@ def ExitPage(
             text,
             href=href,
             role="button",
-            draggable=False,
+            draggable="false",
             cls=(
                 "govuk-button govuk-button--warning"
                 " govuk-exit-this-page__button"
@@ -118,7 +121,7 @@ def NavigationLink(
             else text,
             href=href,
             cls="govuk-service-navigation__link",
-            aria_current=active,
+            aria_current="true" if active else False,
         ),
         cls=(
             "govuk-service-navigation__item"
@@ -139,7 +142,7 @@ def Navigation(
     Returns:
         FT: A FastHTML Navigation component.
     """
-    return fh.Div(
+    return fh.Section(
         fh.Div(
             fh.Div(
                 fh.Span(
@@ -169,6 +172,7 @@ def Navigation(
             cls="govuk-width-container",
         ),
         cls="govuk-service-navigation",
+        aria_label="Service information",
         data_module="govuk-service-navigation",
     )
 
@@ -242,7 +246,7 @@ def PaginationLink(
             href=href,
             cls="govuk-link govuk-pagination__link",
             aria_label=f"Page {label}",
-            aria_current="page",
+            aria_current="page" if active else "",
         ),
         cls=f"govuk-pagination__item{active_cls}",
     )
@@ -271,5 +275,59 @@ def Pagination(
         ),
         _pagination_next(next_link) if next_link else "",
         cls="govuk-pagination",
+        aria_label="Pagination",
+    )
+
+
+def PaginationBlock(
+    prev: tuple[str, str],
+    next: tuple[str, str],
+) -> fh.FT:
+    """
+    PaginationBlock component.
+    Args:
+        prev_link (tuple): Text and Link for previous page.
+        next_link (tuple): Text and Link for next page.
+    Returns:
+        FT: A FastHTML Pagination component.
+    """
+    prev_label, prev_link = prev
+    prev_component = fh.Div(
+        fh.A(
+            fh.NotStr(Previous()),
+            fh.Span(
+                "Previous",
+                fh.Span(" page", cls="govuk-visually-hidden"),
+                cls="govuk-pagination__link-title",
+            ),
+            fh.Span(":", cls="govuk-visually-hidden"),
+            fh.Span(prev_label, cls="govuk-pagination__link-label"),
+            href=prev_link,
+            cls="govuk-link govuk-pagination__link",
+            rel="prev",
+        ),
+        cls="govuk-pagination__prev",
+    )
+    next_label, next_link = next
+    next_component = fh.Div(
+        fh.A(
+            fh.NotStr(Next()),
+            fh.Span(
+                "Next",
+                fh.Span(" page", cls="govuk-visually-hidden"),
+                cls="govuk-pagination__link-title",
+            ),
+            fh.Span(":", cls="govuk-visually-hidden"),
+            fh.Span(next_label, cls="govuk-pagination__link-label"),
+            href=next_link,
+            cls="govuk-link govuk-pagination__link",
+            rel="next",
+        ),
+        cls="govuk-pagination__next",
+    )
+    return fh.Nav(
+        prev_component,
+        next_component,
+        cls="govuk-pagination govuk-pagination--block",
         aria_label="Pagination",
     )
