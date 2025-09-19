@@ -1,7 +1,9 @@
 import logging
+from functools import cache
 from dataclasses import dataclass
 from datetime import datetime
 
+import httpx
 import fasthtml.common as fh
 from notifications_python_client.errors import HTTPError
 
@@ -83,6 +85,35 @@ class EmailBackend(Backend):
             logger.info(f"Email sent for form: {resp}")
         except HTTPError as e:
             logger.error(f"Error sending email for form '{title}': {e}")
+            # User should not get the impression that the form
+            # was submitted successfully if email failed
+            raise
+        return self.success()
+
+
+@cache
+def _client(username, password):
+    auth = httpx.BasicAuth(username=username, password=password)
+    return httpx.Client(auth=auth)
+
+
+class APIBackend(Backend):
+    """
+    Backend that sends submitted forms to an API.
+    """
+    async def process(self):
+        url = getattr(self, "url")
+        username = getattr(self, "username")
+        password = getattr(self, "password")
+        title = getattr(self, "title")
+        data = await getattr(self, "clean")
+        data["form_name"] = title
+        data["submitted_on"] = datetime.now()
+        try:
+            client = _client(username, password)
+            client.post(url, data=data)
+        except httpx.HTTPError as e:
+            logger.error(f"Error sending request for form '{title}': {e}")
             # User should not get the impression that the form
             # was submitted successfully if email failed
             raise
@@ -189,4 +220,12 @@ class DBForm(Form, DBBackend):
 class EmailForm(Form, EmailBackend):
     def __init__(self, notify, *args, **kwargs):
         self.notify = notify
+        super().__init__(*args, **kwargs)
+
+
+class APIForm(Form, APIBackend):
+    def __init__(self, url, username, password, *args, **kwargs):
+        self.url = url
+        self.username = username
+        self.password = password
         super().__init__(*args, **kwargs)
