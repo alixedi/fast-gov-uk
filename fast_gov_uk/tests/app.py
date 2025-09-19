@@ -4,8 +4,10 @@ from fast_gov_uk.core import Fast
 
 
 fast = Fast({
+    "SERVICE_NAME": "Fast-gov-uk test",
     "DATABASE_URL": ":memory:",
     "DEV_MODE": False,
+    "NOTIFY_API_KEY": "test-aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
 })
 
 @fast.page("/")
@@ -44,4 +46,22 @@ def profile(data=None):
         success_url="/",
         cta="Send feedback",
         db=fast.db,
+    )
+
+
+@fast.form
+def feedback(data=None):
+    return forms.EmailForm(
+        title="Feedback",
+        fields=[
+            ds.Radios(
+                name="satisfaction",
+                label="How satisfied did you feel about the service?",
+                choices=["Satisfied", "Dissatisfied"],
+            ),
+        ],
+        data=data,
+        success_url="/",
+        cta="Send feedback",
+        notify=fast.notify("test", "test@test.com"),
     )

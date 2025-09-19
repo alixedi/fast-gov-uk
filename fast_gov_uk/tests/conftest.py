@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from bs4 import BeautifulSoup
@@ -8,6 +9,8 @@ from fasthtml import common as fh
 @pytest.fixture
 def fast():
     from .app import fast
+    # Mock notify for testing
+    fast.notify_client = Mock()
     return fast
 
 

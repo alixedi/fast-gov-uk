@@ -1,6 +1,6 @@
 import json
 from dataclasses import asdict
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 import pytest
 
@@ -15,7 +15,7 @@ def test_form_get_404(client):
     assert response.status_code == 404
 
 
-def test_form_post_valid(client, db, picture):
+def test_db_form_post_valid(client, db, picture):
     data = {
         "name": "Test",
         "gender": "male",
@@ -123,3 +123,22 @@ def test_form_post_invalid(errors, expected, client, db, picture):
         form = mock_page.call_args.args[0]
         assert response.status_code == 200
         assert form.errors == expected
+
+
+def test_email_form_post_valid(fast, client):
+    data = {"satisfaction": "satisfied"}
+    response = client.post(
+        "/form/feedback",
+        data=data,
+    )
+    assert response.status_code == 303
+    notify_call_args = fast.notify_client.send_email_notification.call_args
+    assert notify_call_args == call(
+        email_address='test@test.com',
+        template_id='test',
+        personalisation={
+            'form_name': 'Feedback',
+            'form_data': '* satisfaction: satisfied',
+            'service_name': 'Fast-gov-uk test'
+        }
+    )
