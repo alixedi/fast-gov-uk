@@ -79,7 +79,7 @@ class EmailBackend(Backend):
         data = await getattr(self, "clean")
         formatted_data = await self.format(data)
         try:
-            resp = notify(form_name=title, form_data=formatted_data)
+            resp = await notify(form_name=title, form_data=formatted_data)
             logger.info(f"Email sent for form: {resp}")
         except HTTPError as e:
             logger.error(f"Error sending email for form '{title}': {e}")

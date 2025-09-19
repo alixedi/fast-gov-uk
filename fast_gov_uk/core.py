@@ -84,7 +84,7 @@ class Fast(fh.FastHTML):
     def notify(self, template_id: str, email: str):
         if not hasattr(self, "notify_client"):
             raise ValueError("NOTIFY_API_KEY not configured.")
-        def _notifier(**kwargs):
+        async def _notifier(**kwargs):
             kwargs["service_name"] = self.service_name
             return self.notify_client.send_email_notification(
                 email_address=email,
