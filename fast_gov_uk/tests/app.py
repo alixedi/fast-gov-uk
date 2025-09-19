@@ -50,7 +50,7 @@ def profile(data=None):
 
 
 @fast.form
-def feedback(data=None):
+def email_feedback(data=None):
     return forms.EmailForm(
         title="Feedback",
         fields=[
@@ -64,4 +64,24 @@ def feedback(data=None):
         success_url="/",
         cta="Send feedback",
         notify=fast.notify("test", "test@test.com"),
+    )
+
+
+@fast.form
+def api_feedback(data=None):
+    return forms.APIForm(
+        title="Feedback",
+        fields=[
+            ds.Radios(
+                name="satisfaction",
+                label="How satisfied did you feel about the service?",
+                choices=["Satisfied", "Dissatisfied"],
+            ),
+        ],
+        data=data,
+        success_url="/",
+        cta="Send feedback",
+        url="https://test.com",
+        username="test_user",
+        password="test_password",
     )
