@@ -1,6 +1,6 @@
 import json
 from dataclasses import asdict
-from unittest.mock import patch, call
+from unittest.mock import Mock, patch, call, ANY
 
 import pytest
 
@@ -128,7 +128,7 @@ def test_form_post_invalid(errors, expected, client, db, picture):
 def test_email_form_post_valid(fast, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
-        "/form/feedback",
+        "/form/email_feedback",
         data=data,
     )
     assert response.status_code == 303
@@ -140,5 +140,26 @@ def test_email_form_post_valid(fast, client):
             'form_name': 'Feedback',
             'form_data': '* satisfaction: satisfied',
             'service_name': 'Fast-gov-uk test'
+        }
+    )
+
+
+def test_api_form_post_valid(fast, client):
+    data = {"satisfaction": "satisfied"}
+    with patch("fast_gov_uk.forms._client") as mock_client:
+        mock_post = Mock()
+        mock_client.return_value = Mock(post=mock_post)
+        response = client.post(
+            "/form/api_feedback",
+            data=data,
+        )
+    assert response.status_code == 303
+    assert mock_client.call_args == call("test_user", "test_password")
+    assert mock_post.call_args == call(
+        'https://test.com',
+        data={
+            'satisfaction': 'satisfied',
+            'form_name': 'Feedback',
+            'submitted_on': ANY,
         }
     )
