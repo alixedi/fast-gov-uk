@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import fasthtml.common as fh
+from notifications_python_client.errors import HTTPError
 
 from fast_gov_uk.design_system import Button, Field, Fieldset
 
@@ -58,6 +59,33 @@ class DBBackend(Backend):
         record = Record(title=title, created_on=now, data=data)
         forms.insert(record)
         logger.info(f"Form: '{title}' saved with: {data}.")
+        return self.success()
+
+
+class EmailBackend(Backend):
+    """
+    Backend that sends submitted forms to admin email.
+    """
+
+    async def format(self, data):
+        return "\n".join(
+            f"* {key}: {val}"
+            for key, val in data.items()
+        )
+
+    async def process(self):
+        notify = getattr(self, "notify")
+        title = getattr(self, "title")
+        data = await getattr(self, "clean")
+        formatted_data = await self.format(data)
+        try:
+            resp = notify(form_name=title, form_data=formatted_data)
+            logger.info(f"Email sent for form: {resp}")
+        except HTTPError as e:
+            logger.error(f"Error sending email for form '{title}': {e}")
+            # User should not get the impression that the form
+            # was submitted successfully if email failed
+            raise
         return self.success()
 
 
@@ -155,4 +183,10 @@ class LogForm(Form, LogBackend):
 class DBForm(Form, DBBackend):
     def __init__(self, db, *args, **kwargs):
         self.db = db
+        super().__init__(*args, **kwargs)
+
+
+class EmailForm(Form, EmailBackend):
+    def __init__(self, notify, *args, **kwargs):
+        self.notify = notify
         super().__init__(*args, **kwargs)
