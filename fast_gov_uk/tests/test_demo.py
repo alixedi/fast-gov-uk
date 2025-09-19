@@ -6,7 +6,12 @@ from fast_gov_uk import core
 
 @pytest.fixture
 def dev_client():
-    settings = {"DATABASE_URL": ":memory:", "DEV_MODE": True}
+    settings = {
+        "SERVICE_NAME": "Fast",
+        "DATABASE_URL": ":memory:",
+        "DEV_MODE": True,
+        "NOTIFY_API_KEY": None
+    }
     app = core.Fast(settings)
     return TestClient(app)
 

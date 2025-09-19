@@ -1,4 +1,5 @@
 import fasthtml.common as fh
+from notifications_python_client import notifications as notify
 
 import fast_gov_uk.design_system as ds
 from fast_gov_uk.demo import demo
@@ -61,6 +62,8 @@ class Fast(fh.FastHTML):
             style="margin: 0px;",
             exception_handlers={404: not_found, 500: problem_with_service},
         )
+        # Service name
+        self.service_name = settings["SERVICE_NAME"]
         # Set up Database
         db_url = settings["DATABASE_URL"]
         self.db = fh.database(db_url)
@@ -73,6 +76,22 @@ class Fast(fh.FastHTML):
             self.route("/demo")(demo)
         self.route("/{fname:path}.{ext:static}")(assets)
         self.route("/form/{name}", methods=["GET", "POST"])(self.process_form)
+        # Initialise notify client
+        notify_key = settings["NOTIFY_API_KEY"]
+        if notify_key:
+            self.notify_client = notify.NotificationsAPIClient(notify_key)
+
+    def notify(self, template_id: str, email: str):
+        if not hasattr(self, "notify_client"):
+            raise ValueError("NOTIFY_API_KEY not configured.")
+        def _notifier(**kwargs):
+            kwargs["service_name"] = self.service_name
+            return self.notify_client.send_email_notification(
+                email_address=email,
+                template_id=template_id,
+                personalisation=kwargs,
+            )
+        return _notifier
 
     def page(self, url=None):
         def page_decorator(func):
