@@ -13,14 +13,14 @@ import fast_gov_uk.design_system as ds
         "test@",
     ),
 )
-def test_emailinput_invalid(value):
+def test_emailinput_invalid(value, html):
     """Test EmailInput with various parameters.
     Args:
         value (str): The value to assign to EmailInput.
     """
     email = ds.EmailInput(name="test")
     email.value = value
-    assert fh.to_xml(email, indent=False) == (
+    assert html(email) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<p id="test-error" class="govuk-error-message">'
                 '<span class="govuk-visually-hidden">Error: </span>'
@@ -38,14 +38,14 @@ def test_emailinput_invalid(value):
         "@test",
     ),
 )
-def test_emailinput_valid(value):
+def test_emailinput_valid(value, html):
     """Test EmailInput with various parameters.
     Args:
         value (str): The value to assign to EmailInput.
     """
     email = ds.EmailInput(name="test")
     email.value = value
-    assert fh.to_xml(email, indent=False) == (
+    assert html(email) == html(
         '<div class="govuk-form-group">'
             f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
         "</div>"
@@ -60,14 +60,14 @@ def test_emailinput_valid(value):
         "5!",
     ),
 )
-def test_numberinput_invalid(value):
+def test_numberinput_invalid(value, html):
     """Test NumberInput with various parameters.
     Args:
         value (str): The value to assign to NumberInput.
     """
     email = ds.NumberInput(name="test")
     email.value = value
-    assert fh.to_xml(email, indent=False) == (
+    assert html(email) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<p id="test-error" class="govuk-error-message">'
                 '<span class="govuk-visually-hidden">Error: </span>'
@@ -85,14 +85,14 @@ def test_numberinput_invalid(value):
         "0",
     ),
 )
-def test_numberinput_valid(value):
+def test_numberinput_valid(value, html):
     """Test NumberInput with various parameters.
     Args:
         value (str): The value to assign to NumberInput.
     """
     email = ds.NumberInput(name="test")
     email.value = value
-    assert fh.to_xml(email, indent=False) == (
+    assert html(email) == html(
         '<div class="govuk-form-group">'
             f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
         "</div>"
@@ -107,14 +107,14 @@ def test_numberinput_valid(value):
         "5!",
     ),
 )
-def test_decimalinput_invalid(value):
+def test_decimalinput_invalid(value, html):
     """Test DecimalInput with various parameters.
     Args:
         value (str): The value to assign to DecimalInput.
     """
     email = ds.DecimalInput(name="test")
     email.value = value
-    assert fh.to_xml(email, indent=False) == (
+    assert html(email) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<p id="test-error" class="govuk-error-message">'
                 '<span class="govuk-visually-hidden">Error: </span>'
@@ -133,14 +133,14 @@ def test_decimalinput_invalid(value):
         "5",
     ),
 )
-def test_decimalinput_valid(value):
+def test_decimalinput_valid(value, html):
     """Test DecimalInput with various parameters.
     Args:
         value (str): The value to assign to DecimalInput.
     """
     email = ds.DecimalInput(name="test")
     email.value = value
-    assert fh.to_xml(email, indent=False) == (
+    assert html(email) == html(
         '<div class="govuk-form-group">'
             f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
         "</div>"
