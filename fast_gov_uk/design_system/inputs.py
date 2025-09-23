@@ -66,8 +66,12 @@ def Error(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
     )
 
 
+class AbstractField:
+    pass
+
+
 @dataclass
-class Field:
+class Field(AbstractField):
     """
     Baseclass for form fields.
     Args:
@@ -422,7 +426,7 @@ class TextInput(Field):
 
 
 @dataclass
-class Checkbox:
+class Checkbox(AbstractField):
     """
     Checkbox component. This component does not inherit from Field because
     (at this moment), the primary usage for this is as an API to define
@@ -534,7 +538,7 @@ class Checkboxes(Field):
 
 
 @dataclass
-class Radio:
+class Radio(AbstractField):
     """
     Radio component. This component does not inherit from Field because
     (at this moment), the primary usage for this is as an API to define
