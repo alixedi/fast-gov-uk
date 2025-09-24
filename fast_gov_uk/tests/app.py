@@ -21,10 +21,17 @@ def profile(data=None):
         title="Create a Profile",
         fields=[
             ds.TextInput("name", "What is your name?"),
-            ds.Radios(
-                name="gender",
-                label="What is your gender?",
-                choices=["Male", "Female", "Prefer not to say"],
+            ds.Fieldset(
+                ds.Radios(
+                    name="sex",
+                    label="What is your sex?",
+                    choices=["Male", "Female", "Prefer not to say"],
+                ),
+                ds.Radios(
+                    name="gender",
+                    label="Is your gender the same as your sex?",
+                    choices=["Yes", "No", "Prefer not to say"],
+                ),
             ),
             ds.Radios(
                 name="ethnicity",

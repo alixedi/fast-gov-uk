@@ -5,6 +5,8 @@ import pytest
 from bs4 import BeautifulSoup
 from fasthtml import common as fh
 
+from fast_gov_uk.design_system import AbstractField
+
 
 @pytest.fixture
 def fast():
@@ -33,8 +35,13 @@ def picture():
 
 @pytest.fixture
 def html():
-    def pretty_html(component):
-        html_str = str(component)
+    def pretty_html(x):
+        if isinstance(x, AbstractField):
+            html_str = fh.to_xml(x)
+        elif isinstance(x, fh.FT):
+            html_str = str(x)
+        else:
+            html_str = x
         soup = BeautifulSoup(html_str, "html.parser")
         return soup.prettify()
     return pretty_html

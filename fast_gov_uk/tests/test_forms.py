@@ -18,7 +18,8 @@ def test_form_get_404(client):
 def test_db_form_post_valid(client, db, picture):
     data = {
         "name": "Test",
-        "gender": "male",
+        "sex": "male",
+        "gender": "yes",
         "ethnicity": "mixed",
         "dob": ["10", "10", "2000"],
         "phone": "12345",
@@ -38,7 +39,8 @@ def test_db_form_post_valid(client, db, picture):
     form_dict = json.loads(form_data)
     assert form_dict == {
         "name": "Test",
-        "gender": "male",
+        "sex": "male",
+        "gender": "yes",
         "ethnicity": "mixed",
         # This should be a date string
         "dob": "2000-10-10",
@@ -56,6 +58,11 @@ def test_db_form_post_valid(client, db, picture):
             # empty name
             {"name": ""},
             {"name": "This field is required."}
+        ),
+        (
+            # empty sex
+            {"sex": ""},
+            {"sex": "This field is required."}
         ),
         (
             # empty gender
@@ -78,9 +85,24 @@ def test_db_form_post_valid(client, db, picture):
             {"dob": "This field is required."}
         ),
         (
+            # invalid dob
+            {"dob": ["foo", "10", "2003"]},
+            {"dob": "Invalid values."}
+        ),
+        (
+            # empty picture
+            {"picture": ""},
+            {"picture": "This field is required."}
+        ),
+        (
             # empty phone
             {"phone": ""},
             {"phone": "This field is required."}
+        ),
+        (
+            # non-numeric phone
+            {"phone": "A12345"},
+            {"phone": "Value is not a number."}
         ),
         (
             # non-numeric phone
@@ -106,7 +128,8 @@ def test_db_form_post_valid(client, db, picture):
 def test_form_post_invalid(errors, expected, client, db, picture):
     data = {
         "name": "Test",
-        "gender": "male",
+        "sex": "male",
+        "gender": "yes",
         "ethnicity": "mixed",
         "dob": ["10", "10", "2000"],
         "phone": "12345",

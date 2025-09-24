@@ -66,8 +66,12 @@ def Error(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
     )
 
 
+class AbstractField:
+    pass
+
+
 @dataclass
-class Field:
+class Field(AbstractField):
     """
     Baseclass for form fields.
     Args:
@@ -422,7 +426,7 @@ class TextInput(Field):
 
 
 @dataclass
-class Checkbox:
+class Checkbox(AbstractField):
     """
     Checkbox component. This component does not inherit from Field because
     (at this moment), the primary usage for this is as an API to define
@@ -534,7 +538,7 @@ class Checkboxes(Field):
 
 
 @dataclass
-class Radio:
+class Radio(AbstractField):
     """
     Radio component. This component does not inherit from Field because
     (at this moment), the primary usage for this is as an API to define
@@ -648,13 +652,36 @@ class FileUpload(Field):
     """
 
     @property
+    def valid_file(self):
+        filename = getattr(self.value, "filename", None)
+        return filename is not None
+
+    @Field.value.setter
+    def value(self, value):
+        self._value = value
+        if self.required and not self.valid_file:
+            self.error = "This field is required."
+            return
+
+    @property
     async def clean(self):
-        if self.value:
+        # field was not required
+        if not self.value:
+            return None
+        # Sometimes, when field is left empty
+        # we get a reference to an empty UploadFile
+        # TODO: Figure out when and why this happens
+        # and write tests against it.
+        if not self.valid_file:
+            return None
+        try:
             buffer = await self.value.read()
             filename = self.value.filename
             path = Path("media") / filename
             path.write_bytes(buffer)
             return str(path)
+        except (ValueError, AttributeError, OSError):
+            raise
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
@@ -727,19 +754,22 @@ class DateInput(Field):
 
     @property
     async def clean(self):
+        # Field not required
+        if not self.value:
+            return None
         try:
             day, month, year = self.value
             day, month, year = int(day), int(month), int(year)
             _date = date(day=day, month=month, year=year)
             return _date.isoformat()
         except ValueError:
-            return None
+            raise
 
     @value.setter
     def value(self, value):
         self._value = value
         day, month, year = self._value
-        if not day or not month or not year:
+        if self.required and (not day or not month or not year):
             self.error = "This field is required."
             return
         try:
@@ -934,30 +964,33 @@ def CookieBanner(
         role="region",
         aria_label=f"Cookies on {service_name}",
         data_nosnippet=True,
-        _id="cookie-banner",
+        id="cookie-banner",
     )
 
 
-def Fieldset(
-    legend: str,
-    *children: Field,
-) -> fh.FT:
+class Fieldset(AbstractField):
     """
     Fieldset component.
     Args:
+        fields (list): Fields to include in the fieldset.
         legend (str): The legend text for the fieldset.
-        *children (Field): Child components to include in the fieldset.
     Returns:
         FT: A FastHTML Fieldset component.
     """
-    return fh.Fieldset(
-        fh.Legend(
-            fh.H1(
-                legend,
-                cls="govuk-fieldset__heading",
+
+    def __init__(self, *fields: Field, legend: str = ""):
+        self.fields = fields
+        self.legend = legend
+
+    def __ft__(self):
+        return fh.Fieldset(
+            fh.Legend(
+                fh.H1(
+                    self.legend,
+                    cls="govuk-fieldset__heading",
+                ),
+                cls="govuk-fieldset__legend govuk-fieldset__legend--l",
             ),
-            cls="govuk-fieldset__legend govuk-fieldset__legend--l",
-        ),
-        *children,
-        cls="govuk-fieldset",
-    )
+            *self.fields,
+            cls="govuk-fieldset",
+        )

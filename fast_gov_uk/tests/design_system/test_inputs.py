@@ -50,21 +50,21 @@ import fast_gov_uk.design_system as ds
         ),
     ),
 )
-def test_field(kwargs, expected):
+def test_field(kwargs, expected, html):
     """Test Field with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Field.
         expected (str): The expected HTML output.
     """
     field = ds.Field(**kwargs)
-    assert fh.to_xml(field, indent=False) == expected
+    assert html(field) == html(expected)
 
 
-def test_field_required():
+def test_field_required(html):
     """Test Field with required attribute."""
     field = ds.Field("test", label="Test")
     field.value = ""
-    assert fh.to_xml(field, indent=False) == (
+    assert html(field) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<label for="test" class="govuk-label">Test</label>'
             '<p id="test-error" class="govuk-error-message">'
@@ -75,11 +75,11 @@ def test_field_required():
     )
 
 
-def test_field_optional():
+def test_field_optional(html):
     """Test Field with required=False."""
     field = ds.Field("test", label="Test", required=False)
     field.value = ""
-    assert fh.to_xml(field, indent=False) == (
+    assert html(field) == html(
         '<div class="govuk-form-group">'
             '<label for="test" class="govuk-label">Test (Optional)</label>'
         "</div>"
@@ -135,24 +135,24 @@ def test_field_optional():
         ),
     ),
 )
-def test_select(kwargs, expected):
+def test_select(kwargs, expected, html):
     """Test Select with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Select.
         expected (str): The expected HTML output.
     """
     select = ds.Select(**kwargs)
-    assert fh.to_xml(select, indent=False) == expected
+    assert html(select) == html(expected)
 
 
-def test_select_value():
+def test_select_value(html):
     """Test Select with value."""
     select = ds.Select(
         name="test",
         options=[("yes", "Yes"), ("no", "No")],
     )
     select.value = "yes"
-    assert fh.to_xml(select, indent=False) == (
+    assert html(select) == html(
         '<div class="govuk-form-group">'
             '<select name="test" id="test" class="govuk-select">'
                 '<option value="yes" selected>Yes</option>'
@@ -230,14 +230,14 @@ def test_select_value():
         ),
     ),
 )
-def test_textarea(kwargs, expected):
+def test_textarea(kwargs, expected, html):
     """Test Textarea with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Textarea.
         expected (str): The expected HTML output.
     """
     textarea = ds.Textarea(**kwargs)
-    assert fh.to_xml(textarea, indent=False) == expected
+    assert html(textarea) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -295,22 +295,22 @@ def test_textarea(kwargs, expected):
         ),
     ),
 )
-def test_passwordinput(kwargs, expected):
+def test_passwordinput(kwargs, expected, html):
     """Test PasswordInput with various parameters.
     Args:
         kwargs (dict): The arguments to pass to PasswordInput.
         expected (str): The expected HTML output.
     """
     password = ds.PasswordInput(**kwargs)
-    assert fh.to_xml(password, indent=False) == expected
+    assert html(password) == html(expected)
 
 
-def test_fieldset():
+def test_fieldset(html):
     """Test Fieldset with various parameters."""
     fieldset = ds.Fieldset(
-        "Test Legend",
         fh.P("Test Content 1"),
         fh.P("Test Content 2"),
+        legend="Test Legend",
     )
     expected = (
         '<fieldset class="govuk-fieldset">'
@@ -321,7 +321,7 @@ def test_fieldset():
             "<p>Test Content 2</p>"
         "</fieldset>"
     )
-    assert str(fieldset) == expected
+    assert html(fieldset) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -398,14 +398,14 @@ def test_fieldset():
         ),
     ),
 )
-def test_charactercount(kwargs, expected):
+def test_charactercount(kwargs, expected, html):
     """Test CharacterCount with various parameters.
     Args:
         kwargs (dict): The arguments to pass to CharacterCount.
         expected (str): The expected HTML output.
     """
     charcount = ds.CharacterCount(**kwargs)
-    assert fh.to_xml(charcount, indent=False) == expected
+    assert html(charcount) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -437,15 +437,15 @@ def test_charactercount(kwargs, expected):
         ),
     )
 )
-def test_button(kwargs, expected):
+def test_button(kwargs, expected, html):
     """
     Test Table with various parameters.
     """
     button = ds.Button("test1", **kwargs)
-    assert str(button) == expected
+    assert html(button) == html(expected)
 
 
-def test_start_button():
+def test_start_button(html):
     """
     Test Table with various parameters.
     """
@@ -459,7 +459,7 @@ def test_start_button():
             "</svg>"
         "</a>"
     )
-    assert str(start) == expected
+    assert html(start) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -658,14 +658,14 @@ def test_start_button():
         ),
     ),
 )
-def test_textinput(kwargs, expected):
+def test_textinput(kwargs, expected, html):
     """Test TextInput with various parameters.
     Args:
         kwargs (dict): The arguments to pass to TextInput.
         expected (str): The expected HTML output.
     """
     input = ds.TextInput(**kwargs)
-    assert fh.to_xml(input, indent=False) == expected
+    assert html(input) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -720,14 +720,14 @@ def test_textinput(kwargs, expected):
         ),
     ),
 )
-def test_checkbox(kwargs, expected):
+def test_checkbox(kwargs, expected, html):
     """Test Checkbox with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Checkbox.
         expected (str): The expected HTML output.
     """
     cb = ds.Checkbox(**kwargs)
-    assert fh.to_xml(cb, indent=False) == expected
+    assert html(cb) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -840,24 +840,24 @@ def test_checkbox(kwargs, expected):
         ),
     ),
 )
-def test_checkboxes(kwargs, expected):
+def test_checkboxes(kwargs, expected, html):
     """Test Checkboxes with various parameters.
     Args:
         kwargs (dict): The kwargs to pass to Checkboxes.
         expected (str): The expected HTML output.
     """
     cbs = ds.Checkboxes(**kwargs)
-    assert fh.to_xml(cbs, indent=False) == expected
+    assert html(cbs) == html(expected)
 
 
-def test_checkboxes_value():
+def test_checkboxes_value(html):
     """Test Checkboxes with value."""
     checks = ds.Checkboxes(
         name="test",
         checkboxes=[ds.Checkbox("test", "yes", "Yes"), ds.Checkbox("test", "no", "No")],
     )
     checks.value = "yes"
-    assert fh.to_xml(checks, indent=False) == (
+    assert html(checks) == html(
         '<div class="govuk-form-group">'
             '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
                 '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
@@ -913,14 +913,14 @@ def test_checkboxes_value():
         ),
     ),
 )
-def test_radio(kwargs, expected):
+def test_radio(kwargs, expected, html):
     """Test Radio with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Radio.
         expected (str): The expected HTML output.
     """
     radio = ds.Radio(**kwargs)
-    assert fh.to_xml(radio, indent=False) == expected
+    assert html(radio) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -1040,7 +1040,7 @@ def test_radio(kwargs, expected):
         ),
     ),
 )
-def test_radios(kwargs, expected):
+def test_radios(kwargs, expected, html):
     """Test Radios with various parameters.
     Args:
         name (str): name to pass to Radios.
@@ -1050,17 +1050,17 @@ def test_radios(kwargs, expected):
         expected (str): The expected HTML output.
     """
     radios = ds.Radios(**kwargs)
-    assert fh.to_xml(radios, indent=False) == expected
+    assert html(radios) == html(expected)
 
 
-def test_radios_value():
+def test_radios_value(html):
     """Test Radios with value."""
     radios = ds.Radios(
         name="test",
         radios=[ds.Radio("test", "yes", "Yes"), ds.Radio("test", "no", "No")],
     )
     radios.value = "yes"
-    assert fh.to_xml(radios, indent=False) == (
+    assert html(radios) == html(
         '<div class="govuk-form-group">'
             '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
                 '<div data-module="govuk-radios" class="govuk-radios">'
@@ -1134,14 +1134,14 @@ def test_radios_value():
         ),
     ),
 )
-def test_fileupload(kwargs, expected):
+def test_fileupload(kwargs, expected, html):
     """Test FileUpload with various parameters.
     Args:
         kwargs (dict): The arguments to pass to FileUpload.
         expected (str): The expected HTML output.
     """
     fu = ds.FileUpload(**kwargs)
-    assert fh.to_xml(fu, indent=False) == expected
+    assert html(fu) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -1271,14 +1271,14 @@ def test_fileupload(kwargs, expected):
         ),
     ),
 )
-def test_date_input(kwargs, expected):
+def test_date_input(kwargs, expected, html):
     """Test DateInput with various parameters.
     Args:
         kwargs (dict): The arguments to pass to DateInput.
         expected (str): The expected HTML output.
     """
     dateinput = ds.DateInput(**kwargs)
-    assert fh.to_xml(dateinput, indent=False) == expected
+    assert html(dateinput) == html(expected)
 
 
 @pytest.mark.parametrize(
@@ -1287,21 +1287,23 @@ def test_date_input(kwargs, expected):
         (
             {},
             (
-                '<div role="region" aria-label="Cookies on Test Service" data-nosnippet id="cookie-banner" class="govuk-cookie-banner">'
-                    '<div class="govuk-cookie-banner__message govuk-width-container">'
-                        '<div class="govuk-grid-row">'
-                            '<div class="govuk-grid-column-two-thirds">'
-                                '<h2 class="govuk-heading-m">Cookies for Test Service</h2>'
-                                '<div class="govuk-cookie-banner__content"></div>'
+                "<div>"
+                    '<div role="region" aria-label="Cookies on Test Service" data-nosnippet id="cookie-banner" class="govuk-cookie-banner">'
+                        '<div class="govuk-cookie-banner__message govuk-width-container">'
+                            '<div class="govuk-grid-row">'
+                                '<div class="govuk-grid-column-two-thirds">'
+                                    '<h2 class="govuk-heading-m">Cookies for Test Service</h2>'
+                                    '<div class="govuk-cookie-banner__content"></div>'
+                                "</div>"
                             "</div>"
+                            '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner">'
+                                '<div class="govuk-button-group">'
+                                    '<button type="submit" data-module="govuk-button" value="yes" name="cookies[additional]" class="govuk-button">Accept additional cookies</button>'
+                                    '<button type="submit" data-module="govuk-button" value="no" name="cookies[additional]" class="govuk-button">Reject additional cookies</button>'
+                                    '<a href="/cookies" class="govuk-link">View cookies</a>'
+                                "</div>"
+                            "</form>"
                         "</div>"
-                        '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner">'
-                            '<div class="govuk-button-group">'
-                                '<button type="submit" data-module="govuk-button" value="yes" name="cookies[additional]" class="govuk-button">Accept additional cookies</button>'
-                                '<button type="submit" data-module="govuk-button" value="no" name="cookies[additional]" class="govuk-button">Reject additional cookies</button>'
-                                '<a href="/cookies" class="govuk-link">View cookies</a>'
-                            "</div>"
-                        "</form>"
                     "</div>"
                 "</div>"
             ),
@@ -1309,30 +1311,32 @@ def test_date_input(kwargs, expected):
         (
             {"confirmation": True},
             (
-                '<div role="region" aria-label="Cookies on Test Service" data-nosnippet id="cookie-banner" class="govuk-cookie-banner">'
-                    '<div class="govuk-cookie-banner__message govuk-width-container">'
-                        '<div class="govuk-grid-row">'
-                            '<div class="govuk-grid-column-two-thirds">'
-                                '<h2 class="govuk-heading-m">Cookies for Test Service</h2>'
-                                '<div class="govuk-cookie-banner__content"></div>'
+                "<div>"
+                    '<div role="region" aria-label="Cookies on Test Service" data-nosnippet id="cookie-banner" class="govuk-cookie-banner">'
+                        '<div class="govuk-cookie-banner__message govuk-width-container">'
+                            '<div class="govuk-grid-row">'
+                                '<div class="govuk-grid-column-two-thirds">'
+                                    '<h2 class="govuk-heading-m">Cookies for Test Service</h2>'
+                                    '<div class="govuk-cookie-banner__content"></div>'
+                                "</div>"
                             "</div>"
+                            '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner">'
+                                '<div class="govuk-button-group">'
+                                    '<button type="submit" data-module="govuk-button" value="hide" name="cookies[additional]" class="govuk-button">Hide cookie message</button>'
+                                "</div>"
+                            "</form>"
                         "</div>"
-                        '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner">'
-                            '<div class="govuk-button-group">'
-                                '<button type="submit" data-module="govuk-button" value="hide" name="cookies[additional]" class="govuk-button">Hide cookie message</button>'
-                            "</div>"
-                        "</form>"
                     "</div>"
                 "</div>"
             ),
         ),
     ),
 )
-def test_cookie_banner(kwargs, expected):
+def test_cookie_banner(kwargs, expected, html):
     """Test CookieBanner with various parameters.
     Args:
         kwargs (dict): The arguments to pass to CookieBanner.
         expected (str): The expected HTML output.
     """
-    banner = ds.CookieBanner("Test Service", **kwargs)
-    assert banner.__html__() == expected
+    banner = ds.Div(ds.CookieBanner("Test Service", **kwargs))
+    assert html(banner) == html(expected)
