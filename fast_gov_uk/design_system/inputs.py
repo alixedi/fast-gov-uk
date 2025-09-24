@@ -731,19 +731,22 @@ class DateInput(Field):
 
     @property
     async def clean(self):
+        # Field not required
+        if not self.value:
+            return None
         try:
             day, month, year = self.value
             day, month, year = int(day), int(month), int(year)
             _date = date(day=day, month=month, year=year)
             return _date.isoformat()
         except ValueError:
-            return None
+            raise
 
     @value.setter
     def value(self, value):
         self._value = value
         day, month, year = self._value
-        if not day or not month or not year:
+        if self.required and (not day or not month or not year):
             self.error = "This field is required."
             return
         try:
