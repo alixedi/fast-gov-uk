@@ -652,13 +652,36 @@ class FileUpload(Field):
     """
 
     @property
+    def valid_file(self):
+        filename = getattr(self.value, "filename", None)
+        return filename is not None
+
+    @Field.value.setter
+    def value(self, value):
+        self._value = value
+        if self.required and not self.valid_file:
+            self.error = "This field is required."
+            return
+
+    @property
     async def clean(self):
-        if self.value:
+        # field was not required
+        if not self.value:
+            return None
+        # Sometimes, when field is left empty
+        # we get a reference to an empty UploadFile
+        # TODO: Figure out when and why this happens
+        # and write tests against it.
+        if not self.valid_file:
+            return None
+        try:
             buffer = await self.value.read()
             filename = self.value.filename
             path = Path("media") / filename
             path.write_bytes(buffer)
             return str(path)
+        except (ValueError, AttributeError, OSError):
+            raise
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
