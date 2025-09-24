@@ -308,9 +308,9 @@ def test_passwordinput(kwargs, expected, html):
 def test_fieldset(html):
     """Test Fieldset with various parameters."""
     fieldset = ds.Fieldset(
-        "Test Legend",
         fh.P("Test Content 1"),
         fh.P("Test Content 2"),
+        legend="Test Legend",
     )
     expected = (
         '<fieldset class="govuk-fieldset">'
