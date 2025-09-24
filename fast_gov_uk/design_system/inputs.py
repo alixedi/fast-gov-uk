@@ -938,7 +938,7 @@ def CookieBanner(
         role="region",
         aria_label=f"Cookies on {service_name}",
         data_nosnippet=True,
-        _id="cookie-banner",
+        id="cookie-banner",
     )
 
 
