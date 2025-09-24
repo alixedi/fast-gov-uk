@@ -942,26 +942,29 @@ def CookieBanner(
     )
 
 
-def Fieldset(
-    legend: str,
-    *children: Field,
-) -> fh.FT:
+class Fieldset(AbstractField):
     """
     Fieldset component.
     Args:
+        fields (list): Fields to include in the fieldset.
         legend (str): The legend text for the fieldset.
-        *children (Field): Child components to include in the fieldset.
     Returns:
         FT: A FastHTML Fieldset component.
     """
-    return fh.Fieldset(
-        fh.Legend(
-            fh.H1(
-                legend,
-                cls="govuk-fieldset__heading",
+
+    def __init__(self, *fields: Field, legend: str = ""):
+        self.fields = fields
+        self.legend = legend
+
+    def __ft__(self):
+        return fh.Fieldset(
+            fh.Legend(
+                fh.H1(
+                    self.legend,
+                    cls="govuk-fieldset__heading",
+                ),
+                cls="govuk-fieldset__legend govuk-fieldset__legend--l",
             ),
-            cls="govuk-fieldset__legend govuk-fieldset__legend--l",
-        ),
-        *children,
-        cls="govuk-fieldset",
-    )
+            *self.fields,
+            cls="govuk-fieldset",
+        )
