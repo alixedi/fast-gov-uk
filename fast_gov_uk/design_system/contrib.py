@@ -46,12 +46,10 @@ class NumberInput(TextInput):
 
     @property
     async def clean(self):
-        if self.value:
-            try:
-                number = int(self.value)
-                return number
-            except ValueError:
-                return None
+        if not self.value:
+            return None
+        number = int(self.value)
+        return number
 
 
 @dataclass
@@ -77,9 +75,7 @@ class DecimalInput(TextInput):
 
     @property
     async def clean(self):
-        if self.value:
-            try:
-                number = float(self.value)
-                return number
-            except ValueError:
-                return None
+        if not self.value:
+            return None
+        number = float(self.value)
+        return number
