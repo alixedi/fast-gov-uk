@@ -1,4 +1,3 @@
-import fasthtml.common as fh
 import pytest
 
 import fast_gov_uk.design_system as ds
