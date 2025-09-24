@@ -85,9 +85,24 @@ def test_db_form_post_valid(client, db, picture):
             {"dob": "This field is required."}
         ),
         (
+            # invalid dob
+            {"dob": ["foo", "10", "2003"]},
+            {"dob": "Invalid values."}
+        ),
+        (
+            # empty picture
+            {"picture": ""},
+            {"picture": "This field is required."}
+        ),
+        (
             # empty phone
             {"phone": ""},
             {"phone": "This field is required."}
+        ),
+        (
+            # non-numeric phone
+            {"phone": "A12345"},
+            {"phone": "Value is not a number."}
         ),
         (
             # non-numeric phone
