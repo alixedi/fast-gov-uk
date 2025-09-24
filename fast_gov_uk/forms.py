@@ -155,13 +155,22 @@ class Form:
         self.bind()
 
     @property
+    def form_fields(self):
+        for field in self.fields:
+            if isinstance(field, Fieldset):
+                for field in field.fields:
+                    yield field
+            else:
+                yield field
+
+    @property
     def errors(self) -> dict:
         """
         Get the error messages from the field.
         Returns:
             dict: Error messages from fields.
         """
-        return {field.name: field.error for field in self.fields if field.error}
+        return {field.name: field.error for field in self.form_fields if field.error}
 
     @property
     def valid(self) -> bool:
@@ -170,7 +179,7 @@ class Form:
         Returns:
             bool: True if all fields are valid, False otherwise.
         """
-        return all(field.error == "" for field in self.fields)
+        return all(field.error == "" for field in self.form_fields)
 
     @property
     async def clean(self) -> dict:
@@ -181,7 +190,7 @@ class Form:
         """
         return {
             f.name: await f.clean
-            for f in self.fields
+            for f in self.form_fields
         }
 
     def bind(self):
@@ -194,12 +203,12 @@ class Form:
         # have a single radio field and submitted empty
         # with POST dict = {}
         if self.data is not None:
-            for field in self.fields:
+            for field in self.form_fields:
                 field.value = self.data.get(field.name, "")
 
     def __ft__(self) -> fh.FT:
         return fh.Form(
-            Fieldset(self.title, *self.fields),
+            Fieldset(*self.fields, legend=self.title),
             Button(self.cta),
             method=self.method,
             action=self.action,
