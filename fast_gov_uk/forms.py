@@ -158,8 +158,8 @@ class Form:
     def form_fields(self):
         for field in self.fields:
             if isinstance(field, Fieldset):
-                for field in field.fields:
-                    yield field
+                for fs_field in field.fields:
+                    yield fs_field
             else:
                 yield field
 
