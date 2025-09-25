@@ -91,5 +91,224 @@ def feedback(data=None):
     )
 
 
+@fast.question()
+def equality(step=0, data=None):
+    """
+    This is an example of a question-protocol aka wizard form.
+    It steps through the fields one at a time.
+
+    It takes step as an argument to know which field to show.
+    It also takes data as an argument to fill in the fields
+    that have already been filled in.
+
+    Note that this form does not do anything with the data
+    when it is completed. You can add your own processing logic
+    in the process method of the Questions class.
+    """
+    return forms.DBQuestions(
+        title="Equality monitoring",
+        fields=[
+            ds.Radios(
+                name="permission",
+                label="Do you want to answer the equality questions?",
+                choices={
+                    "yes": "Yes, answer the equality questions",
+                    "no": "No, skip the equality questions",
+                },
+            ),
+            ds.DateInput(
+                name="dob",
+                label="What is your date of birth?",
+            ),
+            ds.Radios(
+                name="health",
+                label=(
+                    "Do you have any physical or mental health conditions or illness "
+                    "lasting or expected to last 12 months or more?"
+                ),
+                choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
+            ),
+            ds.Radios(
+                name="ability",
+                label=(
+                    "Do any of your conditions or illnesses reduce your ability "
+                    "to carry out day to day activities?"
+                ),
+                choices={
+                    "alot": "Yes, a lot",
+                    "little": "Yes, a little",
+                    "not": "Not at all",
+                    "skip": "Prefer not to say",
+                },
+                required=False,
+            ),
+            ds.Radios(
+                name="ethnic-group",
+                label="What is your ethnic group?",
+                choices={
+                    "white": "White",
+                    "mixed": "Mixed or multiple ethnic groups",
+                    "asian": "Asian or Asian British",
+                    "black": "Black, African, Caribbean or Black British",
+                    "other": "Other ethnic group",
+                    "skip": "Prefer not to say",
+                },
+            ),
+            ds.Radios(
+                name="white",
+                label="Which of the following best describes your White background?",
+                choices={
+                    "british": "English, Welsh, Scottish, Northern Irish or British",
+                    "irish": "Irish",
+                    "gypsy": "Gypsy or Irish Traveller",
+                    "other": "Any other White background",
+                    "skip": "Prefer not to say",
+                },
+                required=False,
+            ),
+            ds.Radios(
+                name="mixed",
+                label=(
+                    "Which of the following best describes your "
+                    "multiple ethnic group background?"
+                ),
+                choices={
+                    "caribbean": "White and Black Caribbean",
+                    "african": "White and Black African",
+                    "asian": "White and Asian",
+                    "mixed": "Any other mixed or multiple ethnic background",
+                    "skip": "Prefer not to say",
+                },
+                required=False,
+            ),
+            ds.Radios(
+                name="asian",
+                label=(
+                    "Which of the following best describes your "
+                    "Asian or Asian British background?"
+                ),
+                choices={
+                    "indian": "Indian",
+                    "pakistani": "Pakistani",
+                    "bangladeshi": "Bangladeshi",
+                    "chinese": "Chinese",
+                    "other": "Any other Asian background",
+                    "skip": "Prefer not to say",
+                },
+                required=False,
+            ),
+            ds.Radios(
+                name="black",
+                label=(
+                    "Which of the following best describes your Black, African, "
+                    "Caribbean or Black British background?"
+                ),
+                choices={
+                    "african": "African",
+                    "caribbean": "Caribbean",
+                    "other": "Any other Black, African or Caribbean background",
+                    "skip": "Prefer not to say",
+                },
+                required=False,
+            ),
+            ds.Radios(
+                name="other",
+                label="Which of the following best describes your background?",
+                choices={
+                    "arab": "Arab",
+                    "other": "Any other ethnic group",
+                    "skip": "Prefer not to say",
+                },
+                required=False,
+            ),
+            ds.Radios(
+                name="marital-status",
+                label="What is your legal marital or registered civil partnership status?",
+                choices={
+                    "never": "Never married and never registered in a civil partnership",
+                    "married": "Married",
+                    "civil-partnership": "In a registered civil partnership",
+                    "separated-married": "Separated, but still legally married",
+                    "separated-civil-partnership": "Separated, but still legally in a civil partnership",
+                    "divorced": "Divorced",
+                    "dissolved": "Formerly in a civil partnership which is now legally dissolved",
+                    "widowed": "Widowed",
+                    "surviving-partner": "Surviving partner from a registered civil partnership",
+                    "skip": "Prefer not to say",
+                },
+            ),
+            ds.Radios(
+                name="religion",
+                label="What is your religion?",
+                choices={
+                    "no": "No religion",
+                    "christian": "Christian",
+                    "budhhist": "Buddhist",
+                    "hindu": "Hindu",
+                    "jewish": "Jewish",
+                    "muslim": "Muslim",
+                    "sikh": "Sikh",
+                    "other": "Any other religion",
+                    "skip": "Prefer not to say",
+                },
+            ),
+            ds.Fieldset(
+                ds.Radios(
+                    name="sex",
+                    label="What is your sex?",
+                    choices={
+                        "female": "Female",
+                        "male": "Male",
+                        "skip": "Prefer not to say",
+                    },
+                ),
+                ds.Radios(
+                    name="gender",
+                    label=(
+                        "Is the gender you identify with the same as "
+                        "your sex registered at birth?"
+                    ),
+                    choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
+                ),
+                legend="Sex and gender identity",
+                name="sex-and-gender",
+            ),
+            ds.Radios(
+                name="sexual-orientation",
+                label="Which of the following best describes your sexual orientation?",
+                choices={
+                    "straight": "Heterosexual or straight",
+                    "gay-or-lesbian": "Gay or lesbian",
+                    "bisexual": "Bisexual",
+                    "other": "Other",
+                    "skip": "Prefer not to say",
+                },
+            ),
+        ],
+        data=data,
+        step=step,
+        success_url="/",
+        cta="Continue",
+        db=fast.db,
+        predicates={
+            # These fields are only run if the data collected
+            # in specified prior fields have the specified values
+            "dob": {"permission": "yes"},
+            "health": {"permission": "yes"},
+            "ability": {"permission": "yes", "health": "yes"},
+            "ethnic-group": {"permission": "yes"},
+            "white": {"permission": "yes", "ethnic-group": "white"},
+            "mixed": {"permission": "yes", "ethnic-group": "mixed"},
+            "asian": {"permission": "yes", "ethnic-group": "asian"},
+            "black": {"permission": "yes", "ethnic-group": "black"},
+            "other": {"permission": "yes", "ethnic-group": "other"},
+            "marital-status": {"permission": "yes"},
+            "religion": {"permission": "yes"},
+            "sex-and-gender": {"permission": "yes"},
+            "sexual-orientation": {"permission": "yes"},
+        },
+    )
+
+
 # Serves the app
 fh.serve(app="fast")
