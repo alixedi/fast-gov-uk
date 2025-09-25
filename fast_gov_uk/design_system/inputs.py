@@ -289,6 +289,9 @@ class CharacterCount(Field):
     @Field.value.setter
     def value(self, value):
         self._value = value
+        if self.required and not value:
+            self.error = "This field is required."
+            return
         if self.maxchars:
             if len(self._value) > self.maxchars:
                 self.error = f"Characters exceed limit of {self.maxchars}."
@@ -753,7 +756,7 @@ class DateInput(Field):
     @property
     async def clean(self):
         # Field not required
-        if not self.value:
+        if self.value == ("", "", ""):
             return None
         try:
             day, month, year = self.value
@@ -765,7 +768,7 @@ class DateInput(Field):
 
     @value.setter
     def value(self, value):
-        self._value = value
+        self._value = value or ("", "", "")
         day, month, year = self._value
         if self.required and (not day or not month or not year):
             self.error = "This field is required."
