@@ -25,18 +25,18 @@ def profile(data=None):
                 ds.Radios(
                     name="sex",
                     label="What is your sex?",
-                    choices=["Male", "Female", "Prefer not to say"],
+                    choices={"male": "Male", "female": "Female", "skip": "Prefer not to say"},
                 ),
                 ds.Radios(
                     name="gender",
                     label="Is your gender the same as your sex?",
-                    choices=["Yes", "No", "Prefer not to say"],
+                    choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
                 ),
             ),
             ds.Radios(
                 name="ethnicity",
                 label="What is your ethnicity?",
-                choices=["White", "Mixed", "Asian", "African or Caribbean", "Other"],
+                choices={"white": "White", "mixed": "Mixed", "asian": "Asian", "black": "African or Caribbean", "other": "Other"},
             ),
             ds.DateInput("dob", "What is your date of birth?"),
             ds.FileUpload("picture", "Upload a profile picture"),
@@ -64,7 +64,7 @@ def email_feedback(data=None):
             ds.Radios(
                 name="satisfaction",
                 label="How satisfied did you feel about the service?",
-                choices=["Satisfied", "Dissatisfied"],
+                choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
         data=data,
@@ -82,7 +82,7 @@ def api_feedback(data=None):
             ds.Radios(
                 name="satisfaction",
                 label="How satisfied did you feel about the service?",
-                choices=["Satisfied", "Dissatisfied"],
+                choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
         data=data,

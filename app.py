@@ -65,13 +65,13 @@ def feedback(data=None):
             ds.Radios(
                 name="satisfaction",
                 label="Overall, how satisfied did you feel about Fast Gov UK?",
-                choices=[
-                    "Very Satisfied",
-                    "Satisfied",
-                    "Neither satisfied not dissatisfied",
-                    "Dissatisfied",
-                    "Very dissatisfied",
-                ],
+                choices={
+                    "very-satisfied": "Very Satisfied",
+                    "satisfied": "Satisfied",
+                    "neutral": "Neither satisfied not dissatisfied",
+                    "dissatisfied": "Dissatisfied",
+                    "very-dissatisfied": "Very dissatisfied",
+                },
             ),
             ds.CharacterCount(
                 name="comments",

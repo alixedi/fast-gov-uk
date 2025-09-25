@@ -613,15 +613,13 @@ class Radios(Field):
     """
 
     radios: List[Radio] = field(default_factory=list)
-    choices: List[str] = field(default_factory=list)
+    choices: dict = field(default_factory=dict)
     small: bool = False
     inline: bool = False
 
     def make_radios(self):
-        for choice in self.choices:
-            choice_tokens = choice.lower().split()
-            value = "_".join(choice_tokens)
-            radio = Radio(self.name, value, choice)
+        for value, label in self.choices.items():
+            radio = Radio(self.name, value, label)
             self.radios.append(radio)
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
