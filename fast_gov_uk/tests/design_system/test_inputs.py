@@ -1,4 +1,5 @@
 import fasthtml.common as fh
+from fast_gov_uk import forms
 import pytest
 
 import fast_gov_uk.design_system as ds
@@ -950,7 +951,7 @@ def test_radio(kwargs, expected, html):
             {
                 "name": "test",
                 "label": "Test Label",
-                "choices": ["Label 1"],
+                "choices": {"label_1": "Label 1"},
             },
             (
                 '<div class="govuk-form-group">'
@@ -1340,3 +1341,47 @@ def test_cookie_banner(kwargs, expected, html):
     """
     banner = ds.Div(ds.CookieBanner("Test Service", **kwargs))
     assert html(banner) == html(expected)
+
+
+@pytest.mark.parametrize("field", (
+    ds.Select,
+    ds.Textarea,
+    ds.PasswordInput,
+    ds.CharacterCount,
+    ds.TextInput,
+    ds.Checkboxes,
+    ds.Radios,
+    ds.FileUpload,
+    ds.DateInput,
+    ds.EmailInput,
+    ds.NumberInput,
+    ds.DecimalInput,
+))
+def test_required(field):
+    """Test that all input fields can be marked as required."""
+    f = field(name="test", label="Test Label", required=True)
+    form = forms.Form(title="Test Form", fields=[f], success_url="/", data={})
+    assert not form.valid
+    assert form.errors == {"test": "This field is required."}
+
+
+@pytest.mark.parametrize("field", (
+    ds.Select,
+    ds.Textarea,
+    ds.PasswordInput,
+    ds.CharacterCount,
+    ds.TextInput,
+    ds.Checkboxes,
+    ds.Radios,
+    ds.FileUpload,
+    ds.DateInput,
+    ds.EmailInput,
+    ds.NumberInput,
+    ds.DecimalInput,
+))
+def test_not_required(field):
+    """Test that all input fields can be marked as not required."""
+    f = field(name="test", label="Test Label", required=False)
+    form = forms.Form(title="Test Form", fields=[f], success_url="/", data={})
+    # TODO: assert exact errors :/
+    assert form.errors != {"test": "This field is required."}

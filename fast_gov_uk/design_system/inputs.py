@@ -289,6 +289,9 @@ class CharacterCount(Field):
     @Field.value.setter
     def value(self, value):
         self._value = value
+        if self.required and not value:
+            self.error = "This field is required."
+            return
         if self.maxchars:
             if len(self._value) > self.maxchars:
                 self.error = f"Characters exceed limit of {self.maxchars}."
@@ -613,15 +616,13 @@ class Radios(Field):
     """
 
     radios: List[Radio] = field(default_factory=list)
-    choices: List[str] = field(default_factory=list)
+    choices: dict = field(default_factory=dict)
     small: bool = False
     inline: bool = False
 
     def make_radios(self):
-        for choice in self.choices:
-            choice_tokens = choice.lower().split()
-            value = "_".join(choice_tokens)
-            radio = Radio(self.name, value, choice)
+        for value, label in self.choices.items():
+            radio = Radio(self.name, value, label)
             self.radios.append(radio)
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
@@ -755,7 +756,7 @@ class DateInput(Field):
     @property
     async def clean(self):
         # Field not required
-        if not self.value:
+        if self.value == ("", "", ""):
             return None
         try:
             day, month, year = self.value
@@ -767,7 +768,7 @@ class DateInput(Field):
 
     @value.setter
     def value(self, value):
-        self._value = value
+        self._value = value or ("", "", "")
         day, month, year = self._value
         if self.required and (not day or not month or not year):
             self.error = "This field is required."
@@ -973,13 +974,15 @@ class Fieldset(AbstractField):
     Fieldset component.
     Args:
         fields (list): Fields to include in the fieldset.
+        name (str): Name of the fieldset. Defaults to "".
         legend (str): The legend text for the fieldset.
     Returns:
         FT: A FastHTML Fieldset component.
     """
 
-    def __init__(self, *fields: Field, legend: str = ""):
+    def __init__(self, *fields: Field, name:str = "", legend: str = ""):
         self.fields = fields
+        self.name = name
         self.legend = legend
 
     def __ft__(self):

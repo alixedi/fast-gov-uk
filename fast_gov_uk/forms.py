@@ -70,10 +70,7 @@ class EmailBackend(Backend):
     """
 
     async def format(self, data):
-        return "\n".join(
-            f"* {key}: {val}"
-            for key, val in data.items()
-        )
+        return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
     async def process(self):
         notify = getattr(self, "notify")
@@ -101,6 +98,7 @@ class APIBackend(Backend):
     """
     Backend that sends submitted forms to an API.
     """
+
     async def process(self):
         url = getattr(self, "url")
         username = getattr(self, "username")
@@ -158,8 +156,8 @@ class Form:
     def form_fields(self):
         for field in self.fields:
             if isinstance(field, Fieldset):
-                for field in field.fields:
-                    yield field
+                for fs_field in field.fields:
+                    yield fs_field
             else:
                 yield field
 
@@ -188,10 +186,7 @@ class Form:
         field values. E.g. A cleaned value for DateInput would be
         a date object instead of ["10", "10", "2000"].
         """
-        return {
-            f.name: await f.clean
-            for f in self.form_fields
-        }
+        return {f.name: await f.clean for f in self.form_fields}
 
     def bind(self):
         """
@@ -216,7 +211,66 @@ class Form:
         )
 
 
+class QuestionsFinished(Exception):
+    pass
+
+
+class Questions(Form):
+    """
+    Implements the question-protocol aka Wizard i.e. forms that step
+    through the fields one at a time.
+    """
+
+    def __init__(self, step: int = 0, predicates: dict | None = None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.step = step
+        self.predicates = predicates or {}
+
+    @property
+    def step_valid(self):
+        field = self.fields[self.step]
+        if isinstance(field, Fieldset):
+            return all(f.error == "" for f in field.fields)
+        return field.error == ""
+
+    @property
+    def next_step(self):
+        data = self.data or {}
+        next_step = self.step + 1
+        if next_step >= len(self.fields):
+            raise QuestionsFinished()
+        next_field = self.fields[next_step]
+        if next_field.name not in self.predicates:
+            return next_step
+        while next_step < len(self.fields):
+            predicate = self.predicates.get(next_field.name, {})
+            if all([data.get(k) == v for k, v in predicate.items()]):
+                return next_step
+            next_step = next_step + 1
+            if next_step >= len(self.fields):
+                raise QuestionsFinished()
+            next_field = self.fields[next_step]
+            continue
+
+    def __ft__(self) -> fh.FT:
+        try:
+            field = self.fields[self.step]
+        except IndexError:
+            raise fh.HTTPException(status_code=404)
+        return fh.Form(
+            Fieldset(field, legend=self.title),
+            Button(self.cta),
+            method=self.method,
+            action=self.action,
+            **self.kwargs,
+        )
+
+
 class LogForm(Form, LogBackend):
+    pass
+
+
+class LogQuestions(Questions, LogBackend):
     pass
 
 
@@ -237,4 +291,10 @@ class APIForm(Form, APIBackend):
         self.url = url
         self.username = username
         self.password = password
+        super().__init__(*args, **kwargs)
+
+
+class DBQuestions(Questions, DBBackend):
+    def __init__(self, db, *args, **kwargs):
+        self.db = db
         super().__init__(*args, **kwargs)

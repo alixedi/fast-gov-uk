@@ -3,6 +3,8 @@ from notifications_python_client import notifications as notify
 
 import fast_gov_uk.design_system as ds
 from fast_gov_uk.demo import demo
+from fast_gov_uk.forms import QuestionsFinished
+
 
 GOV_UK_HTTP_HEADERS = [
     fh.Link(rel="stylesheet", href="/govuk-frontend-5.11.1.min.css", type="text/css"),
@@ -71,11 +73,16 @@ class Fast(fh.FastHTML):
         self.dev = settings["DEV_MODE"]
         # Initialize form registry
         self.forms = {}
+        # Initialise wizard registry
+        self.questions = {}
         # Set up routes
         if self.dev:
             self.route("/demo")(demo)
         self.route("/{fname:path}.{ext:static}")(assets)
         self.route("/form/{name}", methods=["GET", "POST"])(self.process_form)
+        self.route("/questions/{name}/{step}", methods=["GET", "POST"])(
+            self.process_questions
+        )
         # Initialise notify client
         notify_key = settings["NOTIFY_API_KEY"]
         if notify_key:
@@ -84,6 +91,7 @@ class Fast(fh.FastHTML):
     def notify(self, template_id: str, email: str):
         if not hasattr(self, "notify_client"):
             raise ValueError("NOTIFY_API_KEY not configured.")
+
         async def _notifier(**kwargs):
             kwargs["service_name"] = self.service_name
             return self.notify_client.send_email_notification(
@@ -91,6 +99,7 @@ class Fast(fh.FastHTML):
                 template_id=template_id,
                 personalisation=kwargs,
             )
+
         return _notifier
 
     def page(self, url=None):
@@ -121,6 +130,20 @@ class Fast(fh.FastHTML):
         # Used as @app.form("/some-url")
         return form_decorator
 
+    def question(self, url=None):
+        def question_decorator(func):
+            _url = url or func.__name__
+            self.questions[_url] = func
+            return func
+
+        if callable(url):
+            # Used as @app.form
+            func = url
+            url = None
+            return question_decorator(func)
+        # Used as @app.question("/some-url")
+        return question_decorator
+
     async def process_form(self, req, name: str, post: dict):
         mkform = self.forms.get(name, None)
         if not mkform:
@@ -136,3 +159,35 @@ class Fast(fh.FastHTML):
             return await form.process()
         # Else return with errors
         return ds.Page(form)
+
+    async def process_questions(
+        self, req, session: dict, name: str, step: str, post: dict
+    ):
+        try:
+            mk_question = self.questions[name]
+            _step = int(step or "0")
+        except (KeyError, ValueError):
+            raise fh.HTTPException(status_code=404)
+        # Get data from session
+        session_key = f"{name}_questions"
+        form_data = session.get(session_key, {})
+        # If GET, just return the form
+        if req.method == "GET":
+            # Reset the session on first step
+            if _step == 0:
+                session.pop(session_key, None)
+            question = mk_question(step=_step)
+            return ds.Page(question)
+        # If POST, fill the form
+        form_data.update(post)
+        session[session_key] = form_data
+        question = mk_question(step=_step, data=form_data)
+        # If step valid
+        if question.step_valid:
+            try:
+                next_step = question.next_step
+                return fh.Redirect(f"/questions/{name}/{next_step}")
+            except QuestionsFinished:
+                return await question.process()
+        # Else return with errors
+        return ds.Page(question)

@@ -25,18 +25,18 @@ def profile(data=None):
                 ds.Radios(
                     name="sex",
                     label="What is your sex?",
-                    choices=["Male", "Female", "Prefer not to say"],
+                    choices={"male": "Male", "female": "Female", "skip": "Prefer not to say"},
                 ),
                 ds.Radios(
                     name="gender",
                     label="Is your gender the same as your sex?",
-                    choices=["Yes", "No", "Prefer not to say"],
+                    choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
                 ),
             ),
             ds.Radios(
                 name="ethnicity",
                 label="What is your ethnicity?",
-                choices=["White", "Mixed", "Asian", "African or Caribbean", "Other"],
+                choices={"white": "White", "mixed": "Mixed", "asian": "Asian", "black": "African or Caribbean", "other": "Other"},
             ),
             ds.DateInput("dob", "What is your date of birth?"),
             ds.FileUpload("picture", "Upload a profile picture"),
@@ -64,7 +64,7 @@ def email_feedback(data=None):
             ds.Radios(
                 name="satisfaction",
                 label="How satisfied did you feel about the service?",
-                choices=["Satisfied", "Dissatisfied"],
+                choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
         data=data,
@@ -82,7 +82,7 @@ def api_feedback(data=None):
             ds.Radios(
                 name="satisfaction",
                 label="How satisfied did you feel about the service?",
-                choices=["Satisfied", "Dissatisfied"],
+                choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
         data=data,
@@ -91,4 +91,67 @@ def api_feedback(data=None):
         url="https://test.com",
         username="test_user",
         password="test_password",
+    )
+
+
+@fast.question
+def mini_equality(step=0, data=None):
+    return forms.DBQuestions(
+        title="Equality monitoring",
+        fields=[
+            ds.Radios(
+                name="permission",
+                label="Do you want to answer the equality questions?",
+                choices={
+                    "yes": "Yes, answer the equality questions",
+                    "no": "No, skip the equality questions"
+                },
+            ),
+            ds.Radios(
+                name="health",
+                label=(
+                    "Do you have any physical or mental health conditions or illness "
+                    "lasting or expected to last 12 months or more?"
+                ),
+                choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
+            ),
+            ds.Radios(
+                name="ability",
+                label=(
+                    "Do any of your conditions or illnesses reduce your ability "
+                    "to carry out day to day activities?"
+                ),
+                choices={"alot": "Yes, a lot", "little": "Yes, a little", "not": "Not at all", "skip": "Prefer not to say"},
+                required=False,
+            ),
+            ds.Fieldset(
+                ds.Radios(
+                    name="sex",
+                    label="What is your sex?",
+                    choices={"female": "Female", "male": "Male", "skip": "Prefer not to say"},
+                ),
+                ds.Radios(
+                    name="gender",
+                    label=(
+                        "Is the gender you identify with the same as "
+                        "your sex registered at birth?"
+                    ),
+                    choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
+                ),
+                legend="Sex and gender identity",
+                name="sex-and-gender",
+            ),
+        ],
+        data=data,
+        step=step,
+        success_url="/",
+        cta="Continue",
+        db=fast.db,
+        predicates={
+            # These fields are only run if the data collected
+            # in specified prior fields have the specified values
+            "health": {"permission": "yes"},
+            "ability": {"permission": "yes", "health": "yes"},
+            "sex-and-gender": {"permission": "yes"},
+        }
     )
