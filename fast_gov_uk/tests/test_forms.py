@@ -148,7 +148,7 @@ def test_form_post_invalid(errors, expected, client, db, picture):
         assert form.errors == expected
 
 
-def test_email_form_post_valid(fast, client):
+def test_email_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
         "/form/email_feedback",
@@ -167,7 +167,7 @@ def test_email_form_post_valid(fast, client):
     )
 
 
-def test_api_form_post_valid(fast, client):
+def test_api_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     with patch("fast_gov_uk.forms._client") as mock_client:
         mock_post = Mock()
@@ -186,3 +186,74 @@ def test_api_form_post_valid(fast, client):
             'submitted_on': ANY,
         }
     )
+
+
+def test_questions_get(client):
+    response = client.get("/questions/mini_equality")
+    assert response.status_code == 307
+    response = client.get("/questions/mini_equality/0")
+    assert response.status_code == 200
+    response = client.get("/questions/mini_equality/1")
+    assert response.status_code == 200
+    response = client.get("/questions/mini_equality/2")
+    assert response.status_code == 200
+    response = client.get("/questions/mini_equality/3")
+    assert response.status_code == 200
+
+
+def test_question_no_permission(db, client):
+    response = client.post(
+        "/questions/mini_equality/",
+        data={"permission": "no"},
+    )
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/"
+
+
+def test_question_permission(db, client):
+    response = client.post(
+        "/questions/mini_equality/",
+        data={"permission": "yes"},
+    )
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/questions/mini_equality/1"
+
+
+def test_questions_no_predicate(db, client):
+    response = client.post(
+        "/questions/mini_equality/1",
+        data={"permission": "yes", "health": "no"},
+    )
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/questions/mini_equality/3"
+
+
+def test_questions_predicate(db, client):
+    response = client.post(
+        "/questions/mini_equality/1",
+        data={"permission": "yes", "health": "yes"},
+    )
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/questions/mini_equality/2"
+
+
+def test_questions_valid(db, client):
+    response = client.post(
+        "/questions/mini_equality/3",
+        data={"permission": "yes", "health": "yes", "ability": "yes", "sex": "skip", "gender": "skip"},
+    )
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/"
+    forms = db.t.forms()
+    form = forms[0]
+    assert form.title == "Equality monitoring"
+    form_json = asdict(form)
+    form_data = form_json["data"]
+    form_dict = json.loads(form_data)
+    assert form_dict == {
+        "permission": "yes",
+        "health": "yes",
+        "ability": "yes",
+        "sex": "skip",
+        "gender": "skip"
+    }
