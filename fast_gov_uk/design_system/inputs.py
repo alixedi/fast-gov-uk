@@ -974,13 +974,15 @@ class Fieldset(AbstractField):
     Fieldset component.
     Args:
         fields (list): Fields to include in the fieldset.
+        name (str): Name of the fieldset. Defaults to "".
         legend (str): The legend text for the fieldset.
     Returns:
         FT: A FastHTML Fieldset component.
     """
 
-    def __init__(self, *fields: Field, legend: str = ""):
+    def __init__(self, *fields: Field, name:str = "", legend: str = ""):
         self.fields = fields
+        self.name = name
         self.legend = legend
 
     def __ft__(self):
