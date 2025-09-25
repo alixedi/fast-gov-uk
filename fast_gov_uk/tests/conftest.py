@@ -21,9 +21,12 @@ def client(fast):
     return fh.Client(fast)
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def db(fast):
-    return fast.db
+    db = fast.db
+    db.q("BEGIN TRANSACTION;")
+    yield db
+    db.q("ROLLBACK;")
 
 
 @pytest.fixture
