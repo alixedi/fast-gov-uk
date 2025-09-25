@@ -70,10 +70,7 @@ class EmailBackend(Backend):
     """
 
     async def format(self, data):
-        return "\n".join(
-            f"* {key}: {val}"
-            for key, val in data.items()
-        )
+        return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
     async def process(self):
         notify = getattr(self, "notify")
@@ -101,6 +98,7 @@ class APIBackend(Backend):
     """
     Backend that sends submitted forms to an API.
     """
+
     async def process(self):
         url = getattr(self, "url")
         username = getattr(self, "username")
@@ -188,10 +186,7 @@ class Form:
         field values. E.g. A cleaned value for DateInput would be
         a date object instead of ["10", "10", "2000"].
         """
-        return {
-            f.name: await f.clean
-            for f in self.form_fields
-        }
+        return {f.name: await f.clean for f in self.form_fields}
 
     def bind(self):
         """
