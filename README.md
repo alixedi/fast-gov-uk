@@ -1,5 +1,7 @@
 # fast-gov-uk
 
+Fast-gov-uk is a new toolkit for **rapid development of simple gov.uk services**. 
+
 Fast-gov-uk is three things -
 
 1) an implementation of [gov.uk design system](https://design-system.service.gov.uk) in Python using [FastHTML](https://www.fastht.ml)
