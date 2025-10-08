@@ -160,3 +160,30 @@ def test_gbpinput_valid(html):
             "</div>"
         "</div>"
     )
+
+
+@pytest.mark.parametrize(
+    "kwargs, expected",
+    (
+        (
+            {},
+            '<a class="govuk-back-link" href="javascript:history.back()">Back</a>',
+        ),
+        (
+            {"text": "Test"},
+            '<a class="govuk-back-link" href="javascript:history.back()">Test</a>',
+        ),
+        (
+            {"inverse": True},
+            '<a class="govuk-back-link govuk-back-link--inverse" href="javascript:history.back()">Back</a>',
+        ),
+    ),
+)
+def test_backlinkjs(kwargs, expected, html):
+    """Test BacklinkJS with various parameters.
+    Args:
+        kwargs (dict): The arguments to pass to Inset.
+        expected (str): The expected HTML output.
+    """
+    text = ds.BacklinkJS(**kwargs)
+    assert html(text) == html(expected)

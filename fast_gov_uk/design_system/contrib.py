@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 from email.utils import parseaddr
 
+import fasthtml.common as fh
+
 from .inputs import TextInput
+from .navigation import Backlink
 
 
 @dataclass
@@ -87,3 +90,10 @@ class GBPInput(DecimalInput):
     GBPInput because its such a common ask.
     """
     prefix : str = "£"
+
+
+def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
+    """
+    Backlink component based on js
+    """
+    return Backlink("javascript:history.back()", text=text, inverse=inverse)
