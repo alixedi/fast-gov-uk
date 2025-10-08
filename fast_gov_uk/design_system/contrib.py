@@ -31,7 +31,7 @@ class NumberInput(TextInput):
     error attribute if invalid.
     """
 
-    numeric = True
+    numeric: bool = True
 
     @TextInput.value.setter
     def value(self, value):
@@ -60,7 +60,7 @@ class DecimalInput(TextInput):
     error attribute if invalid.
     """
 
-    numeric = True
+    numeric: bool = True
 
     @TextInput.value.setter
     def value(self, value):
@@ -79,3 +79,11 @@ class DecimalInput(TextInput):
             return None
         number = float(self.value)
         return number
+
+
+@dataclass
+class GBPInput(DecimalInput):
+    """
+    GBPInput because its such a common ask.
+    """
+    prefix : str = "£"
