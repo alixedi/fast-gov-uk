@@ -156,6 +156,7 @@ def Page(*content: fh.FT | Field) -> fh.FT:
         # Every page will have a cookie banner until the user hides it
         fh.Div(hx_get="/cookie-banner", hx_trigger="load"),
         Header("Fast GOV.UK", "/"),
+        fh.Div(hx_get="/phase", hx_trigger="load"),
         fh.Div(
             fh.Main(
                 fh.Div(
