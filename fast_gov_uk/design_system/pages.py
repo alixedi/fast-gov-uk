@@ -148,6 +148,8 @@ def Page(*content: fh.FT | Field) -> fh.FT:
         fh.Script(
             "document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');",
         ),
+        # Every page will have a cookie banner until the user hides it
+        fh.Div(hx_get="/cookie-banner", hx_trigger="load"),
         Header("Fast GOV.UK", "/"),
         fh.Div(
             fh.Main(
