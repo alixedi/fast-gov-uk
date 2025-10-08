@@ -113,53 +113,61 @@ def test_footer(args, expected):
         (
             {"content": [ds.P("Test Content")]},
             (
-                '<div class="govuk-phase-banner">'
-                    '<p class="govuk-phase-banner__content">'
-                        '<strong class="govuk-tag govuk-phase-banner__content__tag">alpha</strong>'
-                        '<span class="govuk-phase-banner__text">'
-                            '<p class="govuk-body">Test Content</p>'
-                        '</span>'
-                    "</p>"
+                '<div class="govuk-width-container">'
+                    '<div class="govuk-phase-banner">'
+                        '<p class="govuk-phase-banner__content">'
+                            '<strong class="govuk-tag govuk-phase-banner__content__tag">Alpha</strong>'
+                            '<span class="govuk-phase-banner__text">'
+                                '<p class="govuk-body">Test Content</p>'
+                            '</span>'
+                        "</p>"
+                    "</div>"
                 "</div>"
             ),
         ),
         (
             {"phase": "Beta", "content": [ds.P("Test Content")]},
             (
-                '<div class="govuk-phase-banner">'
-                    '<p class="govuk-phase-banner__content">'
-                        '<strong class="govuk-tag govuk-phase-banner__content__tag">Beta</strong>'
-                        '<span class="govuk-phase-banner__text">'
-                            '<p class="govuk-body">Test Content</p>'
-                        '</span>'
-                    "</p>"
+                '<div class="govuk-width-container">'
+                    '<div class="govuk-phase-banner">'
+                        '<p class="govuk-phase-banner__content">'
+                            '<strong class="govuk-tag govuk-phase-banner__content__tag">Beta</strong>'
+                            '<span class="govuk-phase-banner__text">'
+                                '<p class="govuk-body">Test Content</p>'
+                            '</span>'
+                        "</p>"
+                    "</div>"
                 "</div>"
             ),
         ),
         (
             {"content": [ds.A("Test Link")]},
             (
-                '<div class="govuk-phase-banner">'
-                    '<p class="govuk-phase-banner__content">'
-                        '<strong class="govuk-tag govuk-phase-banner__content__tag">alpha</strong>'
-                        '<span class="govuk-phase-banner__text">'
-                            '<a href="#" class="govuk-link">Test Link</a>'
-                        "</span>"
-                    "</p>"
+                '<div class="govuk-width-container">'
+                    '<div class="govuk-phase-banner">'
+                        '<p class="govuk-phase-banner__content">'
+                            '<strong class="govuk-tag govuk-phase-banner__content__tag">Alpha</strong>'
+                            '<span class="govuk-phase-banner__text">'
+                                '<a href="#" class="govuk-link">Test Link</a>'
+                            "</span>"
+                        "</p>"
+                    "</div>"
                 "</div>"
             ),
         ),
         (
             {"content": [ds.A("Test Link"), ds.P("Test Content")]},
             (
-                '<div class="govuk-phase-banner">'
-                    '<p class="govuk-phase-banner__content">'
-                        '<strong class="govuk-tag govuk-phase-banner__content__tag">alpha</strong>'
-                        '<span class="govuk-phase-banner__text">'
-                            '<a href="#" class="govuk-link">Test Link</a>'
-                            '<p class="govuk-body">Test Content</p>'
-                        "</span>"
-                    "</p>"
+                '<div class="govuk-width-container">'
+                    '<div class="govuk-phase-banner">'
+                        '<p class="govuk-phase-banner__content">'
+                            '<strong class="govuk-tag govuk-phase-banner__content__tag">Alpha</strong>'
+                            '<span class="govuk-phase-banner__text">'
+                                '<a href="#" class="govuk-link">Test Link</a>'
+                                '<p class="govuk-body">Test Content</p>'
+                            "</span>"
+                        "</p>"
+                    "</div>"
                 "</div>"
             ),
         ),
