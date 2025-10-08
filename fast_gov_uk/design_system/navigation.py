@@ -3,13 +3,14 @@ import fasthtml.common as fh
 from .utils import Next, Previous
 
 
-def Backlink(href: str, text: str = "Back", inverse: bool = False) -> fh.FT:
+def Backlink(href: str, text: str = "Back", inverse: bool = False, **kwargs) -> fh.FT:
     """
     A back link to the previous page.
     Args:
         href (str): Link to the previous page.
         text (str): The text to display in the link. Defaults to "Back".
         inverse (bool): If True, applies an inverse style. Defaults to False.
+        kwargs (dict): kwargs to be passed in to A.
     Returns:
         FT: A FastHTML Backlink component.
     """
@@ -18,6 +19,7 @@ def Backlink(href: str, text: str = "Back", inverse: bool = False) -> fh.FT:
         text,
         href=href,
         cls=f"govuk-back-link{inverse_cls}",
+        **kwargs,
     )
 
 

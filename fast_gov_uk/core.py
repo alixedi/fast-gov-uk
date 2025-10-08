@@ -181,7 +181,7 @@ class Fast(fh.FastHTML):
             if _step == 0:
                 session.pop(session_key, None)
             question = mk_question(step=_step)
-            return ds.Page(question)
+            return ds.Page(ds.BacklinkJS(), question)
         # If POST, fill the form
         form_data.update(post)
         session[session_key] = form_data
