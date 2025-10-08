@@ -63,6 +63,9 @@ class Fast(fh.FastHTML):
             # TODO: Why do I have to do this?
             style="margin: 0px;",
             exception_handlers={404: not_found, 500: problem_with_service},
+            # Set up session cookie
+            session_cookie="session_cookie",
+            max_age=24*60*60,
         )
         # Service name
         self.service_name = settings["SERVICE_NAME"]
@@ -206,7 +209,9 @@ class Fast(fh.FastHTML):
             val = post.get("cookies[additional]", None)
             hide = val == "hide"
             cookie_val = "hide" if hide else ""
-            cookie = fh.cookie("cookie_policy", cookie_val)
+            # Cookie should expire in a year
+            cookie_age = 365*24*60*60
+            cookie = fh.cookie("cookie_policy", cookie_val, max_age=cookie_age)
             return "" if hide else banner, cookie
         hide = "hide" in cookie_policy
         return "" if hide else banner
