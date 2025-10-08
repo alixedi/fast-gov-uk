@@ -159,10 +159,21 @@ def mini_equality(step=0, data=None):
 
 @fast.page
 def cookies():
-    """
-    This returns a standard Cookies page for a service
-    with essential cookies only. If you are using other
-    cookies in addition to essential cookies, you can
-    change this.
-    """
     return ds.Cookies()
+
+
+@fast.page
+def phase():
+    """
+    This returns a phase banner partial that is inserted
+    into all the pages of the service. This means that if
+    your service goes Beta, you only need to update here
+    and all of the pages on your service will reflect this.
+    """
+    return ds.PhaseBanner(
+        ds.Span(
+            "This is a new service. Help us improve it and ",
+            ds.A("give your feedback.", href="/form/feedback"),
+        ),
+        phase="Alpha",
+    )

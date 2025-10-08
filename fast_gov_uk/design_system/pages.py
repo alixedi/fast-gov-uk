@@ -112,7 +112,7 @@ def Footer(*links: tuple[str, str]) -> fh.FT:
 
 def PhaseBanner(
     *content: fh.FT,
-    phase: str = "alpha",
+    phase: str = "Alpha",
 ) -> fh.FT:
     """
     Phase banner component.
@@ -123,18 +123,21 @@ def PhaseBanner(
         FT: A FastHTML PhaseBanner component.
     """
     return fh.Div(
-        fh.P(
-            fh.Strong(
-                phase,
-                cls="govuk-tag govuk-phase-banner__content__tag",
+        fh.Div(
+            fh.P(
+                fh.Strong(
+                    phase,
+                    cls="govuk-tag govuk-phase-banner__content__tag",
+                ),
+                fh.Span(
+                    *content,
+                    cls="govuk-phase-banner__text",
+                ),
+                cls="govuk-phase-banner__content",
             ),
-            fh.Span(
-                *content,
-                cls="govuk-phase-banner__text",
-            ),
-            cls="govuk-phase-banner__content",
+            cls="govuk-phase-banner",
         ),
-        cls="govuk-phase-banner",
+        cls="govuk-width-container",
     )
 
 
@@ -153,6 +156,7 @@ def Page(*content: fh.FT | Field) -> fh.FT:
         # Every page will have a cookie banner until the user hides it
         fh.Div(hx_get="/cookie-banner", hx_trigger="load"),
         Header("Fast GOV.UK", "/"),
+        fh.Div(hx_get="/phase", hx_trigger="load"),
         fh.Div(
             fh.Main(
                 fh.Div(

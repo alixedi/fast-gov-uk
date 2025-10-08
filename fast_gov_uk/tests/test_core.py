@@ -25,3 +25,9 @@ def test_cookies_get(client):
     assert response.status_code == 200
     assert "session_cookie" in response.text
     assert "cookie_policy" in response.text
+
+
+def test_phase_get(client):
+    response = client.get("/phase")
+    assert response.status_code == 200
+    assert "Alpha" in response.text
