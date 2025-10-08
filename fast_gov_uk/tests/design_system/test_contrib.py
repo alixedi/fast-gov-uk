@@ -17,9 +17,9 @@ def test_emailinput_invalid(value, html):
     Args:
         value (str): The value to assign to EmailInput.
     """
-    email = ds.EmailInput(name="test")
-    email.value = value
-    assert html(email) == html(
+    field = ds.EmailInput(name="test")
+    field.value = value
+    assert html(field) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<p id="test-error" class="govuk-error-message">'
                 '<span class="govuk-visually-hidden">Error: </span>'
@@ -42,9 +42,9 @@ def test_emailinput_valid(value, html):
     Args:
         value (str): The value to assign to EmailInput.
     """
-    email = ds.EmailInput(name="test")
-    email.value = value
-    assert html(email) == html(
+    field = ds.EmailInput(name="test")
+    field.value = value
+    assert html(field) == html(
         '<div class="govuk-form-group">'
             f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
         "</div>"
@@ -64,15 +64,15 @@ def test_numberinput_invalid(value, html):
     Args:
         value (str): The value to assign to NumberInput.
     """
-    email = ds.NumberInput(name="test")
-    email.value = value
-    assert html(email) == html(
+    field = ds.NumberInput(name="test")
+    field.value = value
+    assert html(field) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<p id="test-error" class="govuk-error-message">'
                 '<span class="govuk-visually-hidden">Error: </span>'
                 "Value is not a number."
             "</p>"
-            f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input govuk-input--error">'
+            f'<input type="text" inputmode="numeric" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input govuk-input--error">'
         "</div>"
     )
 
@@ -89,11 +89,11 @@ def test_numberinput_valid(value, html):
     Args:
         value (str): The value to assign to NumberInput.
     """
-    email = ds.NumberInput(name="test")
-    email.value = value
-    assert html(email) == html(
+    field = ds.NumberInput(name="test")
+    field.value = value
+    assert html(field) == html(
         '<div class="govuk-form-group">'
-            f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
+            f'<input type="text" inputmode="numeric" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
         "</div>"
     )
 
@@ -111,15 +111,15 @@ def test_decimalinput_invalid(value, html):
     Args:
         value (str): The value to assign to DecimalInput.
     """
-    email = ds.DecimalInput(name="test")
-    email.value = value
-    assert html(email) == html(
+    field = ds.DecimalInput(name="test")
+    field.value = value
+    assert html(field) == html(
         '<div class="govuk-form-group govuk-form-group--error">'
             '<p id="test-error" class="govuk-error-message">'
                 '<span class="govuk-visually-hidden">Error: </span>'
                 "Value is not a number."
             "</p>"
-            f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input govuk-input--error">'
+            f'<input type="text" inputmode="numeric" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input govuk-input--error">'
         "</div>"
     )
 
@@ -137,10 +137,26 @@ def test_decimalinput_valid(value, html):
     Args:
         value (str): The value to assign to DecimalInput.
     """
-    email = ds.DecimalInput(name="test")
-    email.value = value
-    assert html(email) == html(
+    field = ds.DecimalInput(name="test")
+    field.value = value
+    assert html(field) == html(
         '<div class="govuk-form-group">'
-            f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
+            f'<input type="text" inputmode="numeric" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
+        "</div>"
+    )
+
+
+def test_gbpinput_valid(html):
+    """
+    Test GBPInput renders £ prefix.
+    """
+    field = ds.GBPInput(name="test")
+    field.value = "5"
+    assert html(field) == html(
+        '<div class="govuk-form-group">'
+            '<div class="govuk-input__wrapper">'
+                '<div aria-hidden="" class="govuk-input__prefix">£</div>'
+                '<input type="text" inputmode="numeric" name="test" value="5" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
+            "</div>"
         "</div>"
     )
