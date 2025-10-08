@@ -63,6 +63,9 @@ class Fast(fh.FastHTML):
             # TODO: Why do I have to do this?
             style="margin: 0px;",
             exception_handlers={404: not_found, 500: problem_with_service},
+            # Set up session cookie
+            session_cookie="session_cookie",
+            max_age=24*60*60,
         )
         # Service name
         self.service_name = settings["SERVICE_NAME"]
@@ -83,6 +86,7 @@ class Fast(fh.FastHTML):
         self.route("/questions/{name}/{step}", methods=["GET", "POST"])(
             self.process_questions
         )
+        self.route("/cookie-banner", methods=["GET", "POST"])(self.cookie_banner)
         # Initialise notify client
         notify_key = settings["NOTIFY_API_KEY"]
         if notify_key:
@@ -191,3 +195,23 @@ class Fast(fh.FastHTML):
                 return await question.process()
         # Else return with errors
         return ds.Page(question)
+
+    def cookie_banner(self, req, post: dict, cookie_policy: str = ""):
+        banner = ds.CookieBanner(
+            self.service_name,
+            ds.P("We use some essential cookies to make this service work."),
+            cookie_form_link="/cookie-banner",
+            # TODO: ATM, we only use essential cookies so no need
+            # to show the banner with accept/reject options
+            confirmation=True,
+        )
+        if req.method == "POST":
+            val = post.get("cookies[additional]", None)
+            hide = val == "hide"
+            cookie_val = "hide" if hide else ""
+            # Cookie should expire in a year
+            cookie_age = 365*24*60*60
+            cookie = fh.cookie("cookie_policy", cookie_val, max_age=cookie_age)
+            return "" if hide else banner, cookie
+        hide = "hide" in cookie_policy
+        return "" if hide else banner

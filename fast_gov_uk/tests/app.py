@@ -155,3 +155,14 @@ def mini_equality(step=0, data=None):
             "sex-and-gender": {"permission": "yes"},
         }
     )
+
+
+@fast.page
+def cookies():
+    """
+    This returns a standard Cookies page for a service
+    with essential cookies only. If you are using other
+    cookies in addition to essential cookies, you can
+    change this.
+    """
+    return ds.Cookies()
