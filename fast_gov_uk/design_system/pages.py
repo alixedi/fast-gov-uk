@@ -153,7 +153,13 @@ def Page(*content: fh.FT | Field) -> fh.FT:
         Header("Fast GOV.UK", "/"),
         fh.Div(
             fh.Main(
-                *content,
+                fh.Div(
+                    fh.Div(
+                        *content,
+                        cls="govuk-grid-column-two-thirds",
+                    ),
+                    cls="govuk-grid-row",
+                ),
                 cls="govuk-main-wrapper",
             ),
             cls="govuk-width-container",
