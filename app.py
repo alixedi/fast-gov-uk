@@ -310,5 +310,10 @@ def equality(step=0, data=None):
     )
 
 
+@fast.page
+def cookies():
+    return ds.Cookies()
+
+
 # Serves the app
 fh.serve(app="fast")
