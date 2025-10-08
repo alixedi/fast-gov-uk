@@ -315,5 +315,16 @@ def cookies():
     return ds.Cookies()
 
 
+@fast.page
+def phase():
+    return ds.PhaseBanner(
+        ds.Span(
+            "This is a new service. Help us improve it and ",
+            ds.A("give your feedback.", href="/form/feedback"),
+        ),
+        phase="Alpha",
+    )
+
+
 # Serves the app
 fh.serve(app="fast")
