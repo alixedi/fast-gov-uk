@@ -958,7 +958,12 @@ def CookieBanner(
                 ),
                 cls="govuk-grid-row",
             ),
-            fh.Form(button_group, hx_post=cookie_form_link, hx_target="#cookie-banner"),
+            fh.Form(
+                button_group,
+                hx_post=cookie_form_link,
+                hx_target="#cookie-banner",
+                hx_swap="outerHTML",
+            ),
             cls="govuk-cookie-banner__message govuk-width-container",
         ),
         cls="govuk-cookie-banner",

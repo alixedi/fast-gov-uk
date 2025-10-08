@@ -1297,7 +1297,7 @@ def test_date_input(kwargs, expected, html):
                                     '<div class="govuk-cookie-banner__content"></div>'
                                 "</div>"
                             "</div>"
-                            '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner">'
+                            '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner" hx-swap="outerHTML">'
                                 '<div class="govuk-button-group">'
                                     '<button type="submit" data-module="govuk-button" value="yes" name="cookies[additional]" class="govuk-button">Accept additional cookies</button>'
                                     '<button type="submit" data-module="govuk-button" value="no" name="cookies[additional]" class="govuk-button">Reject additional cookies</button>'
@@ -1321,7 +1321,7 @@ def test_date_input(kwargs, expected, html):
                                     '<div class="govuk-cookie-banner__content"></div>'
                                 "</div>"
                             "</div>"
-                            '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner">'
+                            '<form enctype="multipart/form-data" hx-post="/" hx-target="#cookie-banner" hx-swap="outerHTML">'
                                 '<div class="govuk-button-group">'
                                     '<button type="submit" data-module="govuk-button" value="hide" name="cookies[additional]" class="govuk-button">Hide cookie message</button>'
                                 "</div>"
