@@ -188,6 +188,19 @@ def test_api_form_post_valid(fast, db, client):
     )
 
 
+def test_session_form_post_valid(fast, db, client):
+    data = {"satisfaction": "satisfied"}
+    response = client.post(
+        "/form/session_feedback",
+        data=data,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    response = client.get("/session")
+    feedback = response.json()["Feedback"]
+    assert feedback == {"satisfaction": "satisfied"}
+
+
 def test_questions_get(client):
     response = client.get("/questions/mini_equality")
     assert response.status_code == 307

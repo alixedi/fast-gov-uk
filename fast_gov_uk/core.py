@@ -161,7 +161,7 @@ class Fast(fh.FastHTML):
         form = mkform(post)
         # If valid, process
         if form.valid:
-            return await form.process()
+            return await form.process(req.session)
         # Else return with errors
         return ds.Page(form)
 

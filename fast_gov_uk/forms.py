@@ -21,7 +21,7 @@ class Backend:
         success_url = getattr(self, "success_url")
         return fh.Redirect(success_url)
 
-    def process(self):
+    async def process(self, *args, **kwargs):
         """Process the form using the backend function."""
         raise NotImplementedError("Subclasses must implement this method.")
 
@@ -32,7 +32,7 @@ class LogBackend(Backend):
     Backend that logs form data.
     """
 
-    def process(self):
+    async def process(self, *args, **kwargs):
         """Log the form data."""
         title = getattr(self, "title")
         data = getattr(self, "data")
@@ -52,7 +52,7 @@ class DBBackend(Backend):
             forms.create(id=int, title=str, created_on=datetime, data=dict, pk="id")
         return forms
 
-    async def process(self):
+    async def process(self, *args, **kwargs):
         forms = self.get_table()
         Record = forms.dataclass()
         title = getattr(self, "title")
@@ -72,7 +72,7 @@ class EmailBackend(Backend):
     async def format(self, data):
         return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
-    async def process(self):
+    async def process(self, *args, **kwargs):
         notify = getattr(self, "notify")
         title = getattr(self, "title")
         data = await getattr(self, "clean")
@@ -99,7 +99,7 @@ class APIBackend(Backend):
     Backend that sends submitted forms to an API.
     """
 
-    async def process(self):
+    async def process(self, *args, **kwargs):
         url = getattr(self, "url")
         username = getattr(self, "username")
         password = getattr(self, "password")
@@ -115,6 +115,18 @@ class APIBackend(Backend):
             # User should not get the impression that the form
             # was submitted successfully if email failed
             raise
+        return self.success()
+
+
+class SessionBackend(Backend):
+    """
+    Backend that stores form data to the session.
+    """
+
+    async def process(self, session, *args, **kwargs):
+        title = getattr(self, "title")
+        data = getattr(self, "data")
+        session[title] = data
         return self.success()
 
 
@@ -280,7 +292,19 @@ class DBForm(Form, DBBackend):
         super().__init__(*args, **kwargs)
 
 
+class DBQuestions(Questions, DBBackend):
+    def __init__(self, db, *args, **kwargs):
+        self.db = db
+        super().__init__(*args, **kwargs)
+
+
 class EmailForm(Form, EmailBackend):
+    def __init__(self, notify, *args, **kwargs):
+        self.notify = notify
+        super().__init__(*args, **kwargs)
+
+
+class EmailQuestion(Questions, EmailBackend):
     def __init__(self, notify, *args, **kwargs):
         self.notify = notify
         super().__init__(*args, **kwargs)
@@ -294,7 +318,17 @@ class APIForm(Form, APIBackend):
         super().__init__(*args, **kwargs)
 
 
-class DBQuestions(Questions, DBBackend):
-    def __init__(self, db, *args, **kwargs):
-        self.db = db
+class APIQuestion(Questions, APIBackend):
+    def __init__(self, url, username, password, *args, **kwargs):
+        self.url = url
+        self.username = username
+        self.password = password
         super().__init__(*args, **kwargs)
+
+
+class SessionForm(Form, SessionBackend):
+    pass
+
+
+class SessionQuestion(Questions, SessionBackend):
+    pass
