@@ -164,12 +164,6 @@ def cookies():
 
 @fast.page
 def phase():
-    """
-    This returns a phase banner partial that is inserted
-    into all the pages of the service. This means that if
-    your service goes Beta, you only need to update here
-    and all of the pages on your service will reflect this.
-    """
     return ds.PhaseBanner(
         ds.Span(
             "This is a new service. Help us improve it and ",
