@@ -31,3 +31,10 @@ def test_phase_get(client):
     response = client.get("/phase")
     assert response.status_code == 200
     assert "Alpha" in response.text
+
+
+def test_notification_get(client):
+    client.get("/")
+    response = client.get("/notifications")
+    assert response.status_code == 200
+    assert "Important" in response.text
