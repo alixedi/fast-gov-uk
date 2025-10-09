@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from email.utils import parseaddr
+import re
 
 import fasthtml.common as fh
 
@@ -97,3 +98,24 @@ def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
     Backlink component based on js
     """
     return Backlink("javascript:history.back()", text=text, inverse=inverse)
+
+
+@dataclass
+class RegexInput(TextInput):
+    """
+    RegexInput component - A TextInput field that
+    validates the value againt a regex and sets the
+    error attribute if invalid.
+    """
+
+    regex: str = "*"
+
+    @TextInput.value.setter
+    def value(self, value):
+        self._value = value
+        if self.required and not value:
+            self.error = "This field is required."
+            return
+        pattern = re.compile(self.regex)
+        if not pattern.match(self._value):
+            self.error = 'Value does not match the required format.'
