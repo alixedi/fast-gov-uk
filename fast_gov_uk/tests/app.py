@@ -1,3 +1,5 @@
+import fasthtml.common as fh
+
 import fast_gov_uk.design_system as ds
 from fast_gov_uk import forms
 from fast_gov_uk.core import Fast
@@ -95,6 +97,23 @@ def api_feedback(data=None):
     )
 
 
+@fast.form
+def session_feedback(data=None):
+    return forms.SessionForm(
+        title="Feedback",
+        fields=[
+            ds.Radios(
+                name="satisfaction",
+                label="How satisfied did you feel about the service?",
+                choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
+            ),
+        ],
+        data=data,
+        success_url="/",
+        cta="Send feedback",
+    )
+
+
 @fast.question
 def mini_equality(step=0, data=None):
     return forms.DBQuestions(
@@ -172,3 +191,7 @@ def phase():
         ),
         phase="Alpha",
     )
+
+@fast.page
+def session(session):
+    return fh.JSONResponse(session)
