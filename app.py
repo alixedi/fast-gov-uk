@@ -312,11 +312,40 @@ def equality(step=0, data=None):
 
 @fast.page
 def cookies():
+    """
+    This returns the standard GDS cookies page. E.g. -
+    https://design-system.service.gov.uk/patterns/cookies-page/full-page/
+
+    It is preset to Essential cookies but if you are using more cookies,
+    you can easily add them as follows -
+
+    ds.Cookies(
+        ds.H2("Analytical cookies")
+        ds.P("...")
+        ds.Table(...)
+    )
+
+    (See the definition of Cookies)
+    """
     return ds.Cookies()
 
 
 @fast.page
 def phase():
+    """
+    @page does not have to return a full Page. It could also
+    return snippets of html.
+
+    E.g.This returns a phase banner snippet that is inserted
+    into all the pages of the service using htmx. All you need
+    is the following -
+
+        fh.Div(hx_get="/phase", hx_trigger="load"),
+
+    This is useful for several reasons but the primary one is
+    that if your service goes Beta, you only need to update this
+    and all of the pages on your service will reflect the change.
+    """
     return ds.PhaseBanner(
         ds.Span(
             "This is a new service. Help us improve it and ",
