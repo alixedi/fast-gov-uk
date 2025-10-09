@@ -11,7 +11,8 @@ fast = Fast({
 })
 
 @fast.page("/")
-def home():
+def home(session):
+    fast.add_notification(session, "Test")
     return ds.Page(ds.P("Hello, world!"))
 
 
