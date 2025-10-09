@@ -161,6 +161,8 @@ def Page(*content: fh.FT | Field) -> fh.FT:
             fh.Main(
                 fh.Div(
                     fh.Div(
+                        # Every page will check if there are any notifications
+                        fh.Div(hx_get="/notifications", hx_trigger="load"),
                         *content,
                         cls="govuk-grid-column-two-thirds",
                     ),
