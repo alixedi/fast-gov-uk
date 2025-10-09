@@ -87,6 +87,7 @@ class Fast(fh.FastHTML):
             self.process_questions
         )
         self.route("/cookie-banner", methods=["GET", "POST"])(self.cookie_banner)
+        self.route("/notifications")(self.notifications)
         # Initialise notify client
         notify_key = settings["NOTIFY_API_KEY"]
         if notify_key:
@@ -215,3 +216,23 @@ class Fast(fh.FastHTML):
             return "" if hide else banner, cookie
         hide = "hide" in cookie_policy
         return "" if hide else banner
+
+    def add_notification(self, session, content, success=False):
+        notifications = session.get("notifications", [])
+        notifications.append({"title": "Success" if success else "Important", "content": content})
+        session["notifications"] = notifications
+
+    def notifications(self, session):
+        notifications = session.get("notifications", [])
+        banners = ds.Div(
+            *[
+                ds.Notification(
+                    n["content"],
+                    title=n["title"],
+                    success=(n["title"] == "Success")
+                )
+                for n in notifications
+            ]
+        )
+        session.pop("notifications", None)
+        return banners
