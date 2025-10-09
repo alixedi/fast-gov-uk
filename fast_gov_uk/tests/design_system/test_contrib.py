@@ -187,3 +187,55 @@ def test_backlinkjs(kwargs, expected, html):
     """
     text = ds.BacklinkJS(**kwargs)
     assert html(text) == html(expected)
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        "test",
+        "1234",
+        "@",
+        "test@",
+    ),
+)
+def test_regexinput_invalid(value, html):
+    """Test RegexInput with various parameters.
+    Args:
+        value (str): The value to assign.
+    """
+    # simplified regex for emails
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    field = ds.RegexInput(name="test", regex=pattern)
+    field.value = value
+    assert html(field) == html(
+        '<div class="govuk-form-group govuk-form-group--error">'
+            '<p id="test-error" class="govuk-error-message">'
+                '<span class="govuk-visually-hidden">Error: </span>'
+                "Value does not match the required format."
+            "</p>"
+            f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input govuk-input--error">'
+        "</div>"
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        "test@test.com",
+        "test2@test2.net",
+    ),
+)
+def test_regexinput_valid(value, html):
+    """Test RegexInput with various parameters.
+    Args:
+        value (str): The value to assign.
+    """
+    # simplified regex for emails
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    field = ds.RegexInput(name="test", regex=pattern)
+    field.value = value
+    assert html(field) == html(
+        '<div class="govuk-form-group">'
+            f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
+        "</div>"
+    )
