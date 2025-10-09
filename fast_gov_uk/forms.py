@@ -52,7 +52,7 @@ class DBBackend(Backend):
             forms.create(id=int, title=str, created_on=datetime, data=dict, pk="id")
         return forms
 
-    async def process(self):
+    async def process(self, *args, **kwargs):
         forms = self.get_table()
         Record = forms.dataclass()
         title = getattr(self, "title")
