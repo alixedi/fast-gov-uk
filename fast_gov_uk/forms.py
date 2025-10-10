@@ -280,7 +280,10 @@ class Questions(Form):
         except IndexError:
             raise fh.HTTPException(status_code=404)
         return fh.Form(
-            self.error_summary(),
+            # We are not including ErrorSummary here
+            # b/c most of the times, questions have a
+            # single field and therefore its not necessary
+            # to have an error summary
             Fieldset(field, legend=self.title),
             Button(self.cta),
             method=self.method,
