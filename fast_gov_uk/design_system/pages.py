@@ -141,11 +141,12 @@ def PhaseBanner(
     )
 
 
-def Page(*content: fh.FT | Field) -> fh.FT:
+def Page(*content: fh.FT | Field, navigation: fh.FT | None = None) -> fh.FT:
     """
     Page component.
     Args:
         content (list): List of content for the Page.
+        navigation (FT): Navigation component. Defaults to None.
     Returns:
         FT: A FastHTML Page component.
     """
@@ -153,9 +154,12 @@ def Page(*content: fh.FT | Field) -> fh.FT:
         fh.Script(
             "document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');",
         ),
-        # Every page will have a cookie banner until the user hides it
+        # Cookie banner until the user hides it
         fh.Div(hx_get="/cookie-banner", hx_trigger="load"),
         Header("Fast GOV.UK", "/"),
+        # Navigation
+        navigation,
+        # Phase banner
         fh.Div(hx_get="/phase", hx_trigger="load"),
         fh.Div(
             fh.Main(
