@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from fasthtml import common as fh
 
 from fast_gov_uk.design_system import AbstractField
+from fast_gov_uk.forms import Form
 
 
 @pytest.fixture
@@ -40,6 +41,8 @@ def picture():
 def html():
     def pretty_html(x):
         if isinstance(x, AbstractField):
+            html_str = fh.to_xml(x)
+        elif isinstance(x, Form):
             html_str = fh.to_xml(x)
         elif isinstance(x, fh.FT):
             html_str = str(x)

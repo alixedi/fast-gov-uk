@@ -536,6 +536,7 @@ class Checkboxes(Field):
                 ),
                 cls="govuk-fieldset",
                 aria_describedby=f"{self._id}-hint",
+                id=self._id,
             ),
         )
 
@@ -641,6 +642,7 @@ class Radios(Field):
                 ),
                 cls="govuk-fieldset",
                 aria_describedby=f"{self._id}-hint",
+                id=self._id,
             ),
         )
 

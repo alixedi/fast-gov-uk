@@ -743,7 +743,7 @@ def test_checkbox(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
                             '<div class="govuk-checkboxes__item">'
                                 '<input id="test-label_1" name="test" type="checkbox" value="label_1" class="govuk-checkboxes__input">'
@@ -763,7 +763,7 @@ def test_checkbox(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
                             '<div class="govuk-checkboxes__item">'
                                 '<input id="test-label_1" name="test" type="checkbox" value="label_1" class="govuk-checkboxes__input">'
@@ -785,7 +785,7 @@ def test_checkbox(kwargs, expected, html):
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
                     '<div id="test-hint" class="govuk-hint">Test Hint</div>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
                         "</div>"
                     "</fieldset>"
@@ -799,7 +799,7 @@ def test_checkbox(kwargs, expected, html):
                     '<h1 class="govuk-label-wrapper">'
                         '<label for="test" class="govuk-label govuk-label--l">Test Label</label>'
                     "</h1>"
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
                         "</div>"
                     "</fieldset>"
@@ -820,7 +820,7 @@ def test_checkbox(kwargs, expected, html):
                         '<span class="govuk-visually-hidden">Error: </span>'
                         "Test Error!"
                     "</p>"
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
                         "</div>"
                     "</fieldset>"
@@ -832,7 +832,7 @@ def test_checkbox(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-checkboxes" class="govuk-checkboxes govuk-checkboxes--small">'
                         "</div>"
                     "</fieldset>"
@@ -860,7 +860,7 @@ def test_checkboxes_value(html):
     checks.value = "yes"
     assert html(checks) == html(
         '<div class="govuk-form-group">'
-            '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                 '<div data-module="govuk-checkboxes" class="govuk-checkboxes">'
                     '<div class="govuk-checkboxes__item">'
                         '<input id="test-yes" name="test" type="checkbox" value="yes" checked class="govuk-checkboxes__input">'
@@ -936,7 +936,7 @@ def test_radio(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios">'
                             '<div class="govuk-radios__item">'
                                 '<input id="test-label_1" name="test" type="radio" value="label_1" class="govuk-radios__input">'
@@ -956,7 +956,7 @@ def test_radio(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios">'
                             '<div class="govuk-radios__item">'
                                 '<input id="test-label_1" name="test" type="radio" value="label_1" class="govuk-radios__input">'
@@ -973,7 +973,7 @@ def test_radio(kwargs, expected, html):
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
                     '<div id="test-hint" class="govuk-hint">Test Hint</div>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios">'
                         "</div>"
                     "</fieldset>"
@@ -987,7 +987,7 @@ def test_radio(kwargs, expected, html):
                     '<h1 class="govuk-label-wrapper">'
                         '<label for="test" class="govuk-label govuk-label--l">Test Label</label>'
                     "</h1>"
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios">'
                     "</div>"
                     "</fieldset>"
@@ -1008,7 +1008,7 @@ def test_radio(kwargs, expected, html):
                         '<span class="govuk-visually-hidden">Error: </span>'
                         "Test Error!"
                     "</p>"
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios">'
                         "</div>"
                     "</fieldset>"
@@ -1020,7 +1020,7 @@ def test_radio(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios govuk-radios--small">'
                         "</div>"
                     "</fieldset>"
@@ -1032,7 +1032,7 @@ def test_radio(kwargs, expected, html):
             (
                 '<div class="govuk-form-group">'
                     '<label for="test" class="govuk-label">Test Label</label>'
-                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+                    '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                         '<div data-module="govuk-radios" class="govuk-radios govuk-radios--inline">'
                         "</div>"
                     "</fieldset>"
@@ -1063,7 +1063,7 @@ def test_radios_value(html):
     radios.value = "yes"
     assert html(radios) == html(
         '<div class="govuk-form-group">'
-            '<fieldset aria-describedby="test-hint" class="govuk-fieldset">'
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
                 '<div data-module="govuk-radios" class="govuk-radios">'
                     '<div class="govuk-radios__item">'
                         '<input id="test-yes" name="test" type="radio" value="yes" checked class="govuk-radios__input">'

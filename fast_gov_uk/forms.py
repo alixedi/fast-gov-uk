@@ -7,7 +7,7 @@ import httpx
 import fasthtml.common as fh
 from notifications_python_client.errors import HTTPError
 
-from fast_gov_uk.design_system import Button, Field, Fieldset
+from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A
 
 logger = logging.getLogger(__name__)
 
@@ -213,8 +213,18 @@ class Form:
             for field in self.form_fields:
                 field.value = self.data.get(field.name, "")
 
+    def error_summary(self):
+        fields_with_errors = [f for f in self.form_fields if f.error]
+        if not fields_with_errors:
+            return
+        return ErrorSummary(
+            "There is a problem",
+            *[A(f.label, f"#{f._id}") for f in fields_with_errors]
+        )
+
     def __ft__(self) -> fh.FT:
         return fh.Form(
+            self.error_summary(),
             Fieldset(*self.fields, legend=self.title),
             Button(self.cta),
             method=self.method,
@@ -270,6 +280,10 @@ class Questions(Form):
         except IndexError:
             raise fh.HTTPException(status_code=404)
         return fh.Form(
+            # We are not including ErrorSummary here
+            # b/c most of the times, questions have a
+            # single field and therefore its not necessary
+            # to have an error summary
             Fieldset(field, legend=self.title),
             Button(self.cta),
             method=self.method,
