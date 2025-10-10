@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+from datetime import date
 from email.utils import parseaddr
 import re
 
 import fasthtml.common as fh
 
-from .inputs import TextInput
+from .inputs import TextInput, DateInput
 from .navigation import Backlink
 
 
@@ -119,3 +120,42 @@ class RegexInput(TextInput):
         pattern = re.compile(self.regex)
         if not pattern.match(self._value):
             self.error = 'Value does not match the required format.'
+
+
+@dataclass
+class PastDateInput(DateInput):
+
+    @DateInput.value.setter
+    def value(self, value):
+        self._value = value or ("", "", "")
+        day, month, year = self._value
+        if self.required and (not day or not month or not year):
+            self.error = "This field is required."
+            return
+        try:
+            day, month, year = int(day), int(month), int(year)
+            _date = date(day=day, month=month, year=year)
+            if _date > date.today():
+                self.error = "The date must be in the past."
+        except (ValueError, TypeError):
+            self.error = "Invalid values."
+
+
+
+@dataclass
+class FutureDateInput(DateInput):
+
+    @DateInput.value.setter
+    def value(self, value):
+        self._value = value or ("", "", "")
+        day, month, year = self._value
+        if self.required and (not day or not month or not year):
+            self.error = "This field is required."
+            return
+        try:
+            day, month, year = int(day), int(month), int(year)
+            _date = date(day=day, month=month, year=year)
+            if _date < date.today():
+                self.error = "The date must be in the future."
+        except (ValueError, TypeError):
+            self.error = "Invalid values."
