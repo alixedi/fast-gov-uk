@@ -1385,3 +1385,46 @@ def test_not_required(field):
     form = forms.Form(title="Test Form", fields=[f], success_url="/", data={})
     # TODO: assert exact errors :/
     assert form.errors != {"test": "This field is required."}
+
+
+def test_radio_reveal(html):
+    """Test Radios with reveal field."""
+    radios = ds.Radios(
+        name="test",
+        radios=[
+            ds.Radio("test", "yes", "Yes", reveal=ds.TextInput("test1", "Test 1")),
+            ds.Radio("test", "no", "No", reveal=ds.TextInput("test1", "Test 1"))
+        ],
+    )
+    assert html(radios) == html(
+        '<div class="govuk-form-group">'
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" id="test">'
+                '<div data-module="govuk-radios" class="govuk-radios">'
+                    "<div>"
+                        '<div class="govuk-radios__item">'
+                            '<input id="test-yes" name="test" type="radio" value="yes" class="govuk-radios__input" data-aria-controls="conditional-test-yes">'
+                            '<label for="test-yes" class="govuk-label govuk-radios__label">Yes</label>'
+                        "</div>"
+                        '<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-test-yes">'
+                            '<div class="govuk-form-group">'
+                                '<label class="govuk-label" for="test1">Test 1</label>'
+                                '<input aria-describedby="test1-hint test1-error" class="govuk-input" id="test1" name="test1" type="text"/>'
+                            "</div>"
+                        "</div>"
+                    "</div>"
+                    "<div>"
+                        '<div class="govuk-radios__item">'
+                            '<input id="test-no" name="test" type="radio" value="no" class="govuk-radios__input" data-aria-controls="conditional-test-no">'
+                            '<label for="test-no" class="govuk-label govuk-radios__label">No</label>'
+                        "</div>"
+                        '<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-test-no">'
+                            '<div class="govuk-form-group">'
+                                '<label class="govuk-label" for="test1">Test 1</label>'
+                                '<input aria-describedby="test1-hint test1-error" class="govuk-input" id="test1" name="test1" type="text"/>'
+                            "</div>"
+                        "</div>"
+                    "</div>"
+                "</div>"
+            "</fieldset>"
+        "</div>"
+    )
