@@ -355,5 +355,15 @@ def phase():
     )
 
 
+@fast.page
+def footer():
+    """
+    This is the footer that will be rendered on every page in your
+    service. You can change it once, here and it will change the
+    footer on every single page.
+    """
+    return ds.Footer(("Cookies", "/cookies"))
+
+
 # Serves the app
 fh.serve(app="fast")
