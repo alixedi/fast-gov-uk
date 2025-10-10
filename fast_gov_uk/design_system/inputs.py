@@ -561,6 +561,7 @@ class Radio(AbstractField):
     label: str
     hint: str = ""
     checked: bool = False
+    reveal: Optional[Field] = None
 
     @property
     def _id(self):
@@ -583,12 +584,14 @@ class Radio(AbstractField):
         """
         return Hint(self._id, self.hint, extra_cls=" govuk-radios__hint")
 
-    def __ft__(self, *children, **kwargs) -> fh.FT:
-        """
-        Render the field as a FastHTML component.
-        Returns:
-            FT: FastHTML Radio component.
-        """
+    @property
+    def data_aria_controls(self):
+        if self.reveal:
+            return f"conditional-{self._id}"
+        return None
+
+    @property
+    def base_radio(self):
         return fh.Div(
             fh.Input(
                 self.label_component,
@@ -599,8 +602,34 @@ class Radio(AbstractField):
                 value=self.value,
                 checked=self.checked,
                 cls="govuk-radios__input",
+                data_aria_controls=self.data_aria_controls,
             ),
             cls="govuk-radios__item",
+        )
+
+    @property
+    def _reveal(self):
+        if not self.reveal:
+            return None
+        return fh.Div(
+            self.reveal,
+            cls="govuk-radios__conditional govuk-radios__conditional--hidden",
+            id=f"conditional-{self._id}",
+        )
+
+    def __ft__(self, *children, **kwargs) -> fh.FT:
+        """
+        Render the field as a FastHTML component.
+        Returns:
+            FT: FastHTML Radio component.
+        """
+        return (
+            fh.Div(
+                self.base_radio,
+                self._reveal,
+            )
+            if self.reveal
+            else self.base_radio
         )
 
 
@@ -987,7 +1016,7 @@ class Fieldset(AbstractField):
         FT: A FastHTML Fieldset component.
     """
 
-    def __init__(self, *fields: Field, name:str = "", legend: str = ""):
+    def __init__(self, *fields: Field, name: str = "", legend: str = ""):
         self.fields = fields
         self.name = name
         self.legend = legend
