@@ -4,6 +4,8 @@ from unittest.mock import Mock, patch, call, ANY
 
 import pytest
 
+from .app import session_feedback
+
 
 def test_form_get(client):
     response = client.get("/form/profile")
@@ -270,3 +272,47 @@ def test_questions_valid(db, client):
         "sex": "skip",
         "gender": "skip"
     }
+
+
+def test_error_summary(html):
+    form = session_feedback(data={})
+    assert html(form) == html(
+        '<form enctype="multipart/form-data" method="POST">'
+            # The error summary - containine a link to the Radio field
+            '<div class="govuk-error-summary" data-module="govuk-error-summary">'
+                '<div role="alert">'
+                    '<h2 class="govuk-error-summary__title">There is a problem</h2>'
+                    '<div class="govuk-error-summary__body">'
+                        '<ul class="govuk-list govuk-error-summary__list">'
+                            '<li><a class="govuk-link" href="#satisfaction">How satisfied did you feel about the service?</a></li>'
+                        "</ul>"
+                    "</div>"
+                "</div>"
+            "</div>"
+            '<fieldset class="govuk-fieldset">'
+                '<legend class="govuk-fieldset__legend govuk-fieldset__legend--l">'
+                    '<h1 class="govuk-fieldset__heading">Feedback</h1>'
+                "</legend>"
+                '<div class="govuk-form-group govuk-form-group--error">'
+                    '<label class="govuk-label" for="satisfaction">How satisfied did you feel about the service?</label>'
+                    '<p class="govuk-error-message" id="satisfaction-error">'
+                        '<span class="govuk-visually-hidden">Error:</span>'
+                        "This field is required."
+                    "</p>"
+                    '<fieldset aria-describedby="satisfaction-hint" class="govuk-fieldset" id="satisfaction">'
+                        '<div class="govuk-radios" data-module="govuk-radios">'
+                            '<div class="govuk-radios__item">'
+                                '<input class="govuk-radios__input" id="satisfaction-satisfied" name="satisfaction" type="radio" value="satisfied"/>'
+                                '<label class="govuk-label govuk-radios__label" for="satisfaction-satisfied">Satisfied</label>'
+                            "</div>"
+                            '<div class="govuk-radios__item">'
+                                '<input class="govuk-radios__input" id="satisfaction-dissatisfied" name="satisfaction" type="radio" value="dissatisfied"/>'
+                                '<label class="govuk-label govuk-radios__label" for="satisfaction-dissatisfied">Dissatisfied</label>'
+                            "</div>"
+                        "</div>"
+                    "</fieldset>"
+                "</div>"
+            "</fieldset>"
+            '<button class="govuk-button" data-module="govuk-button" type="submit">Send feedback</button>'
+        "</form>"
+    )
