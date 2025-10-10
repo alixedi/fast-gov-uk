@@ -172,7 +172,8 @@ def Page(*content: fh.FT | Field) -> fh.FT:
             ),
             cls="govuk-width-container",
         ),
-        Footer(),
+        # Get central service footer
+        fh.Div(hx_get="/footer", hx_trigger="load"),
         fh.Script(src="/govuk-frontend-5.11.1.min.js", type="module"),
         fh.Script(
             "import {initAll} from '/govuk-frontend-5.11.1.min.js'; initAll();",
