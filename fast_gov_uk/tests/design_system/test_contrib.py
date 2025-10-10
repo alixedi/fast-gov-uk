@@ -239,3 +239,183 @@ def test_regexinput_valid(value, html):
             f'<input type="text" name="test" value="{value}" aria-describedby="test-hint test-error" id="test" class="govuk-input">'
         "</div>"
     )
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        ["1", "1", "2002"],
+        ["1", "1", "1200"],
+    ),
+)
+def test_pastdateinput_valid(value, html):
+    """Test PastDateInput with various parameters.
+    Args:
+        value (str): The value to assign.
+    """
+    # simplified regex for emails
+    field = ds.PastDateInput(name="test")
+    field.value = value
+    assert html(field) == html(
+        '<div class="govuk-form-group">'
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" role="group">'
+                '<div class="govuk-date-input" id="test">'
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-day">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-day-input">Day</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2" id="test-day-input" inputmode="numeric" name="test" type="text" value="{value[0]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-month">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-month-input">Month</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2" id="test-month-input" inputmode="numeric" name="test" type="text" value="{value[1]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-year">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-year-input">Year</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-4" id="test-year-input" inputmode="numeric" name="test" type="text" value="{value[2]}"/>'
+                        "</div>"
+                    "</div>"
+                "</div>"
+            "</fieldset>"
+        "</div>"
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        ["1", "1", "2032"],
+        ["1", "1", "3000"],
+    ),
+)
+def test_pastdateinput_invalid(value, html):
+    """Test PastDateInput with various parameters.
+    Args:
+        value (str): The value to assign.
+    """
+    # simplified regex for emails
+    field = ds.PastDateInput(name="test")
+    field.value = value
+    assert html(field) == html(
+        '<div class="govuk-form-group govuk-form-group--error">'
+            '<p class="govuk-error-message" id="test-error">'
+                '<span class="govuk-visually-hidden">Error:</span>'
+                "The date must be in the past."
+            "</p>"
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" role="group">'
+                '<div class="govuk-date-input" id="test">'
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-day">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-day-input">Day</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2 govuk-input--error" id="test-day-input" inputmode="numeric" name="test" type="text" value="{value[0]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-month">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-month-input">Month</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2 govuk-input--error" id="test-month-input" inputmode="numeric" name="test" type="text" value="{value[1]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-year">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-year-input">Year</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-4 govuk-input--error" id="test-year-input" inputmode="numeric" name="test" type="text" value="{value[2]}"/>'
+                        "</div>"
+                    "</div>"
+                "</div>"
+            "</fieldset>"
+        "</div>"
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        ["1", "1", "2032"],
+        ["1", "1", "3000"],
+    ),
+)
+def test_futuredateinput_valid(value, html):
+    """Test FutureDateInput with various parameters.
+    Args:
+        value (str): The value to assign.
+    """
+    # simplified regex for emails
+    field = ds.FutureDateInput(name="test")
+    field.value = value
+    assert html(field) == html(
+        '<div class="govuk-form-group">'
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" role="group">'
+                '<div class="govuk-date-input" id="test">'
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-day">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-day-input">Day</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2" id="test-day-input" inputmode="numeric" name="test" type="text" value="{value[0]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-month">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-month-input">Month</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2" id="test-month-input" inputmode="numeric" name="test" type="text" value="{value[1]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-year">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-year-input">Year</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-4" id="test-year-input" inputmode="numeric" name="test" type="text" value="{value[2]}"/>'
+                        "</div>"
+                    "</div>"
+                "</div>"
+            "</fieldset>"
+        "</div>"
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        ["1", "1", "2002"],
+        ["1", "1", "1200"],
+    ),
+)
+def test_futuredateinput_invalid(value, html):
+    """Test FutureDateInput with various parameters.
+    Args:
+        value (str): The value to assign.
+    """
+    # simplified regex for emails
+    field = ds.FutureDateInput(name="test")
+    field.value = value
+    assert html(field) == html(
+        '<div class="govuk-form-group govuk-form-group--error">'
+            '<p class="govuk-error-message" id="test-error">'
+                '<span class="govuk-visually-hidden">Error:</span>'
+                "The date must be in the future."
+            "</p>"
+            '<fieldset aria-describedby="test-hint" class="govuk-fieldset" role="group">'
+                '<div class="govuk-date-input" id="test">'
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-day">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-day-input">Day</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2 govuk-input--error" id="test-day-input" inputmode="numeric" name="test" type="text" value="{value[0]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-month">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-month-input">Month</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-2 govuk-input--error" id="test-month-input" inputmode="numeric" name="test" type="text" value="{value[1]}"/>'
+                        "</div>"
+                    "</div>"
+                    '<div class="govuk-date-input__item">'
+                        '<div class="govuk-form-group" id="test-year">'
+                            '<label class="govuk-label govuk-date-input__label" for="test-year-input">Year</label>'
+                            f'<input class="govuk-input govuk-date-input__input govuk-input--width-4 govuk-input--error" id="test-year-input" inputmode="numeric" name="test" type="text" value="{value[2]}"/>'
+                        "</div>"
+                    "</div>"
+                "</div>"
+            "</fieldset>"
+        "</div>"
+    )
