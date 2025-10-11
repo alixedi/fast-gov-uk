@@ -41,9 +41,9 @@ def test_db_form_post_valid(client, db, picture):
     form_dict = json.loads(form_data)
     assert form_dict == {
         "name": "Test",
-        "sex": "male",
-        "gender": "yes",
-        "ethnicity": "mixed",
+        "sex": "Male",
+        "gender": "Yes",
+        "ethnicity": "Mixed",
         # This should be a date string
         "dob": "2000-10-10",
         # This should be a path to the file stored in /media
@@ -163,7 +163,7 @@ def test_email_form_post_valid(fast, db, client):
         template_id='test',
         personalisation={
             'form_name': 'Feedback',
-            'form_data': '* satisfaction: satisfied',
+            'form_data': '* satisfaction: Satisfied',
             'service_name': 'Fast-gov-uk test'
         }
     )
@@ -183,7 +183,7 @@ def test_api_form_post_valid(fast, db, client):
     assert mock_post.call_args == call(
         'https://test.com',
         data={
-            'satisfaction': 'satisfied',
+            'satisfaction': 'Satisfied',
             'form_name': 'Feedback',
             'submitted_on': ANY,
         }
@@ -255,7 +255,7 @@ def test_questions_predicate(db, client):
 def test_questions_valid(db, client):
     response = client.post(
         "/questions/mini_equality/3",
-        data={"permission": "yes", "health": "yes", "ability": "yes", "sex": "skip", "gender": "skip"},
+        data={"permission": "yes", "health": "yes", "ability": "alot", "sex": "skip", "gender": "skip"},
     )
     assert response.status_code == 303
     assert response.headers["Location"] == "/"
@@ -266,11 +266,11 @@ def test_questions_valid(db, client):
     form_data = form_json["data"]
     form_dict = json.loads(form_data)
     assert form_dict == {
-        "permission": "yes",
-        "health": "yes",
-        "ability": "yes",
-        "sex": "skip",
-        "gender": "skip"
+        "permission": "Yes, answer the equality questions",
+        "health": "Yes",
+        "ability": "Yes, a lot",
+        "sex": "Prefer not to say",
+        "gender": "Prefer not to say"
     }
 
 
