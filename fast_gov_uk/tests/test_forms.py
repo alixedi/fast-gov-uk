@@ -200,7 +200,7 @@ def test_session_form_post_valid(fast, db, client):
     assert response.status_code == 200
     response = client.get("/session")
     feedback = response.json()["Feedback"]
-    assert feedback == {"satisfaction": "satisfied"}
+    assert feedback == {"satisfaction": "Satisfied"}
 
 
 def test_questions_get(client):
