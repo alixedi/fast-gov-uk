@@ -243,10 +243,18 @@ class Questions(Form):
     through the fields one at a time.
     """
 
-    def __init__(self, step: int = 0, predicates: dict | None = None, *args, **kwargs):
+    def __init__(
+        self,
+        step: int = 0,
+        predicates: dict | None = None,
+        confirmation: bool = False,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.step = step
         self.predicates = predicates or {}
+        self.confirmation = confirmation
 
     @property
     def step_valid(self):
