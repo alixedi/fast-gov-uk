@@ -193,7 +193,7 @@ class Fast(fh.FastHTML):
                 next_step = question.next_step
                 return fh.Redirect(f"/questions/{name}/{next_step}")
             except QuestionsFinished:
-                return await question.process()
+                return await question.process(session)
         # Else return with errors
         return ds.Page(question)
 
