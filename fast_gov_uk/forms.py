@@ -226,7 +226,8 @@ class Form:
     def __ft__(self) -> fh.FT:
         return fh.Form(
             self.error_summary(),
-            Fieldset(*self.fields, legend=self.title),
+            H1(self.title),
+            *self.fields,
             Button(self.cta),
             method=self.method,
             action=self.action,
@@ -285,7 +286,7 @@ class Questions(Form):
             # b/c most of the times, questions have a
             # single field and therefore its not necessary
             # to have an error summary
-            Fieldset(field, legend=self.title),
+            field,
             Button(self.cta),
             method=self.method,
             action=self.action,
