@@ -123,9 +123,10 @@ class SessionBackend(Backend):
     Backend that stores form data to the session.
     """
 
-    async def process(self, session, *args, **kwargs):
+    async def process(self, req, *args, **kwargs):
         title = getattr(self, "title")
         data = await getattr(self, "clean")
+        session = req.session
         session[title] = data
         return self.success()
 
