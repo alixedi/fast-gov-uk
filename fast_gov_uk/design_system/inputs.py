@@ -501,19 +501,17 @@ class Checkboxes(Field):
     select. Inherits from `Field`.
     Args (in addition to Field):
         checkboxes (list): List of Checkbox components.
-        choices (list): Labels - shorthand for simple checkboxes.
+        choices (dict): Shorthand for simple checkboxes.
         small (bool): Renders small Checkboxes. Defaults to False.
     """
 
     checkboxes: List[Checkbox] = field(default_factory=list)
-    choices: List[str] = field(default_factory=list)
+    choices: dict = field(default_factory=dict)
     small: bool = False
 
     def make_checkboxes(self):
-        for choice in self.choices:
-            choice_tokens = choice.lower().split()
-            value = "_".join(choice_tokens)
-            cb = Checkbox(self.name, value, choice)
+        for value, label in self.choices.items():
+            cb = Checkbox(self.name, value, label)
             self.checkboxes.append(cb)
 
     def __ft__(self, *children, **kwargs) -> fh.FT:

@@ -758,7 +758,7 @@ def test_checkbox(kwargs, expected, html):
             {
                 "name": "test",
                 "label": "Test Label",
-                "choices": ["Label 1"],
+                "choices": {"label_1": "Label 1"},
             },
             (
                 '<div class="govuk-form-group">'
