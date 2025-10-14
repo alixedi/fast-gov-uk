@@ -289,30 +289,26 @@ def test_error_summary(html):
                     "</div>"
                 "</div>"
             "</div>"
-            '<fieldset class="govuk-fieldset">'
-                '<legend class="govuk-fieldset__legend govuk-fieldset__legend--l">'
-                    '<h1 class="govuk-fieldset__heading">Feedback</h1>'
-                "</legend>"
-                '<div class="govuk-form-group govuk-form-group--error">'
-                    '<label class="govuk-label" for="satisfaction">How satisfied did you feel about the service?</label>'
-                    '<p class="govuk-error-message" id="satisfaction-error">'
-                        '<span class="govuk-visually-hidden">Error:</span>'
-                        "This field is required."
-                    "</p>"
-                    '<fieldset aria-describedby="satisfaction-hint" class="govuk-fieldset" id="satisfaction">'
-                        '<div class="govuk-radios" data-module="govuk-radios">'
-                            '<div class="govuk-radios__item">'
-                                '<input class="govuk-radios__input" id="satisfaction-satisfied" name="satisfaction" type="radio" value="satisfied"/>'
-                                '<label class="govuk-label govuk-radios__label" for="satisfaction-satisfied">Satisfied</label>'
-                            "</div>"
-                            '<div class="govuk-radios__item">'
-                                '<input class="govuk-radios__input" id="satisfaction-dissatisfied" name="satisfaction" type="radio" value="dissatisfied"/>'
-                                '<label class="govuk-label govuk-radios__label" for="satisfaction-dissatisfied">Dissatisfied</label>'
-                            "</div>"
+            '<h1 class="govuk-heading-l">Feedback</h1>'
+            '<div class="govuk-form-group govuk-form-group--error">'
+                '<label class="govuk-label" for="satisfaction">How satisfied did you feel about the service?</label>'
+                '<p class="govuk-error-message" id="satisfaction-error">'
+                    '<span class="govuk-visually-hidden">Error:</span>'
+                    "This field is required."
+                "</p>"
+                '<fieldset aria-describedby="satisfaction-hint" class="govuk-fieldset" id="satisfaction">'
+                    '<div class="govuk-radios" data-module="govuk-radios">'
+                        '<div class="govuk-radios__item">'
+                            '<input class="govuk-radios__input" id="satisfaction-satisfied" name="satisfaction" type="radio" value="satisfied"/>'
+                            '<label class="govuk-label govuk-radios__label" for="satisfaction-satisfied">Satisfied</label>'
                         "</div>"
-                    "</fieldset>"
-                "</div>"
-            "</fieldset>"
+                        '<div class="govuk-radios__item">'
+                            '<input class="govuk-radios__input" id="satisfaction-dissatisfied" name="satisfaction" type="radio" value="dissatisfied"/>'
+                            '<label class="govuk-label govuk-radios__label" for="satisfaction-dissatisfied">Dissatisfied</label>'
+                        "</div>"
+                    "</div>"
+                "</fieldset>"
+            "</div>"
             '<button class="govuk-button" data-module="govuk-button" type="submit">Send feedback</button>'
         "</form>"
     )

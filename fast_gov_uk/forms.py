@@ -1,15 +1,18 @@
 import logging
 from functools import cache
-from dataclasses import dataclass
 from datetime import datetime
 
 import httpx
 import fasthtml.common as fh
 from notifications_python_client.errors import HTTPError
 
-from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A
+from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A, H1
 
 logger = logging.getLogger(__name__)
+
+
+class BackendError(Exception):
+    pass
 
 
 class Backend:
@@ -17,27 +20,19 @@ class Backend:
     Base class for backend processing.
     """
 
-    def success(self):
-        success_url = getattr(self, "success_url")
-        return fh.Redirect(success_url)
-
-    async def process(self, *args, **kwargs):
+    async def process(self, request, title, data, *args, **kwargs):
         """Process the form using the backend function."""
         raise NotImplementedError("Subclasses must implement this method.")
 
 
-@dataclass
 class LogBackend(Backend):
     """
     Backend that logs form data.
     """
 
-    async def process(self, *args, **kwargs):
+    async def process(self, request, title, data, *args, **kwargs):
         """Log the form data."""
-        title = getattr(self, "title")
-        data = getattr(self, "data")
-        logger.info(f"Form: '{title}' processed with: {data}.")
-        return self.success()
+        logger.info(f"Form: '{title}' processed with: {await data}.")
 
 
 class DBBackend(Backend):
@@ -45,23 +40,23 @@ class DBBackend(Backend):
     Backend that stores data in the DB.
     """
 
+    def __init__(self, db, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.db = db
+
     def get_table(self):
-        db = getattr(self, "db")
-        forms = db.t.forms
-        if forms not in db.t:
+        forms = self.db.t.forms
+        if forms not in self.db.t:
             forms.create(id=int, title=str, created_on=datetime, data=dict, pk="id")
         return forms
 
-    async def process(self, *args, **kwargs):
+    async def process(self, request, title, data, *args, **kwargs):
+        data = await data
         forms = self.get_table()
         Record = forms.dataclass()
-        title = getattr(self, "title")
-        now = datetime.now()
-        data = await getattr(self, "clean")
-        record = Record(title=title, created_on=now, data=data)
+        record = Record(title=title, created_on=datetime.now(), data=data)
         forms.insert(record)
         logger.info(f"Form: '{title}' saved with: {data}.")
-        return self.success()
 
 
 class EmailBackend(Backend):
@@ -69,23 +64,23 @@ class EmailBackend(Backend):
     Backend that sends submitted forms to admin email.
     """
 
+    def __init__(self, notify, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.notify = notify
+
     async def format(self, data):
         return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
-    async def process(self, *args, **kwargs):
-        notify = getattr(self, "notify")
-        title = getattr(self, "title")
-        data = await getattr(self, "clean")
-        formatted_data = await self.format(data)
+    async def process(self, request, title, data, *args, **kwargs):
+        formatted_data = await self.format(await data)
         try:
-            resp = await notify(form_name=title, form_data=formatted_data)
+            resp = await self.notify(form_name=title, form_data=formatted_data)
             logger.info(f"Email sent for form: {resp}")
         except HTTPError as e:
             logger.error(f"Error sending email for form '{title}': {e}")
             # User should not get the impression that the form
             # was submitted successfully if email failed
             raise
-        return self.success()
 
 
 @cache
@@ -99,23 +94,25 @@ class APIBackend(Backend):
     Backend that sends submitted forms to an API.
     """
 
-    async def process(self, *args, **kwargs):
-        url = getattr(self, "url")
-        username = getattr(self, "username")
-        password = getattr(self, "password")
-        title = getattr(self, "title")
-        data = await getattr(self, "clean")
+    def __init__(self, url, username, password, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.url = url
+        self.username = username
+        self.password = password
+
+
+    async def process(self, request, title, data, *args, **kwargs):
+        data = await data
         data["form_name"] = title
         data["submitted_on"] = datetime.now()
         try:
-            client = _client(username, password)
-            client.post(url, data=data)
+            client = _client(self.username, self.password)
+            client.post(self.url, data=data)
         except httpx.HTTPError as e:
             logger.error(f"Error sending request for form '{title}': {e}")
             # User should not get the impression that the form
             # was submitted successfully if email failed
             raise
-        return self.success()
 
 
 class SessionBackend(Backend):
@@ -123,12 +120,9 @@ class SessionBackend(Backend):
     Backend that stores form data to the session.
     """
 
-    async def process(self, req, *args, **kwargs):
-        title = getattr(self, "title")
-        data = await getattr(self, "clean")
-        session = req.session
-        session[title] = data
-        return self.success()
+    async def process(self, request, title, data, *args, **kwargs):
+        session = request.session
+        session[title] = await data
 
 
 class Form:
@@ -147,7 +141,8 @@ class Form:
     def __init__(
         self,
         title: str,
-        fields: list[Field],
+        fields: list[Field | Fieldset],
+        backends: list[Backend],
         success_url: str,
         method: str = "POST",
         action: str = "",
@@ -157,6 +152,7 @@ class Form:
     ):
         self.title = title
         self.fields = fields
+        self.backends = backends
         self.success_url = success_url
         self.method = method
         self.action = action
@@ -205,8 +201,6 @@ class Form:
     def bind(self):
         """
         Bind data to the form fields.
-        Args:
-            data (dict): Data to bind to the form fields.
         """
         # `if self.data:` doesn't work b/c the form could
         # have a single radio field and submitted empty
@@ -214,6 +208,17 @@ class Form:
         if self.data is not None:
             for field in self.form_fields:
                 field.value = self.data.get(field.name, "")
+
+    async def process(self, req, *args, **kwargs):
+        """
+        Call the process methods on form backends.
+        """
+        try:
+            for backend in self.backends:
+                await backend.process(req, self.title, self.clean, *args, **kwargs)
+        except BackendError:
+            raise
+        return fh.Redirect(self.success_url)
 
     def error_summary(self):
         fields_with_errors = [f for f in self.form_fields if f.error]
@@ -293,59 +298,3 @@ class Questions(Form):
             action=self.action,
             **self.kwargs,
         )
-
-
-class LogForm(Form, LogBackend):
-    pass
-
-
-class LogQuestions(Questions, LogBackend):
-    pass
-
-
-class DBForm(Form, DBBackend):
-    def __init__(self, db, *args, **kwargs):
-        self.db = db
-        super().__init__(*args, **kwargs)
-
-
-class DBQuestions(Questions, DBBackend):
-    def __init__(self, db, *args, **kwargs):
-        self.db = db
-        super().__init__(*args, **kwargs)
-
-
-class EmailForm(Form, EmailBackend):
-    def __init__(self, notify, *args, **kwargs):
-        self.notify = notify
-        super().__init__(*args, **kwargs)
-
-
-class EmailQuestion(Questions, EmailBackend):
-    def __init__(self, notify, *args, **kwargs):
-        self.notify = notify
-        super().__init__(*args, **kwargs)
-
-
-class APIForm(Form, APIBackend):
-    def __init__(self, url, username, password, *args, **kwargs):
-        self.url = url
-        self.username = username
-        self.password = password
-        super().__init__(*args, **kwargs)
-
-
-class APIQuestion(Questions, APIBackend):
-    def __init__(self, url, username, password, *args, **kwargs):
-        self.url = url
-        self.username = username
-        self.password = password
-        super().__init__(*args, **kwargs)
-
-
-class SessionForm(Form, SessionBackend):
-    pass
-
-
-class SessionQuestion(Questions, SessionBackend):
-    pass

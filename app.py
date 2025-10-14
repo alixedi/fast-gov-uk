@@ -59,7 +59,7 @@ def feedback(data=None):
     so that it can save upon correct submission
     """
     # A DBForm gets saved to the database when its valid
-    return forms.DBForm(
+    return forms.Form(
         title="Give feedback for Fast Gov UK",
         fields=[
             ds.Radios(
@@ -84,8 +84,9 @@ def feedback(data=None):
                 ),
             ),
         ],
-        data=data,
+        backends=[forms.DBBackend(db=fast.db)],
         success_url="/",
+        data=data,
         cta="Send feedback",
         db=fast.db,
     )
@@ -105,20 +106,29 @@ def equality(step=0, data=None):
     when it is completed. You can add your own processing logic
     in the process method of the Questions class.
     """
-    return forms.DBQuestions(
+    return forms.Questions(
         title="Equality monitoring",
         fields=[
-            ds.Radios(
-                name="permission",
-                label="Do you want to answer the equality questions?",
-                choices={
-                    "yes": "Yes, answer the equality questions",
-                    "no": "No, skip the equality questions",
-                },
+            ds.Fieldset(
+                ds.Radios(
+                    name="permission",
+                    label="Do you want to answer the equality questions?",
+                    choices={
+                        "yes": "Yes, answer the equality questions",
+                        "no": "No, skip the equality questions",
+                    },
+                    heading=True,
+                    hint="These questions are optional.",
+                ),
+                ds.Detail(
+                    "Why we ask equality questions",
+                    ds.P("[Consider adding an optional longer explanation]")
+                ),
             ),
             ds.DateInput(
                 name="dob",
                 label="What is your date of birth?",
+                heading=True,
             ),
             ds.Radios(
                 name="health",
@@ -285,6 +295,7 @@ def equality(step=0, data=None):
                 },
             ),
         ],
+        backends=[forms.DBBackend(db=fast.db)],
         data=data,
         step=step,
         success_url="/",
