@@ -170,7 +170,8 @@ class Form:
         for field in self.fields:
             if isinstance(field, Fieldset):
                 for fs_field in field.fields:
-                    yield fs_field
+                    if isinstance(fs_field, Field):
+                        yield fs_field
             else:
                 yield field
 
@@ -254,7 +255,7 @@ class Questions(Form):
     def step_valid(self):
         field = self.fields[self.step]
         if isinstance(field, Fieldset):
-            return all(f.error == "" for f in field.fields)
+            return all(not f.error for f in field.fields)
         return field.error == ""
 
     @property
