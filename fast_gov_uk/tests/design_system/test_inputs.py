@@ -1360,7 +1360,7 @@ def test_cookie_banner(kwargs, expected, html):
 def test_required(field):
     """Test that all input fields can be marked as required."""
     f = field(name="test", label="Test Label", required=True)
-    form = forms.Form(title="Test Form", fields=[f], success_url="/", data={})
+    form = forms.Form(title="Test Form", fields=[f], backends=[forms.LogBackend()], success_url="/", data={})
     assert not form.valid
     assert form.errors == {"test": "This field is required."}
 
@@ -1382,7 +1382,7 @@ def test_required(field):
 def test_not_required(field):
     """Test that all input fields can be marked as not required."""
     f = field(name="test", label="Test Label", required=False)
-    form = forms.Form(title="Test Form", fields=[f], success_url="/", data={})
+    form = forms.Form(title="Test Form", fields=[f], backends=[forms.LogBackend()], success_url="/", data={})
     # TODO: assert exact errors :/
     assert form.errors != {"test": "This field is required."}
 

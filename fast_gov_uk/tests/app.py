@@ -20,7 +20,7 @@ def home(session):
 
 @fast.form
 def profile(data=None):
-    return forms.DBForm(
+    return forms.Form(
         title="Create a Profile",
         fields=[
             ds.TextInput("name", "What is your name?"),
@@ -52,16 +52,17 @@ def profile(data=None):
                 required=False,
             ),
         ],
+        backends=[forms.DBBackend(db=fast.db)],
         data=data,
-        success_url="/",
         cta="Send feedback",
         db=fast.db,
+        success_url="/",
     )
 
 
 @fast.form
 def email_feedback(data=None):
-    return forms.EmailForm(
+    return forms.Form(
         title="Feedback",
         fields=[
             ds.Radios(
@@ -70,16 +71,16 @@ def email_feedback(data=None):
                 choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
+        backends=[forms.EmailBackend(notify=fast.notify("test", "test@test.com"))],
         data=data,
-        success_url="/",
         cta="Send feedback",
-        notify=fast.notify("test", "test@test.com"),
+        success_url="/",
     )
 
 
 @fast.form
 def api_feedback(data=None):
-    return forms.APIForm(
+    return forms.Form(
         title="Feedback",
         fields=[
             ds.Radios(
@@ -88,18 +89,16 @@ def api_feedback(data=None):
                 choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
+        backends=[forms.APIBackend(url="https://test.com", username="test_user", password="test_password")],
         data=data,
-        success_url="/",
         cta="Send feedback",
-        url="https://test.com",
-        username="test_user",
-        password="test_password",
+        success_url="/",
     )
 
 
 @fast.form
 def session_feedback(data=None):
-    return forms.SessionForm(
+    return forms.Form(
         title="Feedback",
         fields=[
             ds.Radios(
@@ -108,15 +107,16 @@ def session_feedback(data=None):
                 choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
             ),
         ],
+        backends=[forms.SessionBackend()],
         data=data,
-        success_url="/",
         cta="Send feedback",
+        success_url="/",
     )
 
 
 @fast.question
 def mini_equality(step=0, data=None):
-    return forms.DBQuestions(
+    return forms.Questions(
         title="Equality monitoring",
         fields=[
             ds.Radios(
@@ -162,18 +162,18 @@ def mini_equality(step=0, data=None):
                 name="sex-and-gender",
             ),
         ],
+        backends=[forms.DBBackend(db=fast.db)],
         data=data,
         step=step,
-        success_url="/",
         cta="Continue",
-        db=fast.db,
         predicates={
             # These fields are only run if the data collected
             # in specified prior fields have the specified values
             "health": {"permission": "yes"},
             "ability": {"permission": "yes", "health": "yes"},
             "sex-and-gender": {"permission": "yes"},
-        }
+        },
+        success_url="/",
     )
 
 

@@ -161,7 +161,7 @@ class Fast(fh.FastHTML):
         form = mkform(post)
         # If valid, process
         if form.valid:
-            return await form.process(req.session)
+            return await form.process(req)
         # Else return with errors
         return ds.Page(form)
 
@@ -193,7 +193,7 @@ class Fast(fh.FastHTML):
                 next_step = question.next_step
                 return fh.Redirect(f"/questions/{name}/{next_step}")
             except QuestionsFinished:
-                return await question.process()
+                return await question.process(req)
         # Else return with errors
         return ds.Page(question)
 
