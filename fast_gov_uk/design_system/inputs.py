@@ -164,6 +164,12 @@ class Select(Field):
 
     options: List[Tuple[str, str]] = field(default_factory=list)
 
+    @property
+    async def clean(self):
+        for val, text in self.options:
+            if val == self.value:
+                return text
+
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
         Render the field as a FastHTML component.
@@ -509,6 +515,14 @@ class Checkboxes(Field):
     choices: dict = field(default_factory=dict)
     small: bool = False
 
+    @property
+    async def clean(self):
+        if not self.checkboxes:
+            return self.choices.get(self.value, None)
+        for cb in self.checkboxes:
+            if cb.value == self.value:
+                return cb.label
+
     def make_checkboxes(self):
         for value, label in self.choices.items():
             cb = Checkbox(self.name, value, label)
@@ -647,6 +661,14 @@ class Radios(Field):
     choices: dict = field(default_factory=dict)
     small: bool = False
     inline: bool = False
+
+    @property
+    async def clean(self):
+        if not self.radios:
+            return self.choices.get(self.value, None)
+        for radio in self.radios:
+            if radio.value == self.value:
+                return radio.label
 
     def make_radios(self):
         for value, label in self.choices.items():

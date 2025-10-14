@@ -125,7 +125,7 @@ class SessionBackend(Backend):
 
     async def process(self, session, *args, **kwargs):
         title = getattr(self, "title")
-        data = getattr(self, "data")
+        data = await getattr(self, "clean")
         session[title] = data
         return self.success()
 
