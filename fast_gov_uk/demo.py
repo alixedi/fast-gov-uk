@@ -70,7 +70,7 @@ DEMO_PAGE = (
         "detail",
         label="A Textarea",
         hint="With a hint",
-        heading=True,
+        heading="l",
     ),
     ds.PasswordInput("pass", label="A Password input", hint="with a helpful hint"),
     ds.CharacterCount(
@@ -78,7 +78,7 @@ DEMO_PAGE = (
         label="Character Count",
         hint="with a helpful hint",
         maxchars=10,
-        heading=True,
+        heading="l",
     ),
     ds.ErrorSummary("An Error Summary", ds.A("A link")),
     ds.Table(
@@ -102,7 +102,7 @@ DEMO_PAGE = (
         "input",
         label="A text input",
         hint="With a hint",
-        heading=True,
+        heading="l",
         prefix="£",
         suffix="Only",
     ),
@@ -115,7 +115,7 @@ DEMO_PAGE = (
         ],
         label="Checkboxes",
         hint="With a hint",
-        heading=True,
+        heading="l",
     ),
     ds.Radios(
         name="radio",
@@ -126,13 +126,13 @@ DEMO_PAGE = (
         ],
         label="Radios",
         hint="With a hint",
-        heading=True,
+        heading="l",
     ),
     ds.FileUpload(
         "file_upload",
         "File Upload",
         hint="With a hint",
-        heading=True,
+        heading="l",
     ),
     ds.ExitPage(text="Exit Page component"),
     ds.Navigation(
@@ -149,7 +149,7 @@ DEMO_PAGE = (
         prev_link="/test?page=2",
         next_link="/test?page=4",
     ),
-    ds.DateInput("date_input", "A Date Input", hint="With a hint", heading=True),
+    ds.DateInput("date_input", "A Date Input", hint="With a hint", heading="l"),
     ds.SummaryList(
         ds.SummaryItem("Name", "John Doe"),
         ds.SummaryItem("Date of Birth", "13/10/2010", ds.A("Change", "/change-dob")),

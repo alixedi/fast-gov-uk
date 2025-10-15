@@ -13,7 +13,7 @@ from .utils import mkid
 def Label(
     field_id: str,
     text: str,
-    heading: bool = False,
+    heading: str = "",
     required: bool = True,
     extra_cls: str = "",
 ) -> fh.FT:
@@ -22,13 +22,13 @@ def Label(
     Args:
         field_id (str): HTML id of the field this label is for.
         text (str): Text to be displayed in the label.
-        heading (bool): Is this label a heading? Defaults to False.
+        heading (str): Is this label a heading? Defaults to "".
         required (book): Is this for a field that is required? Defaults to True.
     Returns:
         FT: A FastHTML label component.
     """
     optional = "" if required else " (Optional)"
-    heading_cls = " govuk-label--l" if heading else ""
+    heading_cls = f" govuk-label--{heading}" if heading else ""
     label = fh.Label(
         f"{text}{optional}", cls=f"govuk-label{heading_cls}{extra_cls}", _for=field_id
     )
@@ -87,7 +87,7 @@ class Field(AbstractField):
     label: str = ""
     hint: str = ""
     error: str = ""
-    heading: bool = False
+    heading: str = ""
     required: bool = True
     _value = None
 
@@ -675,9 +675,17 @@ class Radios(Field):
             radio = Radio(self.name, value, label)
             self.radios.append(radio)
 
+    def insert_divider(self):
+        if len(self.radios) <= 2:
+            return self.radios
+        divider = fh.Div("or", cls="govuk-radios__divider")
+        self.radios.insert(-1, divider)
+        return self.radios
+
     def __ft__(self, *children, **kwargs) -> fh.FT:
         if not self.radios:
             self.make_radios()
+        radios = self.insert_divider() or []
         small_cls = " govuk-radios--small" if self.small else ""
         inline_cls = " govuk-radios--inline" if self.inline else ""
         for radio in self.radios:
@@ -685,7 +693,7 @@ class Radios(Field):
         return super().__ft__(
             fh.Fieldset(
                 fh.Div(
-                    *self.radios,
+                    *radios,
                     cls=f"govuk-radios{small_cls}{inline_cls}",
                     data_module="govuk-radios",
                 ),

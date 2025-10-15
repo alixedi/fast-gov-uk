@@ -110,6 +110,16 @@ def equality(step=0, data=None):
         title="Equality monitoring",
         fields=[
             ds.Fieldset(
+                ds.H1("We have received your application"),
+                ds.P(
+                    "Before you finish using the service, "
+                    "we'd like to ask some equality questions."
+                ),
+                ds.P(
+                    "[Add a couple of sentences explaining why "
+                    "you're asking the questions and what you'll "
+                    "do with the information]."
+                ),
                 ds.Radios(
                     name="permission",
                     label="Do you want to answer the equality questions?",
@@ -117,7 +127,7 @@ def equality(step=0, data=None):
                         "yes": "Yes, answer the equality questions",
                         "no": "No, skip the equality questions",
                     },
-                    heading=True,
+                    heading="m",
                     hint="These questions are optional.",
                 ),
                 ds.Detail(
@@ -128,7 +138,11 @@ def equality(step=0, data=None):
             ds.DateInput(
                 name="dob",
                 label="What is your date of birth?",
-                heading=True,
+                hint=(
+                    "For example, 31 3 1980 - if you prefer not to say, "
+                    "continue without entering any information"
+                ),
+                heading="l",
             ),
             ds.Radios(
                 name="health",
@@ -137,6 +151,7 @@ def equality(step=0, data=None):
                     "lasting or expected to last 12 months or more?"
                 ),
                 choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
+                heading="l",
             ),
             ds.Radios(
                 name="ability",
@@ -144,6 +159,7 @@ def equality(step=0, data=None):
                     "Do any of your conditions or illnesses reduce your ability "
                     "to carry out day to day activities?"
                 ),
+                hint="For example eating, washing, walking or going shopping",
                 choices={
                     "alot": "Yes, a lot",
                     "little": "Yes, a little",
@@ -151,6 +167,7 @@ def equality(step=0, data=None):
                     "skip": "Prefer not to say",
                 },
                 required=False,
+                heading="l",
             ),
             ds.Radios(
                 name="ethnic-group",
@@ -163,6 +180,7 @@ def equality(step=0, data=None):
                     "other": "Other ethnic group",
                     "skip": "Prefer not to say",
                 },
+                heading="l",
             ),
             ds.Radios(
                 name="white",
@@ -175,6 +193,7 @@ def equality(step=0, data=None):
                     "skip": "Prefer not to say",
                 },
                 required=False,
+                heading="l",
             ),
             ds.Radios(
                 name="mixed",
@@ -190,6 +209,7 @@ def equality(step=0, data=None):
                     "skip": "Prefer not to say",
                 },
                 required=False,
+                heading="l",
             ),
             ds.Radios(
                 name="asian",
@@ -206,6 +226,7 @@ def equality(step=0, data=None):
                     "skip": "Prefer not to say",
                 },
                 required=False,
+                heading="l",
             ),
             ds.Radios(
                 name="black",
@@ -220,6 +241,7 @@ def equality(step=0, data=None):
                     "skip": "Prefer not to say",
                 },
                 required=False,
+                heading="l",
             ),
             ds.Radios(
                 name="other",
@@ -230,6 +252,7 @@ def equality(step=0, data=None):
                     "skip": "Prefer not to say",
                 },
                 required=False,
+                heading="l",
             ),
             ds.Radios(
                 name="marital-status",
@@ -246,6 +269,7 @@ def equality(step=0, data=None):
                     "surviving-partner": "Surviving partner from a registered civil partnership",
                     "skip": "Prefer not to say",
                 },
+                heading="l",
             ),
             ds.Radios(
                 name="religion",
@@ -261,6 +285,7 @@ def equality(step=0, data=None):
                     "other": "Any other religion",
                     "skip": "Prefer not to say",
                 },
+                heading="l",
             ),
             ds.Fieldset(
                 ds.Radios(
@@ -271,6 +296,7 @@ def equality(step=0, data=None):
                         "male": "Male",
                         "skip": "Prefer not to say",
                     },
+                    heading="m",
                 ),
                 ds.Radios(
                     name="gender",
@@ -279,6 +305,7 @@ def equality(step=0, data=None):
                         "your sex registered at birth?"
                     ),
                     choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
+                    heading="m",
                 ),
                 legend="Sex and gender identity",
                 name="sex-and-gender",
@@ -293,6 +320,7 @@ def equality(step=0, data=None):
                     "other": "Other",
                     "skip": "Prefer not to say",
                 },
+                heading="l",
             ),
         ],
         backends=[forms.DBBackend(db=fast.db)],
