@@ -110,6 +110,16 @@ def equality(step=0, data=None):
         title="Equality monitoring",
         fields=[
             ds.Fieldset(
+                ds.H1("We have received your application"),
+                ds.P(
+                    "Before you finish using the service, "
+                    "we'd like to ask some equality questions."
+                ),
+                ds.P(
+                    "[Add a couple of sentences explaining why "
+                    "you're asking the questions and what you'll "
+                    "do with the information]."
+                ),
                 ds.Radios(
                     name="permission",
                     label="Do you want to answer the equality questions?",
@@ -128,6 +138,10 @@ def equality(step=0, data=None):
             ds.DateInput(
                 name="dob",
                 label="What is your date of birth?",
+                hint=(
+                    "For example, 31 3 1980 - if you prefer not to say, "
+                    "continue without entering any information"
+                ),
                 heading="l",
             ),
             ds.Radios(
