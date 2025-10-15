@@ -1378,6 +1378,10 @@ def test_required(field):
     ds.EmailInput,
     ds.NumberInput,
     ds.DecimalInput,
+    ds.GBPInput,
+    ds.RegexInput,
+    ds.PastDateInput,
+    ds.FutureDateInput,
 ))
 def test_not_required(field):
     """Test that all input fields can be marked as not required."""

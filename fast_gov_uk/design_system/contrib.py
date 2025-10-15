@@ -109,7 +109,7 @@ class RegexInput(TextInput):
     error attribute if invalid.
     """
 
-    regex: str = "*"
+    regex: str = ".*"
 
     @TextInput.value.setter
     def value(self, value):
