@@ -675,9 +675,17 @@ class Radios(Field):
             radio = Radio(self.name, value, label)
             self.radios.append(radio)
 
+    def insert_divider(self):
+        if len(self.radios) <= 2:
+            return self.radios
+        divider = fh.Div("or", cls="govuk-radios__divider")
+        self.radios.insert(-1, divider)
+        return self.radios
+
     def __ft__(self, *children, **kwargs) -> fh.FT:
         if not self.radios:
             self.make_radios()
+        radios = self.insert_divider() or []
         small_cls = " govuk-radios--small" if self.small else ""
         inline_cls = " govuk-radios--inline" if self.inline else ""
         for radio in self.radios:
@@ -685,7 +693,7 @@ class Radios(Field):
         return super().__ft__(
             fh.Fieldset(
                 fh.Div(
-                    *self.radios,
+                    *radios,
                     cls=f"govuk-radios{small_cls}{inline_cls}",
                     data_module="govuk-radios",
                 ),
