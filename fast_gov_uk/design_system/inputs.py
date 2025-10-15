@@ -13,7 +13,7 @@ from .utils import mkid
 def Label(
     field_id: str,
     text: str,
-    heading: bool = False,
+    heading: str = "",
     required: bool = True,
     extra_cls: str = "",
 ) -> fh.FT:
@@ -22,13 +22,13 @@ def Label(
     Args:
         field_id (str): HTML id of the field this label is for.
         text (str): Text to be displayed in the label.
-        heading (bool): Is this label a heading? Defaults to False.
+        heading (str): Is this label a heading? Defaults to "".
         required (book): Is this for a field that is required? Defaults to True.
     Returns:
         FT: A FastHTML label component.
     """
     optional = "" if required else " (Optional)"
-    heading_cls = " govuk-label--l" if heading else ""
+    heading_cls = f" govuk-label--{heading}" if heading else ""
     label = fh.Label(
         f"{text}{optional}", cls=f"govuk-label{heading_cls}{extra_cls}", _for=field_id
     )
@@ -87,7 +87,7 @@ class Field(AbstractField):
     label: str = ""
     hint: str = ""
     error: str = ""
-    heading: bool = False
+    heading: str = ""
     required: bool = True
     _value = None
 

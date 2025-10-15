@@ -21,7 +21,7 @@ import fast_gov_uk.design_system as ds
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "heading": True},
+            {"name": "test", "label": "Test Label", "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper">'
@@ -186,7 +186,7 @@ def test_select_value(html):
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "heading": True},
+            {"name": "test", "label": "Test Label", "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper">'
@@ -386,7 +386,7 @@ def test_fieldset(html):
             ),
         ),
         (
-            {"name": "test", "maxwords": 50, "label": "Test Label", "heading": True},
+            {"name": "test", "maxwords": 50, "label": "Test Label", "heading": "l"},
             (
                 '<div data-module="govuk-character-count" data-maxwords="50" class="govuk-form-group govuk-character-count">'
                     '<h1 class="govuk-label-wrapper"><label for="test" class="govuk-label govuk-label--l">Test Label</label></h1>'
@@ -484,7 +484,7 @@ def test_start_button(html):
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "heading": True},
+            {"name": "test", "label": "Test Label", "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper">'
@@ -793,7 +793,7 @@ def test_checkbox(kwargs, expected, html):
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "checkboxes": [], "heading": True},
+            {"name": "test", "label": "Test Label", "checkboxes": [], "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper">'
@@ -981,7 +981,7 @@ def test_radio(kwargs, expected, html):
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "radios": [], "heading": True},
+            {"name": "test", "label": "Test Label", "radios": [], "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper">'
@@ -1121,7 +1121,7 @@ def test_radios_value(html):
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "heading": True},
+            {"name": "test", "label": "Test Label", "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper">'
@@ -1179,7 +1179,7 @@ def test_fileupload(kwargs, expected, html):
             ),
         ),
         (
-            {"name": "test", "label": "Test Label", "heading": True},
+            {"name": "test", "label": "Test Label", "heading": "l"},
             (
                 '<div class="govuk-form-group">'
                     '<h1 class="govuk-label-wrapper"><label for="test" class="govuk-label govuk-label--l">Test Label</label></h1>'
