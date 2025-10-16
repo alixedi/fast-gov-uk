@@ -184,3 +184,20 @@ def test_ul(args, kwargs, expected):
     """
     list = Ul(*args, **kwargs)
     assert str(list) == expected
+
+
+@pytest.mark.parametrize("component", (
+    A("test", hx_test="foo"),
+    H1("test", hx_test="foo"),
+    H2("test", hx_test="foo"),
+    H3("test", hx_test="foo"),
+    P("test", hx_test="foo"),
+    Ul("test", hx_test="foo"),
+))
+def test_html_attribute(component, html):
+    """
+    Test that passes an html attribute to components - that is not
+    explicitly handled but should be passed through to the
+    underlying FT.
+    """
+    assert 'hx-test="foo"' in html(component)

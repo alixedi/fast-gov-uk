@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import date
 from email.utils import parseaddr
 import re
@@ -9,7 +8,6 @@ from .inputs import TextInput, DateInput
 from .navigation import Backlink
 
 
-@dataclass
 class EmailInput(TextInput):
     """
     EmailInput component - A TextInput field that
@@ -28,7 +26,6 @@ class EmailInput(TextInput):
             self.error = "Value is not an email."
 
 
-@dataclass
 class NumberInput(TextInput):
     """
     NumberInput component - A TextInput field that
@@ -36,7 +33,9 @@ class NumberInput(TextInput):
     error attribute if invalid.
     """
 
-    numeric: bool = True
+    def __init__(self, *args, numeric: bool = True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.numeric = numeric
 
     @TextInput.value.setter
     def value(self, value):
@@ -57,7 +56,6 @@ class NumberInput(TextInput):
         return number
 
 
-@dataclass
 class DecimalInput(TextInput):
     """
     DecimalInput component - A TextInput field that
@@ -65,7 +63,9 @@ class DecimalInput(TextInput):
     error attribute if invalid.
     """
 
-    numeric: bool = True
+    def __init__(self, *args, numeric: bool = True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.numeric = numeric
 
     @TextInput.value.setter
     def value(self, value):
@@ -86,12 +86,14 @@ class DecimalInput(TextInput):
         return number
 
 
-@dataclass
 class GBPInput(DecimalInput):
     """
     GBPInput because its such a common ask.
     """
-    prefix : str = "£"
+
+    def __init__(self, *args, prefix: str = "£", **kwargs):
+        super().__init__(*args, **kwargs)
+        self.prefix = prefix
 
 
 def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
@@ -101,7 +103,6 @@ def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
     return Backlink("javascript:history.back()", text=text, inverse=inverse)
 
 
-@dataclass
 class RegexInput(TextInput):
     """
     RegexInput component - A TextInput field that
@@ -109,7 +110,9 @@ class RegexInput(TextInput):
     error attribute if invalid.
     """
 
-    regex: str = ".*"
+    def __init__(self, *args, regex: str = ".*", **kwargs):
+        super().__init__(*args, **kwargs)
+        self.regex = regex
 
     @TextInput.value.setter
     def value(self, value):
@@ -122,7 +125,6 @@ class RegexInput(TextInput):
             self.error = 'Value does not match the required format.'
 
 
-@dataclass
 class PastDateInput(DateInput):
 
     @DateInput.value.setter
@@ -141,8 +143,6 @@ class PastDateInput(DateInput):
             self.error = "Invalid values."
 
 
-
-@dataclass
 class FutureDateInput(DateInput):
 
     @DateInput.value.setter

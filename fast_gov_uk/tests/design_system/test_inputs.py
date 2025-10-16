@@ -1432,3 +1432,25 @@ def test_radio_reveal(html):
             "</fieldset>"
         "</div>"
     )
+
+
+@pytest.mark.parametrize("field", (
+    ds.Select,
+    ds.Textarea,
+    ds.PasswordInput,
+    ds.CharacterCount,
+    ds.TextInput,
+    ds.Checkboxes,
+    ds.Radios,
+    ds.FileUpload,
+    ds.DateInput,
+))
+def test_html_attribute(field, html):
+    """
+    Test that passes an html attribute to all fields - that is not
+    explicitly handled but should be passed through to the
+    underlying component.
+    """
+    f = field(name="test", label="Test Label", hx_test="foo")
+    # TODO: assert exact errors :/
+    assert 'hx-test="foo"' in html(f)

@@ -210,7 +210,7 @@ def test_accordion(html):
     # FastHTML has an "id" attribute, str(component) returns the id
     # instead of the rendered html of the component.
     accordion = ds.Div(
-        ds.accordion(
+        ds.Accordion(
             {
                 "heading": "Understanding agile project management",
                 "summary": "Introductions, methods, core features.",
@@ -232,7 +232,7 @@ def test_accordion(html):
     )
     assert html(accordion) == html(
         '<div>'
-            '<div class="govuk-accordion" data-module="govuk-accordion" id="accordion-with-summary-sections">'
+            '<div class="govuk-accordion" data-module="govuk-accordion">'
                 '<div class="govuk-accordion__section">'
                     '<div class="govuk-accordion__section-header">'
                         '<h2 class="govuk-accordion__section-heading">'
