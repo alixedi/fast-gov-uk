@@ -125,6 +125,18 @@ class SessionBackend(Backend):
         session[title] = await data
 
 
+class AddSessionBackend(Backend):
+    """
+    Backend that updates (instead of overwrite) session with form data.
+    """
+
+    async def process(self, request, title, data, *args, **kwargs):
+        session = request.session
+        if title not in session:
+            session[title] = {}
+        session[title].update(await data)
+
+
 class Form:
     """
     Wrapper around fh Form for consistency.
