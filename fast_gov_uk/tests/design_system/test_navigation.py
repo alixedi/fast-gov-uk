@@ -316,3 +316,21 @@ def test_pagination(kwargs, expected, html):
     links = kwargs.pop("links")
     page = ds.Pagination(*links, **kwargs)
     assert html(page) == html(expected)
+
+
+@pytest.mark.parametrize("component", (
+    ds.Backlink("/", hx_test="foo"),
+    ds.SkipLink("/", hx_test="foo"),
+    ds.Breadcrumbs(("test", "/"), hx_test="foo"),
+    ds.ExitPage(hx_test="foo"),
+    ds.NavigationLink("test", "/", hx_test="foo"),
+    ds.Navigation(hx_test="foo"),
+    ds.Pagination(hx_test="foo"),
+))
+def test_html_attribute(component, html):
+    """
+    Test that passes an html attribute to components - that is not
+    explicitly handled but should be passed through to the
+    underlying FT.
+    """
+    assert 'hx-test="foo"' in html(component)

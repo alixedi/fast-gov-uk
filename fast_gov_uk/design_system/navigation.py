@@ -26,31 +26,39 @@ def Backlink(href: str, text: str = "Back", inverse: bool = False, **kwargs) -> 
 def SkipLink(
     href: str,
     text: str = "Skip to main content",
+    **kwargs,
 ) -> fh.FT:
     """
     Skip link component.
     Args:
         href (str): On-page anchor (e.g. #main) for the main content.
         text (str): The text to display in the link. Defaults to "Skip to main content".
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML SkipLink component.
     """
-    return fh.A(text, href=href, cls="govuk-skip-link", data_module="govuk-skip-link")
+    return fh.A(
+        text, href=href, cls="govuk-skip-link", data_module="govuk-skip-link", **kwargs
+    )
 
 
 def Breadcrumbs(
     *links: tuple[str, str],
     collapse_on_mobile: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     Breadcrumbs component.
     Args:
         *links (tuple[str, str]): Text & URL for breadcrumb links.
         collapse_on_mobile (boo): Make breadcrumbls responsive. Defaults to False.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Breadcrumbs component.
     """
-    collapse_cls = " govuk-breadcrumbs--collapse-on-mobile" if collapse_on_mobile else ""
+    collapse_cls = (
+        " govuk-breadcrumbs--collapse-on-mobile" if collapse_on_mobile else ""
+    )
     return fh.Nav(
         fh.Ol(
             *[
@@ -64,18 +72,21 @@ def Breadcrumbs(
         ),
         cls=f"govuk-breadcrumbs{collapse_cls}",
         aria_label="Breadcrumb",
+        **kwargs,
     )
 
 
 def ExitPage(
     text: str = "Exit this page",
     href: str = "https://www.bbc.co.uk/weather",
+    **kwargs,
 ) -> fh.FT:
     """
     Exit Page component.
     Args:
         text (str): The text to display on the ExitPate component. Defaults to "Exit Page".
         href (str): The URL the link points to. Defaults to BBC weather service.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML ExitPage component.
     """
@@ -99,6 +110,7 @@ def ExitPage(
         ),
         cls="govuk-exit-this-page",
         data_module="govuk-exit-this-page",
+        **kwargs,
     )
 
 
@@ -106,6 +118,7 @@ def NavigationLink(
     text: str,
     href: str,
     active: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     NavigationLink component.
@@ -113,6 +126,7 @@ def NavigationLink(
         text (str): Text for the NavigationLink.
         href (str): Link for the NavigationLink.
         active (bool): Is the NavigationLink active?
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML NavigationLink component.
     """
@@ -129,18 +143,21 @@ def NavigationLink(
             "govuk-service-navigation__item"
             f"{' govuk-service-navigation__item--active' if active else ''}"
         ),
+        **kwargs,
     )
 
 
 def Navigation(
     *links: fh.FT,
     service_name: str = "",
+    **kwargs,
 ) -> fh.FT:
     """
     Service Navigation component.
     Args:
         links (NavigationLinks): List of NavigationLink components.
         service_name (str): Name of the service. Defaults to "".
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Navigation component.
     """
@@ -176,6 +193,7 @@ def Navigation(
         cls="govuk-service-navigation",
         aria_label="Service information",
         data_module="govuk-service-navigation",
+        **kwargs,
     )
 
 
@@ -231,6 +249,7 @@ def PaginationLink(
     label: str,
     href: str,
     active: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     Link for pagination.
@@ -238,6 +257,7 @@ def PaginationLink(
         label (str): Lavel for the link
         href (str): URL for the page.
         active (book): Is this the current page? Defaults to False.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHtml component.
     """
@@ -251,6 +271,7 @@ def PaginationLink(
             aria_current="page" if active else "",
         ),
         cls=f"govuk-pagination__item{active_cls}",
+        **kwargs,
     )
 
 
@@ -258,6 +279,7 @@ def Pagination(
     *links: fh.FT,
     prev_link: str = "",
     next_link: str = "",
+    **kwargs,
 ) -> fh.FT:
     """
     Pagination component.
@@ -265,6 +287,7 @@ def Pagination(
         *links (PaginationLinks): List of PaginationLink components.
         prev_link (str): Link for previous page. Defaults to "".
         next_link (str): Link for next page. Defaults to "".
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Pagination component.
     # TODO: Add support for ellipses.
@@ -278,18 +301,21 @@ def Pagination(
         _pagination_next(next_link) if next_link else "",
         cls="govuk-pagination",
         aria_label="Pagination",
+        **kwargs,
     )
 
 
 def PaginationBlock(
     prev: tuple[str, str],
     next: tuple[str, str],
+    **kwargs,
 ) -> fh.FT:
     """
     PaginationBlock component.
     Args:
         prev_link (tuple): Text and Link for previous page.
         next_link (tuple): Text and Link for next page.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Pagination component.
     """
@@ -332,4 +358,5 @@ def PaginationBlock(
         next_component,
         cls="govuk-pagination govuk-pagination--block",
         aria_label="Pagination",
+        **kwargs,
     )

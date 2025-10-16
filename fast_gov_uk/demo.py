@@ -48,7 +48,7 @@ DEMO_PAGE = (
     ds.Warning(ds.P("Here is a Warning")),
     ds.Notification(ds.P("Here is some content"), title="A Notification"),
     ds.Notification(ds.P("Here is some content"), title="A Notification", success=True),
-    ds.accordion(
+    ds.Accordion(
         {"heading": "An accordion Section", "content": "Some content"},
         {"heading": "Another accordion Section", "content": "Some more content"},
     ),

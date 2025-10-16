@@ -6,12 +6,13 @@ from .typography import H1, H2, P
 from .utils import OGL, Crown, Logo
 
 
-def Header(title: str, homepage: str) -> fh.FT:
+def Header(title: str, homepage: str, **kwargs) -> fh.FT:
     """
     Header component.
     Args:
         title (str): The title of the header.
         homepage (str): The URL of the homepage.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Header component.
     """
@@ -31,18 +32,21 @@ def Header(title: str, homepage: str) -> fh.FT:
         ),
         cls="govuk-header",
         data_module="govuk-header",
+        **kwargs,
     )
 
 
 def FooterLink(
     text: str,
     href: str,
+    **kwargs,
 ) -> fh.FT:
     """
     Footer link component.
     Args:
         text (str): The text to display in the link.
         href (str): The URL the link points to. Defaults to "#".
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML FooterLink component.
     """
@@ -50,14 +54,16 @@ def FooterLink(
         text,
         href=href,
         cls="govuk-footer__link",
+        **kwargs,
     )
 
 
-def Footer(*links: tuple[str, str]) -> fh.FT:
+def Footer(*links: tuple[str, str], **kwargs) -> fh.FT:
     """
     Footer component.
     Args:
         links (tuples with text and href): Footer links.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Footer component.
     """
@@ -107,18 +113,21 @@ def Footer(*links: tuple[str, str]) -> fh.FT:
             cls="govuk-width-container",
         ),
         cls="govuk-footer",
+        **kwargs,
     )
 
 
 def PhaseBanner(
     *content: fh.FT,
     phase: str = "Alpha",
+    **kwargs,
 ) -> fh.FT:
     """
     Phase banner component.
     Args:
         content (FT): The content to display in the phase banner.
         phase (str): The phase of the project. Defaults to "alpha".
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML PhaseBanner component.
     """
@@ -138,6 +147,7 @@ def PhaseBanner(
             cls="govuk-phase-banner",
         ),
         cls="govuk-width-container",
+        **kwargs,
     )
 
 
@@ -147,6 +157,7 @@ def Page(*content: fh.FT | Field, navigation: fh.FT | None = None) -> fh.FT:
     Args:
         content (list): List of content for the Page.
         navigation (FT): Navigation component. Defaults to None.
+        kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Page component.
     """

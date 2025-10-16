@@ -3,21 +3,23 @@ import fasthtml.common as fh
 from .utils import mkid
 
 
-def Inset(text: str) -> fh.FT:
+def Inset(text: str, **kwargs) -> fh.FT:
     """
     Inset text component.
     Args:
         text (str): The main text to display.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Inset text component.
     """
-    return fh.Div(text, cls="govuk-inset-text")
+    return fh.Div(text, cls="govuk-inset-text", **kwargs)
 
 
 def Detail(
     summary: str,
     *content: fh.FT | str,
     open: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     Detail component.
@@ -25,6 +27,7 @@ def Detail(
         summary (str): The summary text for the detail.
         content (FT): The content to display when the detail is expanded.
         open (bool): If True, the detail is initially open. Defaults to False.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Detail component.
     """
@@ -39,18 +42,21 @@ def Detail(
         ),
         cls="govuk-details",
         open=open,
+        **kwargs,
     )
 
 
 def Panel(
     *content: fh.FT | str,
     title: str = "",
+    **kwargs,
 ) -> fh.FT:
     """
     Panel component.
     Args:
         content (FT): The content to display in the panel.
         title (str): The title of the panel. Defaults to "".
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Panel component.
     """
@@ -58,18 +64,21 @@ def Panel(
         fh.H1(title, cls="govuk-panel__title") if title else "",
         fh.Div(*content, cls="govuk-panel__body"),
         cls="govuk-panel govuk-panel--confirmation",
+        **kwargs,
     )
 
 
 def Tag(
     text: str,
     color: str = "",
+    **kwargs,
 ) -> fh.FT:
     """
     Tag component.
     Args:
         text (str): The text to display in the tag.
         color (str): The color of the tag. Defaults to "blue".
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Tag component.
     """
@@ -86,16 +95,18 @@ def Tag(
         "pink": " govuk-tag--pink",
         "orange": " govuk-tag--orange",
     }
-    return fh.Strong(text, cls=f"govuk-tag{colors.get(color)}")
+    return fh.Strong(text, cls=f"govuk-tag{colors.get(color)}", **kwargs)
 
 
 def Warning(
     *content: fh.FT | str,
+    **kwargs,
 ) -> fh.FT:
     """
     Warning component.
     Args:
         content (FT): The content to display in the warning.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Warning component.
     """
@@ -111,36 +122,41 @@ def Warning(
             cls="govuk-warning-text__text",
         ),
         cls="govuk-warning-text",
+        **kwargs,
     )
 
 
 def NotificatonLink(
     text: str,
     href: str = "#",
+    **kwargs,
 ) -> fh.FT:
     """
     NotificationLink component.
     Args:
         text (str): The text to display in the link.
         href (str): The URL the link points to. Defaults to "#".
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML NotificationLink component.
     """
     cls = "govuk-notification-banner__link"
-    return fh.A(text, href=href, cls=cls)
+    return fh.A(text, href=href, cls=cls, **kwargs)
 
 
-def NotificatonHeading(*content: fh.FT | str) -> fh.FT:
+def NotificatonHeading(*content: fh.FT | str, **kwargs) -> fh.FT:
     """
     H1 component.
     Args:
         text (FT): The content to display in the heading.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML H2 component.
     """
     return fh.P(
         *content,
         cls="govuk-notification-banner__heading",
+        **kwargs,
     )
 
 
@@ -148,6 +164,7 @@ def Notification(
     *content: fh.FT,
     title: str = "Important",
     success: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     Notification banner component.
@@ -155,6 +172,7 @@ def Notification(
         content (FT): The content to display in the phase banner.
         title (str): The title of the notification. Defaults to "Important".
         success (bool): If True, applies a success style. Defaults to False.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Notification component.
     """
@@ -173,6 +191,7 @@ def Notification(
         role="alert",
         aria_labelledby="govuk-notification-banner-title",
         data_module="govuk-notification-banner",
+        **kwargs,
     )
 
 
@@ -218,12 +237,13 @@ def _accordion_section(accordion_id, n, heading, summary, content, open=False):
     )
 
 
-def accordion(*sections: dict, accordion_id="accordion") -> fh.FT:
+def Accordion(*sections: dict, accordion_id="accordion", **kwargs) -> fh.FT:
     """
     Accordion component.
     Args:
         *sections (dict): Sections to include in the accordion.
         accordion_id (str): Id for accordion. Defaults to "accordion".
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Accordion component.
     """
@@ -239,9 +259,9 @@ def accordion(*sections: dict, accordion_id="accordion") -> fh.FT:
             )
             for n, section in enumerate(sections)
         ],
-        id=accordion_id,
         cls="govuk-accordion",
         data_module="govuk-accordion",
+        **kwargs,
     )
 
 
@@ -286,12 +306,13 @@ def _tab_li(heading, active=False):
     )
 
 
-def Tab(*panels: dict, title="") -> fh.FT:
+def Tab(*panels: dict, title="", **kwargs) -> fh.FT:
     """
     Tab component.
     Args:
         *panels (dict): Panels to include in the tab.
         title (str): Title of the tab. Defaults to "".
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Tab component.
     """
@@ -310,15 +331,17 @@ def Tab(*panels: dict, title="") -> fh.FT:
         ],
         cls="govuk-tabs",
         data_module="govuk-tabs",
+        **kwargs,
     )
 
 
-def ErrorSummary(title: str, *links: fh.FT) -> fh.FT:
+def ErrorSummary(title: str, *links: fh.FT, **kwargs) -> fh.FT:
     """
     ErrorSummary component.
     Args:
         title (str): The title of the ErrorSummary component.
         links (A): Links to include in the ErrorSummary component.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML ErrorSummary component.
     """
@@ -339,6 +362,7 @@ def ErrorSummary(title: str, *links: fh.FT) -> fh.FT:
         ),
         cls="govuk-error-summary",
         data_module="govuk-error-summary",
+        **kwargs,
     )
 
 
@@ -386,6 +410,7 @@ def Table(
     numeric_cols: list | None = None,
     col_width: dict | None = None,
     small_text: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     Table component.
@@ -396,6 +421,7 @@ def Table(
         numeric_cols (list): List of columns that are numeric. Defaults to None.
         col_width (dict): Override column widths. Defaults to False.
         small_text (bool): Render a more compact table. Defaults to False.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Table component.
     """
@@ -409,6 +435,7 @@ def Table(
         _table_head(data[0].keys(), numeric_cols, col_width),
         _table_body(data, header_cols, numeric_cols),
         cls=f"govuk-table{small_text_cls}",
+        **kwargs,
     )
 
 
@@ -417,6 +444,7 @@ def Task(
     href: str,
     completed: bool = False,
     hint: str = "",
+    **kwargs,
 ) -> fh.FT:
     """
     Task component.
@@ -425,6 +453,7 @@ def Task(
         href (str): Link for the Task item.
         completed (bool): Is the taks completed?
         hint (str): Hint for the Task item.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Task component.
     """
@@ -464,32 +493,37 @@ def Task(
             _id=status_id,
         ),
         cls="govuk-task-list__item govuk-task-list__item--with-link",
+        **kwargs,
     )
 
 
 def TaskList(
     *tasks: fh.FT,
+    **kwargs,
 ) -> fh.FT:
     """
     TaskList component.
     Args:
-        TaskList (list[Task]): Tasks for the TaskList.
+        tasls (FT): Tasks for the TaskList.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML TaskList component.
     """
     return fh.Ul(
         *[task for task in tasks],
         cls="govuk-task-list",
+        **kwargs,
     )
 
 
-def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT):
+def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT, **kwargs):
     """
     SummaryRow component - a list of these goes in to form a SummaryList.
     Args:
         key (str): Key for the SummaryRow.
         value (str | fh.FT): Content of the SummaryRow.
         *actions (fh.FT): Action/s assigned to the SummaryRow.
+        kwargs (dict): Pass on to underlying component
     """
     for action in actions:
         action.children = (
@@ -520,15 +554,17 @@ def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT):
         fh.Dd(value, cls="govuk-summary-list__value"),
         actions_component,
         cls=f"govuk-summary-list__row{no_actions_cls}",
+        **kwargs,
     )
 
 
-def SummaryList(*items: fh.FT, border: bool = True) -> fh.FT:
+def SummaryList(*items: fh.FT, border: bool = True, **kwargs) -> fh.FT:
     """
     SummaryList component.
     Args:
         items (list): List of SummaryItems.
         border (bool): Choose if a border should be drawn.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML SummaryList component
     """
@@ -536,11 +572,12 @@ def SummaryList(*items: fh.FT, border: bool = True) -> fh.FT:
     return fh.Dl(
         *items,
         cls=f"govuk-summary-list{no_border_cls}",
+        **kwargs,
     )
 
 
 def SummaryCard(
-    title: str, summary_list: fh.FT, actions: list[fh.FT] | None = None
+    title: str, summary_list: fh.FT, actions: list[fh.FT] | None = None, **kwargs
 ) -> fh.FT:
     """
     SummaryCard component.
@@ -548,6 +585,7 @@ def SummaryCard(
         title (str): Title of the card.
         summary_list (list): SummaryList component.
         actions (list): List of card actions. Defaults to None.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML component.
     """
@@ -579,4 +617,5 @@ def SummaryCard(
             cls="govuk-summary-card__content",
         ),
         cls="govuk-summary-card",
+        **kwargs,
     )

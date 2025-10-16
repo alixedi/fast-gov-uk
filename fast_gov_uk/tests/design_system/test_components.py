@@ -265,7 +265,7 @@ def test_notification(kwargs, expected, html):
             [{"heading": "Test 1", "content": "Test Content"}],
             (
                 "<div>"
-                    '<div data-module="govuk-accordion" class="govuk-accordion" id="accordion">'
+                    '<div data-module="govuk-accordion" class="govuk-accordion">'
                         '<div class="govuk-accordion__section">'
                             '<div class="govuk-accordion__section-header">'
                                 '<h2 class="govuk-accordion__section-heading">'
@@ -289,7 +289,7 @@ def test_notification(kwargs, expected, html):
             ],
             (
                 "<div>"
-                    '<div data-module="govuk-accordion" class="govuk-accordion" id="accordion">'
+                    '<div data-module="govuk-accordion" class="govuk-accordion">'
                         '<div class="govuk-accordion__section">'
                             '<div class="govuk-accordion__section-header">'
                                 '<h2 class="govuk-accordion__section-heading">'
@@ -326,7 +326,7 @@ def test_accordion(sections, expected, html):
         sections (list): The sections to pass to accordion.
         expected (str): The expected HTML output.
     """
-    accordion = ds.Div(ds.accordion(*sections))
+    accordion = ds.Div(ds.Accordion(*sections))
     assert html(accordion) == html(expected)
 
 
@@ -649,3 +649,29 @@ def test_summary_card(args, expected, html):
         actions=[ds.A("Test Action 1", "/test1")],
     )
     assert html(summary) == html(expected)
+
+
+@pytest.mark.parametrize("component", (
+    ds.Inset("test", hx_test="foo"),
+    ds.Detail("test", hx_test="foo"),
+    ds.Panel(hx_test="foo"),
+    ds.Tag("test", hx_test="foo"),
+    ds.Warning(hx_test="foo"),
+    ds.Notification(hx_test="foo"),
+    ds.Accordion(hx_test="foo"),
+    ds.Tab(hx_test="foo"),
+    ds.ErrorSummary("test", hx_test="foo"),
+    ds.Table(data=[{}], hx_test="foo"),
+    ds.Task("test", "/", hx_test="foo"),
+    ds.TaskList(hx_test="foo"),
+    ds.SummaryItem("test", "test", hx_test="foo"),
+    ds.SummaryList(hx_test="foo"),
+    ds.SummaryCard("test", ds.P(""), hx_test="foo"),
+))
+def test_html_attribute(component, html):
+    """
+    Test that passes an html attribute to components - that is not
+    explicitly handled but should be passed through to the
+    underlying FT.
+    """
+    assert 'hx-test="foo"' in html(component)

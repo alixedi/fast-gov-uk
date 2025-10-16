@@ -182,3 +182,17 @@ def test_phase_banner(kwargs, expected):
     content = kwargs.pop("content")
     banner = ds.PhaseBanner(*content, **kwargs)
     assert str(banner) == expected
+
+
+@pytest.mark.parametrize("component", (
+    ds.Header("test", "/", hx_test="foo"),
+    ds.Footer(hx_test="foo"),
+    ds.PhaseBanner(hx_test="foo"),
+))
+def test_html_attribute(component, html):
+    """
+    Test that passes an html attribute to components - that is not
+    explicitly handled but should be passed through to the
+    underlying FT.
+    """
+    assert 'hx-test="foo"' in html(component)

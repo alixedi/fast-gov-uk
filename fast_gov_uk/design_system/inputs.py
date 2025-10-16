@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
 from pathlib import Path
@@ -70,7 +69,6 @@ class AbstractField:
     pass
 
 
-@dataclass
 class Field(AbstractField):
     """
     Baseclass for form fields.
@@ -81,15 +79,27 @@ class Field(AbstractField):
         error (str): Error message for the field. Defaults to "".
         heading (bool): Make label a heading? Defaults to False.
         required (book): Is this field required? Defaults to True.
+        kwargs (dict): Pass on to underlying component
     """
 
-    name: str
-    label: str = ""
-    hint: str = ""
-    error: str = ""
-    heading: str = ""
-    required: bool = True
-    _value = None
+    def __init__(
+        self,
+        name: str,
+        label: str = "",
+        hint: str = "",
+        error: str = "",
+        heading: str = "",
+        required: bool = True,
+        **kwargs,
+    ):
+        self.name = name
+        self.label = label
+        self.hint = hint
+        self.error = error
+        self.heading = heading
+        self.required = required
+        self._value = None
+        self.kwargs = kwargs
 
     @property
     def value(self):
@@ -154,15 +164,18 @@ class Field(AbstractField):
         )
 
 
-@dataclass
 class Select(Field):
     """
     Select component. Renders the usual dropdown. Inherits from `Field`.
     Args (in addition to Field):
+        args (list): Pass on to underlying component.
         options (list): Tuple with (<value>, <label>) for options.
+        kwargs (dict): Pass on to underlying component.
     """
 
-    options: List[Tuple[str, str]] = field(default_factory=list)
+    def __init__(self, *args, options: List[Tuple[str, str]] | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.options = options or []
 
     @property
     async def clean(self):
@@ -187,18 +200,22 @@ class Select(Field):
                 _id=self._id,
                 cls=f"govuk-select{error_cls}",
             ),
+            **self.kwargs,
         )
 
 
-@dataclass
 class Textarea(Field):
     """
     Textarea component. Inherits from `Field`.
     Args (in addition to Field):
+        args (list): Pass on to underlying component.
         rows (int): Number of rows in the textarea.
+        kwargs (dict): Pass on to underlying component.
     """
 
-    rows: int = 5
+    def __init__(self, *args, rows: int = 5, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.rows = rows
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
@@ -216,14 +233,20 @@ class Textarea(Field):
                 aria_describedby=f"{self._id}-hint {self._id}-error",
                 cls=f"govuk-textarea{error_cls}",
             ),
+            **self.kwargs,
         )
 
 
-@dataclass
 class PasswordInput(Field):
     """
     PasswordInput component. Inherits from `Field`.
+    Args (in addition to Field):
+        args (list): Pass on to underlying component.
+        kwargs (dict): Pass on to underlying component.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     @property
     def input(self):
@@ -269,28 +292,40 @@ class PasswordInput(Field):
             ),
             cls=" govuk-password-input",
             data_module="govuk-password-input",
+            **self.kwargs,
         )
 
 
-@dataclass
 class CharacterCount(Field):
     """
     CharacterCount component. Renders a Textarea with a message
     that display either the number of characters or the number of
     words left. Inherits from `Field`.
-    Args:
+    Args (in addition to Field):
+        args (list): Pass on to underlying component.
         rows (int): Number of rows in the textarea.
         maxchars (int): Max characters allowed. Defaults to None.
         maxwords (int): Max words allowed. Defaults to None.
         threshold (int): Display the count message when the length
             of text passes a certain threshold in percent.
             Defaults to None.
+        kwargs (dict): Pass on to underlying component.
     """
 
-    rows: int = 5
-    maxchars: Optional[int] = None
-    maxwords: Optional[int] = None
-    threshold: Optional[int] = None
+    def __init__(
+        self,
+        *args,
+        rows: int = 5,
+        maxchars: int | None = None,
+        maxwords: int | None = None,
+        threshold: int | None = None,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.rows = rows
+        self.maxchars = maxchars
+        self.maxwords = maxwords
+        self.threshold = threshold
 
     @Field.value.setter
     def value(self, value):
@@ -351,6 +386,7 @@ class CharacterCount(Field):
             data_maxlength=self.maxchars,
             data_maxwords=self.maxwords,
             data_threshold=self.threshold,
+            **self.kwargs,
         )
 
 
@@ -370,30 +406,56 @@ class InputWidth(Enum):
     W25 = 12
 
 
-@dataclass
 class TextInput(Field):
-    width: InputWidth = InputWidth.DEFAULT
-    prefix: str = ""
-    suffix: str = ""
-    autocomplete: str = ""
-    numeric: bool = False
-    spellcheck: bool = False
-    extra_spacing: bool = False
-    width_cls = {
-        InputWidth.DEFAULT: "",
-        InputWidth.W20: " govuk-input--width-20",
-        InputWidth.W10: " govuk-input--width-10",
-        InputWidth.W5: " govuk-input--width-5",
-        InputWidth.W4: " govuk-input--width-4",
-        InputWidth.W3: " govuk-input--width-3",
-        InputWidth.W2: " govuk-input--width-2",
-        InputWidth.WFULL: " govuk-!-width-full",
-        InputWidth.W75: " govuk-!-width-three-quarters",
-        InputWidth.W66: " govuk-!-width-two-thirds",
-        InputWidth.W50: " govuk-!-width-one-half",
-        InputWidth.W33: " govuk-!-width-one-third",
-        InputWidth.W25: " govuk-!-width-one-quarter",
-    }
+    """
+    TextInput component. Inherits from `Field`.
+    Args (in addition to Field):
+        args (list): Pass on to underlying component.
+        width(InputWidth): Width of TextInput. Defaults to InputWidth.DEFAULT,
+        prefix (str): Prefix to TextInput. Defaults to "",
+        suffix (str): Suffix to TextInput. Defaults to "",
+        autocomplete (str): Set autocomplete. Defaults to "",
+        numeric (bool): Is TextInput numeric? Defaults to False,
+        spellcheck (bool): Turn on spellcheck? Defaults to False,
+        extra_spacing (bool): Make Input with extra space. Defaults to False,
+        kwargs (dict): Pass on to underlying component.
+    """
+
+    def __init__(
+        self,
+        *args,
+        width: InputWidth = InputWidth.DEFAULT,
+        prefix: str = "",
+        suffix: str = "",
+        autocomplete: str = "",
+        numeric: bool = False,
+        spellcheck: bool = False,
+        extra_spacing: bool = False,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.width = width
+        self.prefix = prefix
+        self.suffix = suffix
+        self.autocomplete = autocomplete
+        self.numeric = numeric
+        self.spellcheck = spellcheck
+        self.extra_spacing = extra_spacing
+        self.width_cls = {
+            InputWidth.DEFAULT: "",
+            InputWidth.W20: " govuk-input--width-20",
+            InputWidth.W10: " govuk-input--width-10",
+            InputWidth.W5: " govuk-input--width-5",
+            InputWidth.W4: " govuk-input--width-4",
+            InputWidth.W3: " govuk-input--width-3",
+            InputWidth.W2: " govuk-input--width-2",
+            InputWidth.WFULL: " govuk-!-width-full",
+            InputWidth.W75: " govuk-!-width-three-quarters",
+            InputWidth.W66: " govuk-!-width-two-thirds",
+            InputWidth.W50: " govuk-!-width-one-half",
+            InputWidth.W33: " govuk-!-width-one-third",
+            InputWidth.W25: " govuk-!-width-one-quarter",
+        }
 
     @property
     def input(self):
@@ -431,10 +493,9 @@ class TextInput(Field):
                 fh.Div(self.suffix, cls="govuk-input__suffix", aria_hidden=True),
                 cls="govuk-input__wrapper",
             )
-        return super().__ft__(input)
+        return super().__ft__(input, **self.kwargs)
 
 
-@dataclass
 class Checkbox(AbstractField):
     """
     Checkbox component. This component does not inherit from Field because
@@ -448,14 +509,27 @@ class Checkbox(AbstractField):
         hint (str): Hint for the checkbox element. Defaults to "".
         checked (bool): Make this checkbox checked. Defaults to False.
         exclusive (bool): Make this checkbox eclusive? Defaults to False.
+        kwargs (dict): Pass on to underlying component.
     """
 
-    name: str
-    value: str
-    label: str
-    hint: str = ""
-    checked: bool = False
-    exclusive: bool = False
+    def __init__(
+        self,
+        name: str,
+        value: str,
+        label: str,
+        hint: str = "",
+        checked: bool = False,
+        exclusive: bool = False,
+        **kwargs,
+    ):
+        super().__init__()
+        self.name = name
+        self.value = value
+        self.label = label
+        self.hint = hint
+        self.checked = checked
+        self.exclusive = exclusive
+        self.kwargs = kwargs
 
     @property
     def _id(self):
@@ -497,23 +571,34 @@ class Checkbox(AbstractField):
                 data_behaviour="exclusive" if self.exclusive else None,
             ),
             cls="govuk-checkboxes__item",
+            **self.kwargs,
         )
 
 
-@dataclass
 class Checkboxes(Field):
     """
     Checkboxes component. Renders the usual checkbox group for multiple
     select. Inherits from `Field`.
     Args (in addition to Field):
+        args (list): Pass on to underlying component.
         checkboxes (list): List of Checkbox components.
         choices (dict): Shorthand for simple checkboxes.
         small (bool): Renders small Checkboxes. Defaults to False.
+        kwargs (dict): Pass on to underlying component.
     """
 
-    checkboxes: List[Checkbox] = field(default_factory=list)
-    choices: dict = field(default_factory=dict)
-    small: bool = False
+    def __init__(
+        self,
+        *args,
+        checkboxes: List[Checkbox] | None = None,
+        choices: dict | None = None,
+        small: bool = False,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.checkboxes = checkboxes or []
+        self.choices = choices or {}
+        self.small = small
 
     @property
     async def clean(self):
@@ -550,10 +635,10 @@ class Checkboxes(Field):
                 aria_describedby=f"{self._id}-hint",
                 id=self._id,
             ),
+            **self.kwargs,
         )
 
 
-@dataclass
 class Radio(AbstractField):
     """
     Radio component. This component does not inherit from Field because
@@ -566,7 +651,28 @@ class Radio(AbstractField):
         label (str): Label for the radio element.
         hint (str): Hint for the radio element. Defaults to "".
         checked (bool): Make this radio checked. Defaults to False.
+        reveal (Field): Field revealed when Radio is selected. Defaults to None.
+        kwargs (dict): Pass on to underlying component.
     """
+
+    def __init__(
+        self,
+        name: str,
+        value: str,
+        label: str,
+        hint: str = "",
+        checked: bool = False,
+        reveal: Field | None = None,
+        **kwargs,
+    ):
+        super().__init__()
+        self.name = name
+        self.value = value
+        self.label = label
+        self.hint = hint
+        self.checked = checked
+        self.reveal = reveal
+        self.kwargs = kwargs
 
     name: str
     value: str
@@ -639,28 +745,40 @@ class Radio(AbstractField):
             fh.Div(
                 self.base_radio,
                 self._reveal,
+                **self.kwargs,
             )
             if self.reveal
             else self.base_radio
         )
 
 
-@dataclass
 class Radios(Field):
     """
     Radios component. Renders the usual radio group for single
     select. Inherits from `Field`.
     Args (in addition to Field):
+        args (list): Pass on to underlying component.
         radios (list): List of Radio components.
         choices (list): Labels - shorthand for simple radios
         small (bool): Renders small Radios. Defaults to False.
         inline (bool): Renders inline Radios. Defaults to False.
+        kwargs (dict): Pass on to underlying component.
     """
 
-    radios: List[Radio] = field(default_factory=list)
-    choices: dict = field(default_factory=dict)
-    small: bool = False
-    inline: bool = False
+    def __init__(
+        self,
+        *args,
+        radios: List[Radio] | None = None,
+        choices: dict | None = None,
+        small: bool = False,
+        inline: bool = False,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.radios = radios or []
+        self.choices = choices or {}
+        self.small = small
+        self.inline = inline
 
     @property
     async def clean(self):
@@ -701,15 +819,21 @@ class Radios(Field):
                 aria_describedby=f"{self._id}-hint",
                 id=self._id,
             ),
+            **self.kwargs,
         )
 
 
-@dataclass
 class FileUpload(Field):
     """
     FileUpload component. Renders a file upload field.
     Inherits from `Field`.
+    Args (in addition to Field):
+        args (list): Pass on to underlying component.
+        kwargs (dict): Pass on to underlying component.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     @property
     def valid_file(self):
@@ -763,6 +887,7 @@ class FileUpload(Field):
                 cls="govuk-drop-zone",
                 data_module="govuk-file-upload",
             ),
+            **self.kwargs,
         )
 
 
@@ -800,13 +925,18 @@ def _date_input_item(
     )
 
 
-@dataclass
 class DateInput(Field):
     """
     DateInput component. Renders GDS-style composite field with
     separate TextInputs for day, month and year. Inherits Field.
     TODO: Support errors for individual fields.
+    Args (in addition to Field):
+        args (list): Pass on to underlying component.
+        kwargs (dict): Pass on to underlying component.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     @property
     def value(self):
@@ -889,6 +1019,7 @@ class DateInput(Field):
                 role="group",
                 aria_describedby=f"{self._id}-hint",
             ),
+            **self.kwargs,
         )
 
 
@@ -935,13 +1066,14 @@ def Button(
     )
 
 
-def StartButton(text: str, href: str) -> fh.FT:
+def StartButton(text: str, href: str, **kwargs) -> fh.FT:
     """
     StartButton component for call-to-actions. StartButtons don't submit
     any form data.
     Args:
         text (str): Text on the Button component.
         href (str): URL of the target page.
+        kwargs (dict): Pass on to underlying component.
     Returns:
         FT: A FastHTML StartButton component.
     """
@@ -959,20 +1091,23 @@ def StartButton(text: str, href: str) -> fh.FT:
         draggable="false",
         cls="govuk-button govuk-button--start",
         data_module="govuk-button",
+        **kwargs,
     )
 
 
-def ButtonGroup(*buttons: fh.FT) -> fh.FT:
+def ButtonGroup(*buttons: fh.FT, **kwargs) -> fh.FT:
     """
     ButtonGroup component.
     Args:
         buttons (list): List of Button components.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML component.
     """
     return fh.Div(
         *buttons,
         cls="govuk-button-group",
+        **kwargs,
     )
 
 
@@ -982,6 +1117,7 @@ def CookieBanner(
     cookie_page_link: str = "/cookies",
     cookie_form_link: str = "/",
     confirmation: bool = False,
+    **kwargs,
 ) -> fh.FT:
     """
     CookieConfirmation component.
@@ -990,7 +1126,8 @@ def CookieBanner(
         content (list): Content of the CookieConfirmation component.
         cookie_page_link (str): Link to the cookie settings page. Defaults to "/cookies".
         cookie_form_link (str): Link to the cookie form submission page. Defaults to "/".
-        confirmaton (bool): If True, the cookie confirmation is shown. Defaults to False.
+        confirmation (bool): If True, the cookie confirmation is shown. Defaults to False.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML CookieConfirmation component.
     """
@@ -1030,6 +1167,7 @@ def CookieBanner(
         aria_label=f"Cookies on {service_name}",
         data_nosnippet=True,
         id="cookie-banner",
+        **kwargs,
     )
 
 
@@ -1040,14 +1178,16 @@ class Fieldset(AbstractField):
         fields (list): Fields to include in the fieldset.
         name (str): Name of the fieldset. Defaults to "".
         legend (str): The legend text for the fieldset.
+        kwargs (dict): Pass on to underlying component
     Returns:
         FT: A FastHTML Fieldset component.
     """
 
-    def __init__(self, *fields, name: str = "", legend: str = ""):
+    def __init__(self, *fields, name: str = "", legend: str = "", **kwargs):
         self.fields = fields
         self.name = name
         self.legend = legend
+        self.kwargs = kwargs
 
     def __ft__(self):
         return fh.Fieldset(
@@ -1060,4 +1200,5 @@ class Fieldset(AbstractField):
             ),
             *self.fields,
             cls="govuk-fieldset",
+            **self.kwargs,
         )
