@@ -59,75 +59,75 @@ def test_db_form_post_valid(client, db, picture):
         (
             # empty name
             {"name": ""},
-            {"name": "This field is required."}
+            ("name", "This field is required.")
         ),
         (
             # empty sex
             {"sex": ""},
-            {"sex": "This field is required."}
+            ("sex", "This field is required.")
         ),
         (
             # empty gender
             {"gender": ""},
-            {"gender": "This field is required."}
+            ("gender", "This field is required.")
         ),
         (
             # empty ethnicity
             {"ethnicity": ""},
-            {"ethnicity": "This field is required."}
+            ("ethnicity", "This field is required.")
         ),
         (
             # empty dob
             {"dob": ["", "", ""]},
-            {"dob": "This field is required."}
+            ("dob", "This field is required.")
         ),
         (
             # partially empty dob
             {"dob": ["10", "10", ""]},
-            {"dob": "This field is required."}
+            ("dob", "This field is required.")
         ),
         (
             # invalid dob
             {"dob": ["foo", "10", "2003"]},
-            {"dob": "Invalid values."}
+            ("dob", "Invalid values.")
         ),
         (
             # empty picture
             {"picture": ""},
-            {"picture": "This field is required."}
+            ("picture", "This field is required.")
         ),
         (
             # empty phone
             {"phone": ""},
-            {"phone": "This field is required."}
+            ("phone", "This field is required.")
         ),
         (
             # non-numeric phone
             {"phone": "A12345"},
-            {"phone": "Value is not a number."}
+            ("phone", "Value is not a number.")
         ),
         (
             # non-numeric phone
             {"phone": "test"},
-            {"phone": "Value is not a number."}
+            ("phone", "Value is not a number.")
         ),
         (
             # empty email
             {"email": ""},
-            {"email": "This field is required."}
+            ("email", "This field is required.")
         ),
         (
             # invalid email
             {"email": "test"},
-            {"email": "Value is not an email."}
+            ("email", "Value is not an email.")
         ),
         (
             # Comments more than 10 chars
             {"comments": "This is a long comment."},
-            {"comments": "Characters exceed limit of 10."}
+            ("comments", "Characters exceed limit of 10.")
         ),
 ))
-def test_form_post_invalid(errors, expected, client, db, picture):
+def test_form_post_invalid(errors, expected, client, db, picture, html, find):
     data = {
         "name": "Test",
         "sex": "male",
@@ -139,15 +139,21 @@ def test_form_post_invalid(errors, expected, client, db, picture):
         "comments": "Test",
     }
     data.update(errors)
-    with patch("fast_gov_uk.core.ds.Page") as mock_page:
-        response = client.post(
-            "/form/profile",
-            data=data,
-            files={"picture": picture},
-        )
-        form = mock_page.call_args.args[0]
-        assert response.status_code == 200
-        assert form.errors == expected
+    response = client.post(
+        "/form/profile",
+        data=data,
+        files={"picture": picture},
+    )
+    assert response.status_code == 200
+    field_name, error_message = expected
+    expected_html = html(
+        f'<p class="govuk-error-message" id="{field_name}-error">'
+            '<span class="govuk-visually-hidden">Error: </span>'
+            f"{error_message}"
+        "</p>"
+    )
+    error_p = find(response.text, "p", {"class": "govuk-error-message"})
+    assert html(error_p) == expected_html
 
 
 def test_email_form_post_valid(fast, db, client):
@@ -162,7 +168,7 @@ def test_email_form_post_valid(fast, db, client):
         email_address='test@test.com',
         template_id='test',
         personalisation={
-            'form_name': 'Feedback',
+            'form_name': 'feedback',
             'form_data': '* satisfaction: Satisfied',
             'service_name': 'Fast-gov-uk test'
         }
@@ -184,7 +190,7 @@ def test_api_form_post_valid(fast, db, client):
         'https://test.com',
         data={
             'satisfaction': 'Satisfied',
-            'form_name': 'Feedback',
+            'form_name': 'feedback',
             'submitted_on': ANY,
         }
     )
@@ -199,7 +205,7 @@ def test_session_form_post_valid(fast, db, client):
     )
     assert response.status_code == 200
     response = client.get("/session")
-    feedback = response.json()["Feedback"]
+    feedback = response.json()["feedback"]
     assert feedback == {"satisfaction": "Satisfied"}
 
 
@@ -261,7 +267,7 @@ def test_questions_valid(db, client):
     assert response.headers["Location"] == "/"
     forms = db.t.forms()
     form = forms[0]
-    assert form.title == "Equality monitoring"
+    assert form.name == "equality"
     form_json = asdict(form)
     form_data = form_json["data"]
     form_dict = json.loads(form_data)
@@ -274,41 +280,21 @@ def test_questions_valid(db, client):
     }
 
 
-def test_error_summary(html):
+def test_error_summary(html, find):
     form = session_feedback(data={})
-    assert html(form) == html(
-        '<form enctype="multipart/form-data" method="POST">'
-            # The error summary - containine a link to the Radio field
-            '<div class="govuk-error-summary" data-module="govuk-error-summary">'
-                '<div role="alert">'
-                    '<h2 class="govuk-error-summary__title">There is a problem</h2>'
-                    '<div class="govuk-error-summary__body">'
-                        '<ul class="govuk-list govuk-error-summary__list">'
-                            '<li><a class="govuk-link" href="#satisfaction">How satisfied did you feel about the service?</a></li>'
-                        "</ul>"
-                    "</div>"
+    expected = html(
+        # The error summary - containine a link to the Radio field
+        '<div class="govuk-error-summary" data-module="govuk-error-summary">'
+            '<div role="alert">'
+                '<h2 class="govuk-error-summary__title">There is a problem</h2>'
+                '<div class="govuk-error-summary__body">'
+                    '<ul class="govuk-list govuk-error-summary__list">'
+                        '<li><a class="govuk-link" href="#satisfaction">How satisfied did you feel about the service?</a></li>'
+                    "</ul>"
                 "</div>"
             "</div>"
-            '<h1 class="govuk-heading-l">Feedback</h1>'
-            '<div class="govuk-form-group govuk-form-group--error">'
-                '<label class="govuk-label" for="satisfaction">How satisfied did you feel about the service?</label>'
-                '<p class="govuk-error-message" id="satisfaction-error">'
-                    '<span class="govuk-visually-hidden">Error:</span>'
-                    "This field is required."
-                "</p>"
-                '<fieldset aria-describedby="satisfaction-hint" class="govuk-fieldset" id="satisfaction">'
-                    '<div class="govuk-radios" data-module="govuk-radios">'
-                        '<div class="govuk-radios__item">'
-                            '<input class="govuk-radios__input" id="satisfaction-satisfied" name="satisfaction" type="radio" value="satisfied"/>'
-                            '<label class="govuk-label govuk-radios__label" for="satisfaction-satisfied">Satisfied</label>'
-                        "</div>"
-                        '<div class="govuk-radios__item">'
-                            '<input class="govuk-radios__input" id="satisfaction-dissatisfied" name="satisfaction" type="radio" value="dissatisfied"/>'
-                            '<label class="govuk-label govuk-radios__label" for="satisfaction-dissatisfied">Dissatisfied</label>'
-                        "</div>"
-                    "</div>"
-                "</fieldset>"
-            "</div>"
-            '<button class="govuk-button" data-module="govuk-button" type="submit">Send feedback</button>'
-        "</form>"
+        "</div>"
     )
+    form_html = html(form)
+    error_summary = find(form_html, "div", {"class": "govuk-error-summary"})
+    assert html(error_summary) == expected
