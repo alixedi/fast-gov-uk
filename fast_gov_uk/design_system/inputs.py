@@ -1183,7 +1183,7 @@ class Fieldset(AbstractField):
         FT: A FastHTML Fieldset component.
     """
 
-    def __init__(self, *fields, name: str = "", legend: str = "", **kwargs):
+    def __init__(self, *fields: Field, name: str = "", legend: str = "", **kwargs):
         self.fields = fields
         self.name = name
         self.legend = legend
