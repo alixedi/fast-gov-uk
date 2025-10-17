@@ -21,7 +21,7 @@ class Backend:
     Base class for backend processing.
     """
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         """Process the form using the backend function."""
         raise NotImplementedError("Subclasses must implement this method.")
 
@@ -31,9 +31,9 @@ class LogBackend(Backend):
     Backend that logs form data.
     """
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         """Log the form data."""
-        logger.info(f"Form: '{title}' processed with: {await data}.")
+        logger.info(f"Form: '{name}' processed with: {await data}.")
 
 
 class DBBackend(Backend):
@@ -48,16 +48,16 @@ class DBBackend(Backend):
     def get_table(self):
         forms = self.db.t.forms
         if forms not in self.db.t:
-            forms.create(id=int, title=str, created_on=datetime, data=dict, pk="id")
+            forms.create(id=int, name=str, created_on=datetime, data=dict, pk="id")
         return forms
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         data = await data
         forms = self.get_table()
         Record = forms.dataclass()
-        record = Record(title=title, created_on=datetime.now(), data=data)
+        record = Record(name=name, created_on=datetime.now(), data=data)
         forms.insert(record)
-        logger.info(f"Form: '{title}' saved with: {data}.")
+        logger.info(f"Form: '{name}' saved with: {data}.")
 
 
 class EmailBackend(Backend):
@@ -72,13 +72,13 @@ class EmailBackend(Backend):
     async def format(self, data):
         return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         formatted_data = await self.format(await data)
         try:
-            resp = await self.notify(form_name=title, form_data=formatted_data)
+            resp = await self.notify(form_name=name, form_data=formatted_data)
             logger.info(f"Email sent for form: {resp}")
         except HTTPError as e:
-            logger.error(f"Error sending email for form '{title}': {e}")
+            logger.error(f"Error sending email for form '{name}': {e}")
             # User should not get the impression that the form
             # was submitted successfully if email failed
             raise
@@ -102,15 +102,15 @@ class APIBackend(Backend):
         self.password = password
 
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         data = await data
-        data["form_name"] = title
+        data["form_name"] = name
         data["submitted_on"] = datetime.now()
         try:
             client = _client(self.username, self.password)
             client.post(self.url, data=data)
         except httpx.HTTPError as e:
-            logger.error(f"Error sending request for form '{title}': {e}")
+            logger.error(f"Error sending request for form '{name}': {e}")
             # User should not get the impression that the form
             # was submitted successfully if email failed
             raise
@@ -121,9 +121,9 @@ class SessionBackend(Backend):
     Backend that stores form data to the session.
     """
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         session = request.session
-        session[title] = await data
+        session[name] = await data
 
 
 class AddSessionBackend(Backend):
@@ -131,19 +131,18 @@ class AddSessionBackend(Backend):
     Backend that updates (instead of overwrite) session with form data.
     """
 
-    async def process(self, request, title, data, *args, **kwargs):
+    async def process(self, request, name, data, *args, **kwargs):
         session = request.session
-        if title not in session:
-            session[title] = {}
-        session[title].update(await data)
+        if name not in session:
+            session[name] = {}
+        session[name].update(await data)
 
 
 class Form:
     """
     Wrapper around fh Form for consistency.
     Args:
-        title (str): Title of the Form.
-        fields: Fields for the Form.
+        name (str): Name of the Form.
         method (str): HTTP method for the Form. Default: "POST".
         action (str): Action URL for the Form. Default: "".
         cta (str): Label for Submit button.
@@ -153,7 +152,7 @@ class Form:
 
     def __init__(
         self,
-        title: str,
+        name: str,
         fields: list[Field | Fieldset],
         backends: list[Backend],
         success_url: str | Callable,
@@ -163,7 +162,7 @@ class Form:
         data: dict | None = None,
         **kwargs,
     ):
-        self.title = title
+        self.name = name
         self.fields = fields
         self.backends = backends
         self.success_url = success_url
@@ -234,7 +233,7 @@ class Form:
         """
         try:
             for backend in self.backends:
-                await backend.process(req, self.title, self.clean, *args, **kwargs)
+                await backend.process(req, self.name, self.clean, *args, **kwargs)
         except BackendError:
             raise
         return self.success
