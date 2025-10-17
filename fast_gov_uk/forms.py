@@ -1,6 +1,7 @@
 import logging
 from functools import cache
 from datetime import datetime
+from typing import Callable
 
 import httpx
 import fasthtml.common as fh
@@ -125,6 +126,18 @@ class SessionBackend(Backend):
         session[title] = await data
 
 
+class AddSessionBackend(Backend):
+    """
+    Backend that updates (instead of overwrite) session with form data.
+    """
+
+    async def process(self, request, title, data, *args, **kwargs):
+        session = request.session
+        if title not in session:
+            session[title] = {}
+        session[title].update(await data)
+
+
 class Form:
     """
     Wrapper around fh Form for consistency.
@@ -143,7 +156,7 @@ class Form:
         title: str,
         fields: list[Field | Fieldset],
         backends: list[Backend],
-        success_url: str,
+        success_url: str | Callable,
         method: str = "POST",
         action: str = "",
         cta: str = "Submit",
@@ -209,6 +222,12 @@ class Form:
             for field in self.form_fields:
                 field.value = self.data.get(field.name, "")
 
+    @property
+    def success(self):
+        if isinstance(self.success_url, Callable):
+            self.success_url = self.success_url(self.data)
+        return fh.Redirect(self.success_url)
+
     async def process(self, req, *args, **kwargs):
         """
         Call the process methods on form backends.
@@ -218,7 +237,7 @@ class Form:
                 await backend.process(req, self.title, self.clean, *args, **kwargs)
         except BackendError:
             raise
-        return fh.Redirect(self.success_url)
+        return self.success
 
     def error_summary(self):
         fields_with_errors = [f for f in self.form_fields if f.error]
