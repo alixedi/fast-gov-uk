@@ -145,6 +145,7 @@ class Form:
         name (str): Name of the Form.
         backends (list): List of backends to process submitted data.
         success_url (str or function): Redirect URL after form is processed.
+        items (list): Items in the Form.
         method (str): HTTP method for the Form. Default: "POST".
         action (str): Action URL for the Form. Default: "".
         cta (str): Label for Submit button.
@@ -156,7 +157,7 @@ class Form:
     def __init__(
         self,
         name: str,
-        fields: list[Field | Fieldset],
+        *items: Field | Fieldset,
         backends: list[Backend] | None = None,
         success_url: str | Callable = "/",
         method: str = "POST",
@@ -167,7 +168,7 @@ class Form:
         **kwargs,
     ):
         self.name = name
-        self.fields = fields
+        self.items = items
         self.backends = backends or [SessionBackend()]
         self.success_url = success_url
         self.method = method
@@ -179,14 +180,21 @@ class Form:
         self.bind()
 
     @property
+    def fields(self):
+        return [
+            item
+            for item in self.items
+            if isinstance(item, (Field, Fieldset))
+        ]
+
+    @property
     def form_fields(self):
-        for field in self.fields:
-            if isinstance(field, Fieldset):
-                for fs_field in field.fields:
-                    if isinstance(fs_field, Field):
-                        yield fs_field
+        for item in self.fields:
+            if isinstance(item, Fieldset):
+                for fitem in item.fields:
+                    yield fitem
             else:
-                yield field
+                yield item
 
     @property
     def errors(self) -> dict:
@@ -256,8 +264,7 @@ class Form:
     def render(self) ->fh.FT:
         return fh.Form(
             self.error_summary(),
-            H1(self.title),
-            *self.fields,
+            *self.items,
             Button(self.cta),
             method=self.method,
             action=self.action,
@@ -277,7 +284,7 @@ class Questions(Form):
     through the fields one at a time.
     """
 
-    def __init__(self, step: int = 0, predicates: dict | None = None, *args, **kwargs):
+    def __init__(self, *args, step: int = 0, predicates: dict | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.step = step
         self.predicates = predicates or {}
