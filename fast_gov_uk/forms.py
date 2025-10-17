@@ -143,6 +143,8 @@ class Form:
     Wrapper around fh Form for consistency.
     Args:
         name (str): Name of the Form.
+        backends (list): List of backends to process submitted data.
+        success_url (str or function): Redirect URL after form is processed.
         method (str): HTTP method for the Form. Default: "POST".
         action (str): Action URL for the Form. Default: "".
         cta (str): Label for Submit button.
@@ -155,8 +157,8 @@ class Form:
         self,
         name: str,
         fields: list[Field | Fieldset],
-        backends: list[Backend],
-        success_url: str | Callable,
+        backends: list[Backend] | None = None,
+        success_url: str | Callable = "/",
         method: str = "POST",
         action: str = "",
         cta: str = "Submit",
@@ -166,7 +168,7 @@ class Form:
     ):
         self.name = name
         self.fields = fields
-        self.backends = backends
+        self.backends = backends or [SessionBackend()]
         self.success_url = success_url
         self.method = method
         self.action = action
