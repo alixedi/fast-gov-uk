@@ -156,14 +156,14 @@ class Fast(fh.FastHTML):
         # If GET, just return the form
         if req.method == "GET":
             form = mkform()
-            return ds.Page(form)
+            return form
         # If POST, fill the form
         form = mkform(post)
         # If valid, process
         if form.valid:
             return await form.process(req)
         # Else return with errors
-        return ds.Page(form)
+        return form
 
     async def process_questions(
         self, req, session: dict, name: str, step: str, post: dict
