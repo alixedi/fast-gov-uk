@@ -7,7 +7,7 @@ import httpx
 import fasthtml.common as fh
 from notifications_python_client.errors import HTTPError
 
-from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A, H1
+from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A, Page
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +147,8 @@ class Form:
         action (str): Action URL for the Form. Default: "".
         cta (str): Label for Submit button.
         data (dict|None): Initial data for the Form. Default: None.
-        kwargs (dict): kwargs for Form.
+        page (bool): Render form in a page? Default: True.
+        kwargs (dict): kwargs for underlying fh.Form.
     """
 
     def __init__(
@@ -160,6 +161,7 @@ class Form:
         action: str = "",
         cta: str = "Submit",
         data: dict | None = None,
+        page: bool = True,
         **kwargs,
     ):
         self.name = name
@@ -170,6 +172,7 @@ class Form:
         self.action = action
         self.cta = cta
         self.data = data
+        self.page = page
         self.kwargs = kwargs
         self.bind()
 
@@ -247,7 +250,8 @@ class Form:
             *[A(f.label, f"#{f._id}") for f in fields_with_errors]
         )
 
-    def __ft__(self) -> fh.FT:
+    @property
+    def render(self) ->fh.FT:
         return fh.Form(
             self.error_summary(),
             H1(self.title),
@@ -258,6 +262,8 @@ class Form:
             **self.kwargs,
         )
 
+    def __ft__(self) -> fh.FT:
+        return Page(self.render) if self.page else self.render
 
 class QuestionsFinished(Exception):
     pass
