@@ -60,30 +60,29 @@ def feedback(data=None):
     """
     # A DBForm gets saved to the database when its valid
     return forms.Form(
-        title="Give feedback for Fast Gov UK",
-        fields=[
-            ds.Radios(
-                name="satisfaction",
-                label="Overall, how satisfied did you feel about Fast Gov UK?",
-                choices={
-                    "very-satisfied": "Very Satisfied",
-                    "satisfied": "Satisfied",
-                    "neutral": "Neither satisfied not dissatisfied",
-                    "dissatisfied": "Dissatisfied",
-                    "very-dissatisfied": "Very dissatisfied",
-                },
+        "feedback",
+        ds.Radios(
+            name="satisfaction",
+            label="Overall, how satisfied did you feel about Fast Gov UK?",
+            choices={
+                "very-satisfied": "Very Satisfied",
+                "satisfied": "Satisfied",
+                "neutral": "Neither satisfied not dissatisfied",
+                "dissatisfied": "Dissatisfied",
+                "very-dissatisfied": "Very dissatisfied",
+            },
+            heading="m",
+        ),
+        ds.CharacterCount(
+            name="comments",
+            label="How could we improve this service?",
+            maxchars=1200,
+            required=False,
+            hint=(
+                "Do not include any personal or financial information, "
+                "for example your national insurance number."
             ),
-            ds.CharacterCount(
-                name="comments",
-                label="How could we improve this service?",
-                maxchars=1200,
-                required=False,
-                hint=(
-                    "Do not include any personal or financial information, "
-                    "for example your national insurance number."
-                ),
-            ),
-        ],
+        ),
         backends=[forms.DBBackend(db=fast.db)],
         success_url="/",
         data=data,
@@ -107,7 +106,7 @@ def equality(step=0, data=None):
     in the process method of the Questions class.
     """
     return forms.Questions(
-        title="Equality monitoring",
+        name="equality",
         fields=[
             ds.Fieldset(
                 ds.H1("We have received your application"),
