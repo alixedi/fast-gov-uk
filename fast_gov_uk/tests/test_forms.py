@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch, call, ANY
 import pytest
 
 from .app import session_feedback
+from fast_gov_uk import forms
 
 
 def test_form_get(client):
@@ -298,3 +299,8 @@ def test_error_summary(html, find):
     form_html = html(form)
     error_summary = find(form_html, "div", {"class": "govuk-error-summary"})
     assert html(error_summary) == expected
+
+
+def test_no_fields_at_root():
+    with pytest.raises(ValueError):
+        forms.Form("test", "test")

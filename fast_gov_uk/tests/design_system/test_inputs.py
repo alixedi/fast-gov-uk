@@ -1386,13 +1386,7 @@ def test_required(field):
 def test_not_required(field):
     """Test that all input fields can be marked as not required."""
     f = field(name="test", label="Test Label", required=False)
-    form = forms.Form(
-        name="test",
-        fields=[f],
-        backends=[forms.LogBackend()],
-        success_url="/",
-        data={}
-    )
+    form = forms.Form("test", f)
     # TODO: assert exact errors :/
     assert form.errors != {"test": "This field is required."}
 

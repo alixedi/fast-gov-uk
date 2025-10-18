@@ -101,7 +101,6 @@ class APIBackend(Backend):
         self.username = username
         self.password = password
 
-
     async def process(self, request, name, data, *args, **kwargs):
         data = await data
         data["form_name"] = name
@@ -157,7 +156,7 @@ class Form:
     def __init__(
         self,
         name: str,
-        *items: Field | Fieldset,
+        *items,
         backends: list[Backend] | None = None,
         success_url: str | Callable = "/",
         method: str = "POST",
@@ -177,15 +176,15 @@ class Form:
         self.data = data
         self.page = page
         self.kwargs = kwargs
+        if not self.fields:
+            raise ValueError(
+                "Your Form definition does not seem to have any Field or Fieldset component at the root level."
+            )
         self.bind()
 
     @property
     def fields(self):
-        return [
-            item
-            for item in self.items
-            if isinstance(item, (Field, Fieldset))
-        ]
+        return [item for item in self.items if isinstance(item, (Field, Fieldset))]
 
     @property
     def form_fields(self):
@@ -256,12 +255,11 @@ class Form:
         if not fields_with_errors:
             return
         return ErrorSummary(
-            "There is a problem",
-            *[A(f.label, f"#{f._id}") for f in fields_with_errors]
+            "There is a problem", *[A(f.label, f"#{f._id}") for f in fields_with_errors]
         )
 
     @property
-    def render(self) ->fh.FT:
+    def render(self) -> fh.FT:
         return fh.Form(
             self.error_summary(),
             *self.items,
@@ -273,6 +271,7 @@ class Form:
 
     def __ft__(self) -> fh.FT:
         return Page(self.render) if self.page else self.render
+
 
 class QuestionsFinished(Exception):
     pass

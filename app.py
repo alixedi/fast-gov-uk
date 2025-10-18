@@ -57,10 +57,15 @@ def feedback(data=None):
 
     db: This is a DBForm so it needs a reference to the database
     so that it can save upon correct submission
+
+    P.S. This is an attempt to reproduce -
+    https://www.gov.uk/service-manual/service-assessments/get-feedback-page
     """
     # A DBForm gets saved to the database when its valid
     return forms.Form(
         "feedback",
+        ds.H1("Give feedback on Fast GOV UK"),
+        ds.H2("Satisfaction survey"),
         ds.Radios(
             name="satisfaction",
             label="Overall, how satisfied did you feel about Fast Gov UK?",
@@ -71,7 +76,7 @@ def feedback(data=None):
                 "dissatisfied": "Dissatisfied",
                 "very-dissatisfied": "Very dissatisfied",
             },
-            heading="m",
+            heading="s",
         ),
         ds.CharacterCount(
             name="comments",
@@ -82,6 +87,7 @@ def feedback(data=None):
                 "Do not include any personal or financial information, "
                 "for example your national insurance number."
             ),
+            heading="s",
         ),
         backends=[forms.DBBackend(db=fast.db)],
         success_url="/",
