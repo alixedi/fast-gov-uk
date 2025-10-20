@@ -173,29 +173,17 @@ class Fast(fh.FastHTML):
             _step = int(step or "0")
         except (KeyError, ValueError):
             raise fh.HTTPException(status_code=404)
-        # Get data from session
-        session_key = f"{name}_questions"
-        form_data = session.get(session_key, {})
         # If GET, just return the form
         if req.method == "GET":
-            # Reset the session on first step
-            if _step == 0:
-                session.pop(session_key, None)
             question = mk_question(step=_step)
-            return ds.Page(ds.BacklinkJS(), question)
+            return question
         # If POST, fill the form
-        form_data.update(post)
-        session[session_key] = form_data
-        question = mk_question(step=_step, data=form_data)
+        question = mk_question(step=_step, data=post)
         # If step valid
         if question.step_valid:
-            try:
-                next_step = question.next_step
-                return fh.Redirect(f"/questions/{name}/{next_step}")
-            except QuestionsFinished:
-                return await question.process(req)
+            return await question.next_step(req)
         # Else return with errors
-        return ds.Page(question)
+        return question
 
     def cookie_banner(self, req, post: dict, cookie_policy: str = ""):
         banner = ds.CookieBanner(
