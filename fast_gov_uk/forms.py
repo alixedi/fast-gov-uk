@@ -1,3 +1,4 @@
+from inspect import isawaitable
 import logging
 from functools import cache
 from datetime import datetime
@@ -33,7 +34,9 @@ class LogBackend(Backend):
 
     async def process(self, request, name, data, *args, **kwargs):
         """Log the form data."""
-        logger.info(f"Form: '{name}' processed with: {await data}.")
+        if isawaitable(data):
+            data = await data
+        logger.info(f"Form: '{name}' processed with: {data}.")
 
 
 class DBBackend(Backend):
@@ -52,7 +55,8 @@ class DBBackend(Backend):
         return forms
 
     async def process(self, request, name, data, *args, **kwargs):
-        data = await data
+        if isawaitable(data):
+            data = await data
         forms = self.get_table()
         Record = forms.dataclass()
         record = Record(name=name, created_on=datetime.now(), data=data)
@@ -73,7 +77,9 @@ class EmailBackend(Backend):
         return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
     async def process(self, request, name, data, *args, **kwargs):
-        formatted_data = await self.format(await data)
+        if isawaitable(data):
+            data = await data
+        formatted_data = await self.format(data)
         try:
             resp = await self.notify(form_name=name, form_data=formatted_data)
             logger.info(f"Email sent for form: {resp}")
@@ -102,7 +108,8 @@ class APIBackend(Backend):
         self.password = password
 
     async def process(self, request, name, data, *args, **kwargs):
-        data = await data
+        if isawaitable(data):
+            data = await data
         data["form_name"] = name
         data["submitted_on"] = datetime.now()
         try:
@@ -121,8 +128,10 @@ class SessionBackend(Backend):
     """
 
     async def process(self, request, name, data, *args, **kwargs):
+        if isawaitable(data):
+            data = await data
         session = request.session
-        session[name] = await data
+        session[name] = data
 
 
 class AddSessionBackend(Backend):
@@ -131,6 +140,8 @@ class AddSessionBackend(Backend):
     """
 
     async def process(self, request, name, data, *args, **kwargs):
+        if isawaitable(data):
+            data = await data
         session = request.session
         if name not in session:
             session[name] = {}
