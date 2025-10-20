@@ -1,6 +1,6 @@
 # fast-gov-uk
 
-Fast-gov-uk is a new toolkit for **rapid development of simple gov.uk services**. 
+Fast-gov-uk is a new toolkit for **rapid development of simple gov.uk services**.
 
 Fast-gov-uk is three things -
 
@@ -66,7 +66,7 @@ I feel that gov.uk services have 2 very common interaction patterns - (1) giving
 
 `fast-gov-uk` have some lightweight scaffolding for both. We have covered the former through `Page`. The latter is covered through forms. Lets take a peek -
 
-Make sure the development server is running. Go to your browser and type `127.0.0.1:5001/form/feedback`. You should see a standard gov.uk feedback form.
+Make sure the development server is running. Go to your browser and type `127.0.0.1:5001/forms/feedback`. You should see a standard gov.uk feedback form.
 
 Try filling it in and hit Submit. This should take you to the home page. This means that the form was submitted and processed without errors. We will come back to this later.
 
@@ -92,7 +92,7 @@ def email(data=None):
     )
 ```
 
-Hit save. Go to your browser and type `127.0.0.1:5001/form/email`. You should see your brand new form.
+Hit save. Go to your browser and type `127.0.0.1:5001/forms/email`. You should see your brand new form.
 
 Lets go a little deeper into `fast-gov-uk` and see what comes out of the box -
 

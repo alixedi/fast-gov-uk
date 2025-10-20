@@ -21,7 +21,7 @@ def Label(
     Args:
         field_id (str): HTML id of the field this label is for.
         text (str): Text to be displayed in the label.
-        heading (str): Is this label a heading? Defaults to "".
+        heading (str): Heading size? Defaults to "".
         required (book): Is this for a field that is required? Defaults to True.
     Returns:
         FT: A FastHTML label component.
@@ -77,7 +77,7 @@ class Field(AbstractField):
         label (str): Label for the field.
         hint (str): Hint for the field. Defaults to "".
         error (str): Error message for the field. Defaults to "".
-        heading (bool): Make label a heading? Defaults to False.
+        heading (str): Heading size? Defaults to "".
         required (book): Is this field required? Defaults to True.
         kwargs (dict): Pass on to underlying component
     """
@@ -1183,20 +1183,22 @@ class Fieldset(AbstractField):
         FT: A FastHTML Fieldset component.
     """
 
-    def __init__(self, *fields, name: str = "", legend: str = "", **kwargs):
+    def __init__(self, *fields: Field, name: str = "", legend: str = "", heading: str = "l", **kwargs):
         self.fields = fields
         self.name = name
         self.legend = legend
+        self.heading = heading
         self.kwargs = kwargs
 
     def __ft__(self):
+        heading_cls = f" govuk-fieldset__legend--{self.heading}" if self.heading else ""
         return fh.Fieldset(
             fh.Legend(
                 fh.H1(
                     self.legend,
                     cls="govuk-fieldset__heading",
                 ),
-                cls="govuk-fieldset__legend govuk-fieldset__legend--l",
+                cls=f"govuk-fieldset__legend{heading_cls}",
             ),
             *self.fields,
             cls="govuk-fieldset",

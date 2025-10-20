@@ -47,7 +47,15 @@ def html():
         elif isinstance(x, fh.FT):
             html_str = str(x)
         else:
-            html_str = x
+            html_str = str(x)
         soup = BeautifulSoup(html_str, "html.parser")
         return soup.prettify()
     return pretty_html
+
+
+@pytest.fixture
+def find():
+    def _find(html, tag, selector):
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.find(tag, selector)
+    return _find

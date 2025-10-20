@@ -5,15 +5,16 @@ from unittest.mock import Mock, patch, call, ANY
 import pytest
 
 from .app import session_feedback
+from fast_gov_uk import forms
 
 
 def test_form_get(client):
-    response = client.get("/form/profile")
+    response = client.get("/forms/profile")
     assert response.status_code == 200
 
 
 def test_form_get_404(client):
-    response = client.get("/form/not-profile")
+    response = client.get("/forms/not-profile")
     assert response.status_code == 404
 
 
@@ -29,7 +30,7 @@ def test_db_form_post_valid(client, db, picture):
         "comments": "Test",
     }
     response = client.post(
-        "/form/profile",
+        "/forms/profile",
         data=data,
         files={"picture": picture},
     )
@@ -59,75 +60,75 @@ def test_db_form_post_valid(client, db, picture):
         (
             # empty name
             {"name": ""},
-            {"name": "This field is required."}
+            ("name", "This field is required.")
         ),
         (
             # empty sex
             {"sex": ""},
-            {"sex": "This field is required."}
+            ("sex", "This field is required.")
         ),
         (
             # empty gender
             {"gender": ""},
-            {"gender": "This field is required."}
+            ("gender", "This field is required.")
         ),
         (
             # empty ethnicity
             {"ethnicity": ""},
-            {"ethnicity": "This field is required."}
+            ("ethnicity", "This field is required.")
         ),
         (
             # empty dob
             {"dob": ["", "", ""]},
-            {"dob": "This field is required."}
+            ("dob", "This field is required.")
         ),
         (
             # partially empty dob
             {"dob": ["10", "10", ""]},
-            {"dob": "This field is required."}
+            ("dob", "This field is required.")
         ),
         (
             # invalid dob
             {"dob": ["foo", "10", "2003"]},
-            {"dob": "Invalid values."}
+            ("dob", "Invalid values.")
         ),
         (
             # empty picture
             {"picture": ""},
-            {"picture": "This field is required."}
+            ("picture", "This field is required.")
         ),
         (
             # empty phone
             {"phone": ""},
-            {"phone": "This field is required."}
+            ("phone", "This field is required.")
         ),
         (
             # non-numeric phone
             {"phone": "A12345"},
-            {"phone": "Value is not a number."}
+            ("phone", "Value is not a number.")
         ),
         (
             # non-numeric phone
             {"phone": "test"},
-            {"phone": "Value is not a number."}
+            ("phone", "Value is not a number.")
         ),
         (
             # empty email
             {"email": ""},
-            {"email": "This field is required."}
+            ("email", "This field is required.")
         ),
         (
             # invalid email
             {"email": "test"},
-            {"email": "Value is not an email."}
+            ("email", "Value is not an email.")
         ),
         (
             # Comments more than 10 chars
             {"comments": "This is a long comment."},
-            {"comments": "Characters exceed limit of 10."}
+            ("comments", "Characters exceed limit of 10.")
         ),
 ))
-def test_form_post_invalid(errors, expected, client, db, picture):
+def test_form_post_invalid(errors, expected, client, db, picture, html, find):
     data = {
         "name": "Test",
         "sex": "male",
@@ -139,21 +140,27 @@ def test_form_post_invalid(errors, expected, client, db, picture):
         "comments": "Test",
     }
     data.update(errors)
-    with patch("fast_gov_uk.core.ds.Page") as mock_page:
-        response = client.post(
-            "/form/profile",
-            data=data,
-            files={"picture": picture},
-        )
-        form = mock_page.call_args.args[0]
-        assert response.status_code == 200
-        assert form.errors == expected
+    response = client.post(
+        "/forms/profile",
+        data=data,
+        files={"picture": picture},
+    )
+    assert response.status_code == 200
+    field_name, error_message = expected
+    expected_html = html(
+        f'<p class="govuk-error-message" id="{field_name}-error">'
+            '<span class="govuk-visually-hidden">Error: </span>'
+            f"{error_message}"
+        "</p>"
+    )
+    error_p = find(response.text, "p", {"class": "govuk-error-message"})
+    assert html(error_p) == expected_html
 
 
 def test_email_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
-        "/form/email_feedback",
+        "/forms/email_feedback",
         data=data,
     )
     assert response.status_code == 303
@@ -162,7 +169,7 @@ def test_email_form_post_valid(fast, db, client):
         email_address='test@test.com',
         template_id='test',
         personalisation={
-            'form_name': 'Feedback',
+            'form_name': 'feedback',
             'form_data': '* satisfaction: Satisfied',
             'service_name': 'Fast-gov-uk test'
         }
@@ -175,7 +182,7 @@ def test_api_form_post_valid(fast, db, client):
         mock_post = Mock()
         mock_client.return_value = Mock(post=mock_post)
         response = client.post(
-            "/form/api_feedback",
+            "/forms/api_feedback",
             data=data,
         )
     assert response.status_code == 303
@@ -184,7 +191,7 @@ def test_api_form_post_valid(fast, db, client):
         'https://test.com',
         data={
             'satisfaction': 'Satisfied',
-            'form_name': 'Feedback',
+            'form_name': 'feedback',
             'submitted_on': ANY,
         }
     )
@@ -193,32 +200,32 @@ def test_api_form_post_valid(fast, db, client):
 def test_session_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
-        "/form/session_feedback",
+        "/forms/session_feedback",
         data=data,
         follow_redirects=True,
     )
     assert response.status_code == 200
     response = client.get("/session")
-    feedback = response.json()["Feedback"]
+    feedback = response.json()["feedback"]
     assert feedback == {"satisfaction": "Satisfied"}
 
 
 def test_questions_get(client):
-    response = client.get("/questions/mini_equality")
+    response = client.get("/wizards/mini_equality")
     assert response.status_code == 307
-    response = client.get("/questions/mini_equality/0")
+    response = client.get("/wizards/mini_equality/0")
     assert response.status_code == 200
-    response = client.get("/questions/mini_equality/1")
+    response = client.get("/wizards/mini_equality/1")
     assert response.status_code == 200
-    response = client.get("/questions/mini_equality/2")
+    response = client.get("/wizards/mini_equality/2")
     assert response.status_code == 200
-    response = client.get("/questions/mini_equality/3")
+    response = client.get("/wizards/mini_equality/3")
     assert response.status_code == 200
 
 
 def test_question_no_permission(db, client):
     response = client.post(
-        "/questions/mini_equality/",
+        "/wizards/mini_equality/",
         data={"permission": "no"},
     )
     assert response.status_code == 303
@@ -227,41 +234,56 @@ def test_question_no_permission(db, client):
 
 def test_question_permission(db, client):
     response = client.post(
-        "/questions/mini_equality/",
+        "/wizards/mini_equality/",
         data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/1"
+    assert response.headers["Location"] == "/wizards/mini_equality/1"
 
 
-def test_questions_no_predicate(db, client):
+def test_questions_predicate_true(db, client):
     response = client.post(
-        "/questions/mini_equality/1",
-        data={"permission": "yes", "health": "no"},
+        "/wizards/mini_equality/",
+        data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/3"
+    assert response.headers["Location"] == "/wizards/mini_equality/1"
 
 
-def test_questions_predicate(db, client):
+def test_questions_predicate_false(db, client):
     response = client.post(
-        "/questions/mini_equality/1",
-        data={"permission": "yes", "health": "yes"},
+        "/wizards/mini_equality",
+        data={"permission": "no"},
+        follow_redirects=True,
     )
-    assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/2"
+    assert response.status_code == 200
+    assert response.url == "http://testserver/"
 
 
 def test_questions_valid(db, client):
     response = client.post(
-        "/questions/mini_equality/3",
-        data={"permission": "yes", "health": "yes", "ability": "alot", "sex": "skip", "gender": "skip"},
+        "/wizards/mini_equality/",
+        data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/"
+    response = client.post(
+        "/wizards/mini_equality/1",
+        data={"health": "yes"},
+    )
+    assert response.status_code == 303
+    response = client.post(
+        "/wizards/mini_equality/2",
+        data={"ability": "alot"},
+    )
+    assert response.status_code == 303
+    response = client.post(
+        "/wizards/mini_equality/3",
+        data={"sex": "skip", "gender": "skip"},
+    )
+    assert response.status_code == 303
     forms = db.t.forms()
     form = forms[0]
-    assert form.title == "Equality monitoring"
+    assert form.name == "equality"
     form_json = asdict(form)
     form_data = form_json["data"]
     form_dict = json.loads(form_data)
@@ -274,41 +296,26 @@ def test_questions_valid(db, client):
     }
 
 
-def test_error_summary(html):
+def test_error_summary(html, find):
     form = session_feedback(data={})
-    assert html(form) == html(
-        '<form enctype="multipart/form-data" method="POST">'
-            # The error summary - containine a link to the Radio field
-            '<div class="govuk-error-summary" data-module="govuk-error-summary">'
-                '<div role="alert">'
-                    '<h2 class="govuk-error-summary__title">There is a problem</h2>'
-                    '<div class="govuk-error-summary__body">'
-                        '<ul class="govuk-list govuk-error-summary__list">'
-                            '<li><a class="govuk-link" href="#satisfaction">How satisfied did you feel about the service?</a></li>'
-                        "</ul>"
-                    "</div>"
+    expected = html(
+        # The error summary - containine a link to the Radio field
+        '<div class="govuk-error-summary" data-module="govuk-error-summary">'
+            '<div role="alert">'
+                '<h2 class="govuk-error-summary__title">There is a problem</h2>'
+                '<div class="govuk-error-summary__body">'
+                    '<ul class="govuk-list govuk-error-summary__list">'
+                        '<li><a class="govuk-link" href="#satisfaction">How satisfied did you feel about the service?</a></li>'
+                    "</ul>"
                 "</div>"
             "</div>"
-            '<h1 class="govuk-heading-l">Feedback</h1>'
-            '<div class="govuk-form-group govuk-form-group--error">'
-                '<label class="govuk-label" for="satisfaction">How satisfied did you feel about the service?</label>'
-                '<p class="govuk-error-message" id="satisfaction-error">'
-                    '<span class="govuk-visually-hidden">Error:</span>'
-                    "This field is required."
-                "</p>"
-                '<fieldset aria-describedby="satisfaction-hint" class="govuk-fieldset" id="satisfaction">'
-                    '<div class="govuk-radios" data-module="govuk-radios">'
-                        '<div class="govuk-radios__item">'
-                            '<input class="govuk-radios__input" id="satisfaction-satisfied" name="satisfaction" type="radio" value="satisfied"/>'
-                            '<label class="govuk-label govuk-radios__label" for="satisfaction-satisfied">Satisfied</label>'
-                        "</div>"
-                        '<div class="govuk-radios__item">'
-                            '<input class="govuk-radios__input" id="satisfaction-dissatisfied" name="satisfaction" type="radio" value="dissatisfied"/>'
-                            '<label class="govuk-label govuk-radios__label" for="satisfaction-dissatisfied">Dissatisfied</label>'
-                        "</div>"
-                    "</div>"
-                "</fieldset>"
-            "</div>"
-            '<button class="govuk-button" data-module="govuk-button" type="submit">Send feedback</button>'
-        "</form>"
+        "</div>"
     )
+    form_html = html(form)
+    error_summary = find(form_html, "div", {"class": "govuk-error-summary"})
+    assert html(error_summary) == expected
+
+
+def test_no_fields_at_root():
+    with pytest.raises(ValueError):
+        forms.Form("test", "test")

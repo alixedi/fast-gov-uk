@@ -33,7 +33,7 @@ def home():
 
 
 # I can do @fast.form("foo") instead to make this page available
-# on /form/foo instead of the default /form/feedback
+# on /forms/foo instead of the default /forms/feedback
 @fast.form
 def feedback(data=None):
     """
@@ -57,33 +57,38 @@ def feedback(data=None):
 
     db: This is a DBForm so it needs a reference to the database
     so that it can save upon correct submission
+
+    P.S. This is an attempt to reproduce -
+    https://www.gov.uk/service-manual/service-assessments/get-feedback-page
     """
     # A DBForm gets saved to the database when its valid
     return forms.Form(
-        title="Give feedback for Fast Gov UK",
-        fields=[
-            ds.Radios(
-                name="satisfaction",
-                label="Overall, how satisfied did you feel about Fast Gov UK?",
-                choices={
-                    "very-satisfied": "Very Satisfied",
-                    "satisfied": "Satisfied",
-                    "neutral": "Neither satisfied not dissatisfied",
-                    "dissatisfied": "Dissatisfied",
-                    "very-dissatisfied": "Very dissatisfied",
-                },
+        "feedback",
+        ds.H1("Give feedback on Fast GOV UK"),
+        ds.H2("Satisfaction survey"),
+        ds.Radios(
+            name="satisfaction",
+            label="Overall, how satisfied did you feel about Fast Gov UK?",
+            choices={
+                "very-satisfied": "Very Satisfied",
+                "satisfied": "Satisfied",
+                "neutral": "Neither satisfied not dissatisfied",
+                "dissatisfied": "Dissatisfied",
+                "very-dissatisfied": "Very dissatisfied",
+            },
+            heading="s",
+        ),
+        ds.CharacterCount(
+            name="comments",
+            label="How could we improve this service?",
+            maxchars=1200,
+            required=False,
+            hint=(
+                "Do not include any personal or financial information, "
+                "for example your national insurance number."
             ),
-            ds.CharacterCount(
-                name="comments",
-                label="How could we improve this service?",
-                maxchars=1200,
-                required=False,
-                hint=(
-                    "Do not include any personal or financial information, "
-                    "for example your national insurance number."
-                ),
-            ),
-        ],
+            heading="s",
+        ),
         backends=[forms.DBBackend(db=fast.db)],
         success_url="/",
         data=data,
@@ -92,7 +97,7 @@ def feedback(data=None):
     )
 
 
-@fast.question()
+@fast.wizard
 def equality(step=0, data=None):
     """
     This is an example of a question-protocol aka wizard form.
@@ -106,35 +111,35 @@ def equality(step=0, data=None):
     when it is completed. You can add your own processing logic
     in the process method of the Questions class.
     """
-    return forms.Questions(
-        title="Equality monitoring",
-        fields=[
-            ds.Fieldset(
-                ds.H1("We have received your application"),
-                ds.P(
-                    "Before you finish using the service, "
-                    "we'd like to ask some equality questions."
-                ),
-                ds.P(
-                    "[Add a couple of sentences explaining why "
-                    "you're asking the questions and what you'll "
-                    "do with the information]."
-                ),
-                ds.Radios(
-                    name="permission",
-                    label="Do you want to answer the equality questions?",
-                    choices={
-                        "yes": "Yes, answer the equality questions",
-                        "no": "No, skip the equality questions",
-                    },
-                    heading="m",
-                    hint="These questions are optional.",
-                ),
-                ds.Detail(
-                    "Why we ask equality questions",
-                    ds.P("[Consider adding an optional longer explanation]")
-                ),
+    return forms.Wizard(
+        "equality",
+        forms.Question(
+            ds.H1("We have received your application"),
+            ds.P(
+                "Before you finish using the service, "
+                "we'd like to ask some equality questions."
             ),
+            ds.P(
+                "[Add a couple of sentences explaining why "
+                "you're asking the questions and what you'll "
+                "do with the information]."
+            ),
+            ds.Radios(
+                name="permission",
+                label="Do you want to answer the equality questions?",
+                choices={
+                    "yes": "Yes, answer the equality questions",
+                    "no": "No, skip the equality questions",
+                },
+                heading="m",
+                hint="These questions are optional.",
+            ),
+            ds.Detail(
+                "Why we ask equality questions",
+                ds.P("[Consider adding an optional longer explanation]")
+            ),
+        ),
+        forms.Question(
             ds.DateInput(
                 name="dob",
                 label="What is your date of birth?",
@@ -144,6 +149,9 @@ def equality(step=0, data=None):
                 ),
                 heading="l",
             ),
+            predicates={"permission": "yes"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="health",
                 label=(
@@ -153,6 +161,9 @@ def equality(step=0, data=None):
                 choices={"yes": "Yes", "no": "No", "skip": "Prefer not to say"},
                 heading="l",
             ),
+            predicates={"permission": "yes"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="ability",
                 label=(
@@ -169,6 +180,9 @@ def equality(step=0, data=None):
                 required=False,
                 heading="l",
             ),
+            predicates={"permission": "yes", "health": "yes"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="ethnic-group",
                 label="What is your ethnic group?",
@@ -182,6 +196,9 @@ def equality(step=0, data=None):
                 },
                 heading="l",
             ),
+            predicates={"permission": "yes"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="white",
                 label="Which of the following best describes your White background?",
@@ -195,6 +212,9 @@ def equality(step=0, data=None):
                 required=False,
                 heading="l",
             ),
+            predicates={"permission": "yes", "ethnic-group": "white"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="mixed",
                 label=(
@@ -211,6 +231,9 @@ def equality(step=0, data=None):
                 required=False,
                 heading="l",
             ),
+            predicates={"permission": "yes", "ethnic-group": "mixed"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="asian",
                 label=(
@@ -228,6 +251,9 @@ def equality(step=0, data=None):
                 required=False,
                 heading="l",
             ),
+            predicates={"permission": "yes", "ethnic-group": "asian"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="black",
                 label=(
@@ -243,6 +269,9 @@ def equality(step=0, data=None):
                 required=False,
                 heading="l",
             ),
+            predicates={"permission": "yes", "ethnic-group": "black"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="other",
                 label="Which of the following best describes your background?",
@@ -254,6 +283,9 @@ def equality(step=0, data=None):
                 required=False,
                 heading="l",
             ),
+            predicates={"permission": "yes", "ethnic-group": "other"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="marital-status",
                 label="What is your legal marital or registered civil partnership status?",
@@ -271,6 +303,9 @@ def equality(step=0, data=None):
                 },
                 heading="l",
             ),
+            predicates={"permission": "yes"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="religion",
                 label="What is your religion?",
@@ -287,6 +322,9 @@ def equality(step=0, data=None):
                 },
                 heading="l",
             ),
+            predicates={"permission": "yes"},
+        ),
+        forms.Question(
             ds.Fieldset(
                 ds.Radios(
                     name="sex",
@@ -310,6 +348,9 @@ def equality(step=0, data=None):
                 legend="Sex and gender identity",
                 name="sex-and-gender",
             ),
+            predicates={"permission": "yes"},
+        ),
+        forms.Question(
             ds.Radios(
                 name="sexual-orientation",
                 label="Which of the following best describes your sexual orientation?",
@@ -322,30 +363,12 @@ def equality(step=0, data=None):
                 },
                 heading="l",
             ),
-        ],
+            predicates={"permission": "yes"},
+        ),
         backends=[forms.DBBackend(db=fast.db)],
+        success_url="/",
         data=data,
         step=step,
-        success_url="/",
-        cta="Continue",
-        db=fast.db,
-        predicates={
-            # These fields are only run if the data collected
-            # in specified prior fields have the specified values
-            "dob": {"permission": "yes"},
-            "health": {"permission": "yes"},
-            "ability": {"permission": "yes", "health": "yes"},
-            "ethnic-group": {"permission": "yes"},
-            "white": {"permission": "yes", "ethnic-group": "white"},
-            "mixed": {"permission": "yes", "ethnic-group": "mixed"},
-            "asian": {"permission": "yes", "ethnic-group": "asian"},
-            "black": {"permission": "yes", "ethnic-group": "black"},
-            "other": {"permission": "yes", "ethnic-group": "other"},
-            "marital-status": {"permission": "yes"},
-            "religion": {"permission": "yes"},
-            "sex-and-gender": {"permission": "yes"},
-            "sexual-orientation": {"permission": "yes"},
-        },
     )
 
 
@@ -388,7 +411,7 @@ def phase():
     return ds.PhaseBanner(
         ds.Span(
             "This is a new service. Help us improve it and ",
-            ds.A("give your feedback.", href="/form/feedback"),
+            ds.A("give your feedback.", href="/forms/feedback"),
         ),
         phase="Alpha",
     )
