@@ -323,56 +323,74 @@ class QuestionsFinished(Exception):
     pass
 
 
-class Questions(Form):
+class Questions:
     """
     Implements the question-protocol aka Wizard i.e. forms that step
     through the fields one at a time.
     """
 
-    def __init__(self, *args, step: int = 0, predicates: dict | None = None, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        name: str,
+        *questions: Question,
+        backends: list[Backend] | None = None,
+        success_url: str | Callable = "/",
+        step: int = 0,
+        data: dict | None = None
+    ):
+        self.name = name
+        self.questions = questions
+        self.backends = backends or [SessionBackend()]
+        self.success_url = success_url
         self.step = step
-        self.predicates = predicates or {}
+        self.data = data
+        try:
+            question = self.questions[self.step]
+            self.question = _Question(
+                name,
+                *question.args,
+                backends=[QuestionBackend()],
+                **question.kwargs,
+                data=data,
+            )
+        except IndexError:
+            raise fh.HTTPException(status_code=404)
+
+    @property
+    def success(self):
+        if isinstance(self.success_url, Callable):
+            self.success_url = self.success_url(self.data)
+        return fh.Redirect(self.success_url)
 
     @property
     def step_valid(self):
-        field = self.fields[self.step]
-        if isinstance(field, Fieldset):
-            return all(not f.error for f in field.fields)
-        return field.error == ""
+        return self.question.valid
 
-    @property
-    def next_step(self):
-        data = self.data or {}
-        next_step = self.step + 1
-        if next_step >= len(self.fields):
-            raise QuestionsFinished()
-        next_field = self.fields[next_step]
-        if next_field.name not in self.predicates:
-            return next_step
-        while next_step < len(self.fields):
-            predicate = self.predicates.get(next_field.name, {})
-            if all([data.get(k) == v for k, v in predicate.items()]):
-                return next_step
-            next_step = next_step + 1
-            if next_step >= len(self.fields):
-                raise QuestionsFinished()
-            next_field = self.fields[next_step]
-            continue
-
-    def __ft__(self) -> fh.FT:
+    async def process(self, req, *args, **kwargs):
+        data = req.session[self.name]["data"]
         try:
-            field = self.fields[self.step]
-        except IndexError:
-            raise fh.HTTPException(status_code=404)
-        return fh.Form(
-            # We are not including ErrorSummary here
-            # b/c most of the times, questions have a
-            # single field and therefore its not necessary
-            # to have an error summary
-            field,
-            Button(self.cta),
-            method=self.method,
-            action=self.action,
-            **self.kwargs,
-        )
+            for backend in self.backends:
+                await backend.process(req, self.name, data, *args, **kwargs)
+        except BackendError:
+            raise
+        return self.success
+
+    async def next_step(self, req):
+        await self.question.process(req)
+        data = req.session[self.name]["values"]
+        next_step = self.step + 1
+
+        while next_step < len(self.questions):
+            next_field = self.questions[next_step]
+            predicates = next_field.predicates or {}
+
+            if not predicates or all(data.get(k) == v for k, v in predicates.items()):
+                return fh.Redirect(f"{req.url.path}{next_step}")
+
+            next_step += 1
+
+        return await self.process(req)
+
+
+    def __ft__(self) -> _Question:
+        return self.question
