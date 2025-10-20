@@ -113,7 +113,6 @@ def mini_equality(step=0, data=None):
     return forms.Wizard(
         "equality",
         forms.Question(
-            "equality",
             ds.Radios(
                 name="permission",
                 label="Do you want to answer the equality questions?",
@@ -125,7 +124,6 @@ def mini_equality(step=0, data=None):
             cta="Continue",
         ),
         forms.Question(
-            "equality",
             ds.Radios(
                 name="health",
                 label=(
@@ -138,7 +136,6 @@ def mini_equality(step=0, data=None):
             cta="Continue",
         ),
         forms.Question(
-            "equality",
             ds.Radios(
                 name="ability",
                 label=(
@@ -152,7 +149,6 @@ def mini_equality(step=0, data=None):
             cta="Continue",
         ),
         forms.Question(
-            "equality",
             ds.Fieldset(
                 ds.Radios(
                     name="sex",
