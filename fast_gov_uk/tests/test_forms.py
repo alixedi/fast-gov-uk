@@ -9,12 +9,12 @@ from fast_gov_uk import forms
 
 
 def test_form_get(client):
-    response = client.get("/form/profile")
+    response = client.get("/forms/profile")
     assert response.status_code == 200
 
 
 def test_form_get_404(client):
-    response = client.get("/form/not-profile")
+    response = client.get("/forms/not-profile")
     assert response.status_code == 404
 
 
@@ -30,7 +30,7 @@ def test_db_form_post_valid(client, db, picture):
         "comments": "Test",
     }
     response = client.post(
-        "/form/profile",
+        "/forms/profile",
         data=data,
         files={"picture": picture},
     )
@@ -141,7 +141,7 @@ def test_form_post_invalid(errors, expected, client, db, picture, html, find):
     }
     data.update(errors)
     response = client.post(
-        "/form/profile",
+        "/forms/profile",
         data=data,
         files={"picture": picture},
     )
@@ -160,7 +160,7 @@ def test_form_post_invalid(errors, expected, client, db, picture, html, find):
 def test_email_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
-        "/form/email_feedback",
+        "/forms/email_feedback",
         data=data,
     )
     assert response.status_code == 303
@@ -182,7 +182,7 @@ def test_api_form_post_valid(fast, db, client):
         mock_post = Mock()
         mock_client.return_value = Mock(post=mock_post)
         response = client.post(
-            "/form/api_feedback",
+            "/forms/api_feedback",
             data=data,
         )
     assert response.status_code == 303
@@ -200,7 +200,7 @@ def test_api_form_post_valid(fast, db, client):
 def test_session_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
-        "/form/session_feedback",
+        "/forms/session_feedback",
         data=data,
         follow_redirects=True,
     )

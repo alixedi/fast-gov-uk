@@ -189,7 +189,7 @@ def phase():
     return ds.PhaseBanner(
         ds.Span(
             "This is a new service. Help us improve it and ",
-            ds.A("give your feedback.", href="/form/feedback"),
+            ds.A("give your feedback.", href="/forms/feedback"),
         ),
         phase="Alpha",
     )

@@ -3,7 +3,6 @@ from notifications_python_client import notifications as notify
 
 import fast_gov_uk.design_system as ds
 from fast_gov_uk.demo import demo
-from fast_gov_uk.forms import QuestionsFinished
 
 
 GOV_UK_HTTP_HEADERS = [
@@ -82,7 +81,7 @@ class Fast(fh.FastHTML):
         if self.dev:
             self.route("/demo")(demo)
         self.route("/{fname:path}.{ext:static}")(assets)
-        self.route("/form/{name}", methods=["GET", "POST"])(self.process_form)
+        self.route("/forms/{name}", methods=["GET", "POST"])(self.process_form)
         self.route("/questions/{name}/{step}", methods=["GET", "POST"])(
             self.process_questions
         )

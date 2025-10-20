@@ -33,7 +33,7 @@ def home():
 
 
 # I can do @fast.form("foo") instead to make this page available
-# on /form/foo instead of the default /form/feedback
+# on /forms/foo instead of the default /forms/feedback
 @fast.form
 def feedback(data=None):
     """
@@ -393,7 +393,7 @@ def phase():
     return ds.PhaseBanner(
         ds.Span(
             "This is a new service. Help us improve it and ",
-            ds.A("give your feedback.", href="/form/feedback"),
+            ds.A("give your feedback.", href="/forms/feedback"),
         ),
         phase="Alpha",
     )
