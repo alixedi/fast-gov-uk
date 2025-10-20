@@ -150,12 +150,13 @@ def PhaseBanner(
     )
 
 
-def Page(*content: fh.FT, navigation: fh.FT | None = None, sidebar: fh.FT | None = None) -> fh.FT:
+def Page(*content, navigation=None, sidebar=None) -> fh.FT:
     """
     Page component.
     Args:
         content (list): List of content for the Page.
-        navigation (FT): Navigation component. Defaults to None.
+        navigation: Navigation component. Defaults to None.
+        sidebar: Sidebar content. Defaults to None.
         kwargs (dict): kwargs to be passed to the underlying component.
     Returns:
         FT: A FastHTML Page component.
