@@ -241,31 +241,46 @@ def test_question_permission(db, client):
     assert response.headers["Location"] == "/questions/mini_equality/1"
 
 
-def test_questions_no_predicate(db, client):
+def test_questions_predicate_true(db, client):
     response = client.post(
-        "/questions/mini_equality/1",
-        data={"permission": "yes", "health": "no"},
+        "/questions/mini_equality/",
+        data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/3"
+    assert response.headers["Location"] == "/questions/mini_equality/1"
 
 
-def test_questions_predicate(db, client):
+def test_questions_predicate_false(db, client):
     response = client.post(
-        "/questions/mini_equality/1",
-        data={"permission": "yes", "health": "yes"},
+        "/questions/mini_equality",
+        data={"permission": "no"},
+        follow_redirects=True,
     )
-    assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/2"
+    assert response.status_code == 200
+    assert response.url == "http://testserver/"
 
 
 def test_questions_valid(db, client):
     response = client.post(
-        "/questions/mini_equality/3",
-        data={"permission": "yes", "health": "yes", "ability": "alot", "sex": "skip", "gender": "skip"},
+        "/questions/mini_equality/",
+        data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/"
+    response = client.post(
+        "/questions/mini_equality/1",
+        data={"health": "yes"},
+    )
+    assert response.status_code == 303
+    response = client.post(
+        "/questions/mini_equality/2",
+        data={"ability": "alot"},
+    )
+    assert response.status_code == 303
+    response = client.post(
+        "/questions/mini_equality/3",
+        data={"sex": "skip", "gender": "skip"},
+    )
+    assert response.status_code == 303
     forms = db.t.forms()
     form = forms[0]
     assert form.name == "equality"
