@@ -385,7 +385,7 @@ class Wizard:
             predicates = next_field.predicates or {}
 
             if not predicates or all(data.get(k) == v for k, v in predicates.items()):
-                return fh.Redirect(f"{req.url.path}{next_step}")
+                return fh.Redirect(f'/wizards/{req.path_params["name"]}/{next_step}')
 
             next_step += 1
 
