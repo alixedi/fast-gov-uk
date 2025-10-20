@@ -211,21 +211,21 @@ def test_session_form_post_valid(fast, db, client):
 
 
 def test_questions_get(client):
-    response = client.get("/questions/mini_equality")
+    response = client.get("/wizards/mini_equality")
     assert response.status_code == 307
-    response = client.get("/questions/mini_equality/0")
+    response = client.get("/wizards/mini_equality/0")
     assert response.status_code == 200
-    response = client.get("/questions/mini_equality/1")
+    response = client.get("/wizards/mini_equality/1")
     assert response.status_code == 200
-    response = client.get("/questions/mini_equality/2")
+    response = client.get("/wizards/mini_equality/2")
     assert response.status_code == 200
-    response = client.get("/questions/mini_equality/3")
+    response = client.get("/wizards/mini_equality/3")
     assert response.status_code == 200
 
 
 def test_question_no_permission(db, client):
     response = client.post(
-        "/questions/mini_equality/",
+        "/wizards/mini_equality/",
         data={"permission": "no"},
     )
     assert response.status_code == 303
@@ -234,25 +234,25 @@ def test_question_no_permission(db, client):
 
 def test_question_permission(db, client):
     response = client.post(
-        "/questions/mini_equality/",
+        "/wizards/mini_equality/",
         data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/1"
+    assert response.headers["Location"] == "/wizards/mini_equality/1"
 
 
 def test_questions_predicate_true(db, client):
     response = client.post(
-        "/questions/mini_equality/",
+        "/wizards/mini_equality/",
         data={"permission": "yes"},
     )
     assert response.status_code == 303
-    assert response.headers["Location"] == "/questions/mini_equality/1"
+    assert response.headers["Location"] == "/wizards/mini_equality/1"
 
 
 def test_questions_predicate_false(db, client):
     response = client.post(
-        "/questions/mini_equality",
+        "/wizards/mini_equality",
         data={"permission": "no"},
         follow_redirects=True,
     )
@@ -262,22 +262,22 @@ def test_questions_predicate_false(db, client):
 
 def test_questions_valid(db, client):
     response = client.post(
-        "/questions/mini_equality/",
+        "/wizards/mini_equality/",
         data={"permission": "yes"},
     )
     assert response.status_code == 303
     response = client.post(
-        "/questions/mini_equality/1",
+        "/wizards/mini_equality/1",
         data={"health": "yes"},
     )
     assert response.status_code == 303
     response = client.post(
-        "/questions/mini_equality/2",
+        "/wizards/mini_equality/2",
         data={"ability": "alot"},
     )
     assert response.status_code == 303
     response = client.post(
-        "/questions/mini_equality/3",
+        "/wizards/mini_equality/3",
         data={"sex": "skip", "gender": "skip"},
     )
     assert response.status_code == 303

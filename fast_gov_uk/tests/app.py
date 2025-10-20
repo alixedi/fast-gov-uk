@@ -108,9 +108,9 @@ def session_feedback(data=None):
     )
 
 
-@fast.question
+@fast.wizard
 def mini_equality(step=0, data=None):
-    return forms.Questions(
+    return forms.Wizard(
         "equality",
         forms.Question(
             "equality",

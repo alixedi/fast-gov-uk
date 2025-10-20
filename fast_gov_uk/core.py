@@ -76,14 +76,14 @@ class Fast(fh.FastHTML):
         # Initialize form registry
         self.forms = {}
         # Initialise wizard registry
-        self.questions = {}
+        self.wizards = {}
         # Set up routes
         if self.dev:
             self.route("/demo")(demo)
         self.route("/{fname:path}.{ext:static}")(assets)
         self.route("/forms/{name}", methods=["GET", "POST"])(self.process_form)
-        self.route("/questions/{name}/{step}", methods=["GET", "POST"])(
-            self.process_questions
+        self.route("/wizards/{name}/{step}", methods=["GET", "POST"])(
+            self.process_wizard
         )
         self.route("/cookie-banner", methods=["GET", "POST"])(self.cookie_banner)
         self.route("/notifications")(self.notifications)
@@ -134,19 +134,19 @@ class Fast(fh.FastHTML):
         # Used as @app.form("/some-url")
         return form_decorator
 
-    def question(self, url=None):
-        def question_decorator(func):
+    def wizard(self, url=None):
+        def wizard_decorator(func):
             _url = url or func.__name__
-            self.questions[_url] = func
+            self.wizards[_url] = func
             return func
 
         if callable(url):
             # Used as @app.form
             func = url
             url = None
-            return question_decorator(func)
+            return wizard_decorator(func)
         # Used as @app.question("/some-url")
-        return question_decorator
+        return wizard_decorator
 
     async def process_form(self, req, name: str, post: dict):
         mkform = self.forms.get(name, None)
@@ -154,8 +154,7 @@ class Fast(fh.FastHTML):
             raise fh.HTTPException(status_code=404)
         # If GET, just return the form
         if req.method == "GET":
-            form = mkform()
-            return form
+            return mkform()
         # If POST, fill the form
         form = mkform(post)
         # If valid, process
@@ -164,25 +163,24 @@ class Fast(fh.FastHTML):
         # Else return with errors
         return form
 
-    async def process_questions(
+    async def process_wizard(
         self, req, session: dict, name: str, step: str, post: dict
     ):
         try:
-            mk_question = self.questions[name]
+            mkwizard = self.wizards[name]
             _step = int(step or "0")
         except (KeyError, ValueError):
             raise fh.HTTPException(status_code=404)
         # If GET, just return the form
         if req.method == "GET":
-            question = mk_question(step=_step)
-            return question
+            return mkwizard(step=_step)
         # If POST, fill the form
-        question = mk_question(step=_step, data=post)
+        wizard = mkwizard(step=_step, data=post)
         # If step valid
-        if question.step_valid:
-            return await question.next_step(req)
+        if wizard.step_valid:
+            return await wizard.next_step(req)
         # Else return with errors
-        return question
+        return wizard
 
     def cookie_banner(self, req, post: dict, cookie_policy: str = ""):
         banner = ds.CookieBanner(

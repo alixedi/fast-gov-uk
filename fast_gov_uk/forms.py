@@ -323,7 +323,7 @@ class QuestionsFinished(Exception):
     pass
 
 
-class Questions:
+class Wizard:
     """
     Implements the question-protocol aka Wizard i.e. forms that step
     through the fields one at a time.
