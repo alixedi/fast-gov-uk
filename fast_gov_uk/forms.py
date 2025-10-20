@@ -287,6 +287,38 @@ class Form:
         return Page(self.render) if self.page else self.render
 
 
+class Question:
+    """
+    An interface to the underlying _Question which is a Form. This is useful
+    b/c all the Question objects that belong to the same flow will have the
+    same name and so if we insist on directlry using _Question, the user will
+    have to pass in the same name for each _Question which can be erorr-prone.
+    """
+
+    def __init__(self, *args, predicates: dict | None = None, **kwargs):
+        self.args = args
+        self.predicates = predicates
+        self.kwargs = kwargs
+
+
+class _Question(Form):
+    """
+    Subclass of Form to be used as a single Question page in GDS-style
+    question pages.
+    """
+
+    @property
+    async def clean(self) -> dict:
+        """
+        Override the form clean function to not only save cleaned
+        data from fields but also raw values. The raw values are
+        used to determind control flow through question pages.
+        """
+        values = {f.name: f.value for f in self.form_fields}
+        data = {f.name: await f.clean for f in self.form_fields}
+        return {"values": values, "data": data}
+
+
 class QuestionsFinished(Exception):
     pass
 
