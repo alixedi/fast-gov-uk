@@ -134,9 +134,11 @@ class SessionBackend(Backend):
         session[name] = data
 
 
-class AddSessionBackend(Backend):
+class QuestionBackend(Backend):
     """
-    Backend that updates (instead of overwrite) session with form data.
+    Backend that appends data as well as values to the session.
+    Used by question pages to store state as the user progress
+    from one page to another.
     """
 
     async def process(self, request, name, data, *args, **kwargs):
@@ -144,8 +146,9 @@ class AddSessionBackend(Backend):
             data = await data
         session = request.session
         if name not in session:
-            session[name] = {}
-        session[name].update(await data)
+            session[name] = {"values": {}, "data": {}}
+        session[name]["values"].update(data["values"])
+        session[name]["data"].update(data["data"])
 
 
 class Form:
