@@ -1386,9 +1386,9 @@ def test_required(field):
 def test_not_required(field):
     """Test that all input fields can be marked as not required."""
     f = field(name="test", label="Test Label", required=False)
-    form = forms.Form("test", f)
+    form = forms.Form("test", f, data={})
     # TODO: assert exact errors :/
-    assert form.errors != {"test": "This field is required."}
+    assert form.errors == {}
 
 
 def test_radio_reveal(html):
