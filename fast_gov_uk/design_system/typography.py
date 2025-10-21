@@ -2,7 +2,7 @@ import fasthtml.common as fh
 
 
 def A(
-    text: str,
+    text,
     href: str = "#",
     visited: bool = False,
     inverse=False,
@@ -12,7 +12,7 @@ def A(
     """
     A link component.
     Args:
-        text (str): The text to display in the link.
+        text: The text to display in the link.
         href (str): The URL the link points to. Defaults to "#".
         visited (bool): If True, applies a visited style. Defaults to False.
         newtab (bool): If True, opens the link in a new tab. Defaults to False.
@@ -28,11 +28,11 @@ def A(
     return fh.A(text, href=href, cls=cls, **newtab_attr, **kwargs)
 
 
-def H1(text: str, size="l", caption="", **kwargs) -> fh.FT:
+def H1(text, size="l", caption="", **kwargs) -> fh.FT:
     """
     H1 component.
     Args:
-        text (str): The text to display in the header.
+        text: The text to display in the header.
         size (str): The size of the header. Defaults to "l".
         caption (str): Caption to go with the heading. Defaults to "".
         kwargs (dict): kwargs to be passed to the underlying component.
@@ -47,11 +47,11 @@ def H1(text: str, size="l", caption="", **kwargs) -> fh.FT:
     )
 
 
-def H2(text: str, size="m", caption="", **kwargs) -> fh.FT:
+def H2(text, size="m", caption="", **kwargs) -> fh.FT:
     """
     H1 component.
     Args:
-        text (str): The text to display in the header.
+        text: The text to display in the header.
         size (str): The size of the header. Defaults to "l".
         caption (str): Caption to go with the heading. Defaults to "".
         kwargs (dict): kwargs to be passed to the underlying component.
@@ -66,11 +66,11 @@ def H2(text: str, size="m", caption="", **kwargs) -> fh.FT:
     )
 
 
-def H3(text: str, size="s", caption="", **kwargs) -> fh.FT:
+def H3(text, size="s", caption="", **kwargs) -> fh.FT:
     """
     H1 component.
     Args:
-        text (str): The text to display in the header.
+        text: The text to display in the header.
         size (str): The size of the header. Defaults to "s".
         caption (str): Caption to go with the heading. Defaults to "".
         kwargs (dict): kwargs to be passed to the underlying component.
@@ -85,7 +85,7 @@ def H3(text: str, size="s", caption="", **kwargs) -> fh.FT:
     )
 
 
-def P(*content: str | fh.FT, lead=False, small=False, **kwargs) -> fh.FT:
+def P(*content, lead=False, small=False, **kwargs) -> fh.FT:
     """
     Paragraph component.
     Args:

@@ -18,12 +18,13 @@ class EmailInput(TextInput):
     @TextInput.value.setter
     def value(self, value):
         self._value = value
-        if self.required and not value:
-            self.error = "This field is required."
-            return
-        _, email = parseaddr(self._value)
-        if "@" not in email:
-            self.error = "Value is not an email."
+        if self.required:
+            if not value:
+                self.error = "This field is required."
+                return
+            _, email = parseaddr(self._value)
+            if "@" not in email:
+                self.error = "Value is not an email."
 
 
 class NumberInput(TextInput):
@@ -40,13 +41,14 @@ class NumberInput(TextInput):
     @TextInput.value.setter
     def value(self, value):
         self._value = value
-        if self.required and not value:
-            self.error = "This field is required."
-            return
-        try:
-            _ = int(self._value)
-        except (ValueError, TypeError):
-            self.error = "Value is not a number."
+        if self.required:
+            if not value:
+                self.error = "This field is required."
+                return
+            try:
+                _ = int(self._value)
+            except (ValueError, TypeError):
+                self.error = "Value is not a number."
 
     @property
     async def clean(self):
@@ -70,13 +72,14 @@ class DecimalInput(TextInput):
     @TextInput.value.setter
     def value(self, value):
         self._value = value
-        if self.required and not value:
-            self.error = "This field is required."
-            return
-        try:
-            _ = float(self._value)
-        except (ValueError, TypeError):
-            self.error = "Value is not a number."
+        if self.required:
+            if not value:
+                self.error = "This field is required."
+                return
+            try:
+                _ = float(self._value)
+            except (ValueError, TypeError):
+                self.error = "Value is not a number."
 
     @property
     async def clean(self):
@@ -117,12 +120,13 @@ class RegexInput(TextInput):
     @TextInput.value.setter
     def value(self, value):
         self._value = value
-        if self.required and not value:
-            self.error = "This field is required."
-            return
-        pattern = re.compile(self.regex)
-        if not pattern.match(self._value):
-            self.error = 'Value does not match the required format.'
+        if self.required:
+            if not value:
+                self.error = "This field is required."
+                return
+            pattern = re.compile(self.regex)
+            if not pattern.match(self._value):
+                self.error = 'Value does not match the required format.'
 
 
 class PastDateInput(DateInput):
@@ -131,16 +135,17 @@ class PastDateInput(DateInput):
     def value(self, value):
         self._value = value or ("", "", "")
         day, month, year = self._value
-        if self.required and (not day or not month or not year):
-            self.error = "This field is required."
-            return
-        try:
-            day, month, year = int(day), int(month), int(year)
-            _date = date(day=day, month=month, year=year)
-            if _date > date.today():
-                self.error = "The date must be in the past."
-        except (ValueError, TypeError):
-            self.error = "Invalid values."
+        if self.required:
+            if (not day or not month or not year):
+                self.error = "This field is required."
+                return
+            try:
+                day, month, year = int(day), int(month), int(year)
+                _date = date(day=day, month=month, year=year)
+                if _date > date.today():
+                    self.error = "The date must be in the past."
+            except (ValueError, TypeError):
+                self.error = "Invalid values."
 
 
 class FutureDateInput(DateInput):
@@ -149,13 +154,14 @@ class FutureDateInput(DateInput):
     def value(self, value):
         self._value = value or ("", "", "")
         day, month, year = self._value
-        if self.required and (not day or not month or not year):
-            self.error = "This field is required."
-            return
-        try:
-            day, month, year = int(day), int(month), int(year)
-            _date = date(day=day, month=month, year=year)
-            if _date < date.today():
-                self.error = "The date must be in the future."
-        except (ValueError, TypeError):
-            self.error = "Invalid values."
+        if self.required:
+            if (not day or not month or not year):
+                self.error = "This field is required."
+                return
+            try:
+                day, month, year = int(day), int(month), int(year)
+                _date = date(day=day, month=month, year=year)
+                if _date < date.today():
+                    self.error = "The date must be in the future."
+            except (ValueError, TypeError):
+                self.error = "Invalid values."

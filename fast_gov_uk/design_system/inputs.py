@@ -959,14 +959,15 @@ class DateInput(Field):
     def value(self, value):
         self._value = value or ("", "", "")
         day, month, year = self._value
-        if self.required and (not day or not month or not year):
-            self.error = "This field is required."
-            return
-        try:
-            day, month, year = int(day), int(month), int(year)
-            _ = date(day=day, month=month, year=year)
-        except (ValueError, TypeError):
-            self.error = "Invalid values."
+        if self.required:
+            if (not day or not month or not year):
+                self.error = "This field is required."
+                return
+            try:
+                day, month, year = int(day), int(month), int(year)
+                _ = date(day=day, month=month, year=year)
+            except (ValueError, TypeError):
+                self.error = "Invalid values."
 
     @property
     def day_field(self):

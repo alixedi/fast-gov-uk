@@ -205,9 +205,11 @@ class Form:
         for item in self.fields:
             if isinstance(item, Fieldset):
                 for fitem in item.fields:
-                    yield fitem
+                    if isinstance(fitem, Field):
+                        yield fitem
             else:
-                yield item
+                if isinstance(item, Field):
+                    yield item
 
     @property
     def errors(self) -> dict:
