@@ -364,6 +364,7 @@ def equality(step=0, data=None):
                 heading="l",
             ),
             predicates={"permission": "yes"},
+            cta="Submit",
         ),
         backends=[forms.DBBackend(db=fast.db)],
         success_url="/",

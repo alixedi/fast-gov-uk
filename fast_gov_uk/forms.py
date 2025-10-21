@@ -307,6 +307,14 @@ class _Question(Form):
     question pages.
     """
 
+    def __init__(self, *args, cta: str = "Continue", **kwargs):
+        super().__init__(
+            *args,
+            cta=cta,
+            backends=[QuestionBackend()],
+            **kwargs
+        )
+
     @property
     async def clean(self) -> dict:
         """
@@ -349,7 +357,6 @@ class Wizard:
             self.question = _Question(
                 name,
                 *question.args,
-                backends=[QuestionBackend()],
                 **question.kwargs,
                 data=data,
             )
