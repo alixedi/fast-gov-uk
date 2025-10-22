@@ -107,6 +107,8 @@ class Field(AbstractField):
 
     @property
     async def clean(self):
+        if not self.value:
+            return None
         return self.value
 
     @value.setter
