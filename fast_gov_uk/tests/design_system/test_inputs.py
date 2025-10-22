@@ -410,6 +410,19 @@ def test_charactercount(kwargs, expected, html):
 
 
 @pytest.mark.parametrize(
+    "kwargs, error",
+    (
+        ({"name": "test", "maxchars": 3}, "Characters exceed limit of 3."),
+        ({"name": "test", "maxwords": 1}, "Words exceed limit of 1."),
+    ),
+)
+def test_charactercount_invalid(kwargs, error):
+    charcount = ds.CharacterCount(**kwargs)
+    charcount.value = "A quick brown fox..."
+    assert charcount.error == error
+
+
+@pytest.mark.parametrize(
     "kwargs, expected",
     (
         (
