@@ -18,6 +18,11 @@ def home(session):
     return ds.Page(ds.P("Hello, world!"))
 
 
+@fast.page
+def error():
+    raise Exception
+
+
 @fast.form
 def profile(data=None):
     return forms.Form(
