@@ -261,26 +261,42 @@ def test_questions_predicate_false(db, client):
 
 
 def test_questions_valid(db, client):
+    # First step
     response = client.post(
         "/wizards/mini_equality/",
         data={"permission": "yes"},
+        follow_redirects=True,
     )
-    assert response.status_code == 303
+    assert response.status_code == 200
+    # Second step
     response = client.post(
-        "/wizards/mini_equality/1",
+        response.url,
         data={"health": "yes"},
+        follow_redirects=True,
     )
-    assert response.status_code == 303
+    assert response.status_code == 200
+    # Third step
     response = client.post(
-        "/wizards/mini_equality/2",
+        response.url,
         data={"ability": "alot"},
+        follow_redirects=True,
     )
-    assert response.status_code == 303
+    assert response.status_code == 200
+    # Invalid input
+    response = client.post(
+        response.url,
+        data={},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    # Still third step
     response = client.post(
         "/wizards/mini_equality/3",
         data={"sex": "skip", "gender": "skip"},
+        follow_redirects=True,
     )
-    assert response.status_code == 303
+    assert response.status_code == 200
+    assert response.url.path == "/"
     forms = db.t.forms()
     form = forms[0]
     assert form.name == "equality"
