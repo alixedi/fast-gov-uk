@@ -91,7 +91,7 @@ def test_field_optional(html):
     "kwargs, expected",
     (
         (
-            {"name": "test", "options": [("1", "Option 1"), ("2", "Option 2")]},
+            {"name": "test", "choices": {"1": "Option 1", "2": "Option 2"}},
             (
                 '<div class="govuk-form-group">'
                     '<select name="test" id="test" class="govuk-select">'
@@ -150,7 +150,7 @@ def test_select_value(html):
     """Test Select with value."""
     select = ds.Select(
         name="test",
-        options=[("yes", "Yes"), ("no", "No")],
+        choices={"yes": "Yes", "no": "No"},
     )
     select.value = "yes"
     assert html(select) == html(

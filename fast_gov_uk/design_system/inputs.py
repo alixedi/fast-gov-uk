@@ -169,19 +169,26 @@ class Select(Field):
     Select component. Renders the usual dropdown. Inherits from `Field`.
     Args (in addition to Field):
         args (list): Pass on to underlying component.
-        options (list): Tuple with (<value>, <label>) for options.
+        choices (dict): name - labels in a dict
         kwargs (dict): Pass on to underlying component.
     """
 
-    def __init__(self, *args, options: List[Tuple[str, str]] | None = None, **kwargs):
+    def __init__(self, *args, choices: dict | None = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.options = options or []
+        self.choices = choices or {}
 
     @property
     async def clean(self):
-        for val, text in self.options:
+        for val, text in self.choices.items():
             if val == self.value:
                 return text
+
+    @property
+    def options(self):
+        return [
+            fh.Option(text, value=value, selected=(value == self.value))
+            for value, text in self.choices.items()
+        ]
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
@@ -193,10 +200,7 @@ class Select(Field):
         return super().__ft__(
             fh.Select(
                 name=self.name,
-                *[
-                    fh.Option(text, value=value, selected=(value == self.value))
-                    for value, text in self.options
-                ],
+                *self.options,
                 _id=self._id,
                 cls=f"govuk-select{error_cls}",
             ),

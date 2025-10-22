@@ -62,7 +62,7 @@ DEMO_PAGE = (
     ),
     ds.Select(
         name="color",
-        options=[("Blue", "blue"), ("Red", "red"), ("Green", "green")],
+        choices={"Blue": "blue", "Red": "red", "Green": "green"},
         label="A Select:",
         hint="With a hint",
     ),
