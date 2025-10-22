@@ -1500,3 +1500,17 @@ async def test_clean_choice(field, value, clean):
     f.value = value
     data = await f.clean
     assert data == clean
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "field, value",
+    (
+        (ds.DateInput, ["10", "10", "not-a-number"]),
+    ),
+)
+async def test_clean_with_invalid_values(field, value):
+    with pytest.raises(ValueError):
+        f = field(name="test", label="Test Label", choices={"test1": "Test 1", "test2": "Test 2"})
+        f.value = value
+        await f.clean
