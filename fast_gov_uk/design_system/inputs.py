@@ -599,11 +599,11 @@ class Checkboxes(Field):
         self.checkboxes = checkboxes or []
         self.choices = choices or {}
         self.small = small
+        if self.choices:
+            self.make_checkboxes()
 
     @property
     async def clean(self):
-        if not self.checkboxes:
-            return self.choices.get(self.value, None)
         for cb in self.checkboxes:
             if cb.value == self.value:
                 return cb.label
@@ -619,8 +619,6 @@ class Checkboxes(Field):
         Returns:
             FT: FastHTML Checkboxes component.
         """
-        if not self.checkboxes:
-            self.make_checkboxes()
         small_cls = " govuk-checkboxes--small" if self.small else ""
         for check in self.checkboxes:
             check.checked = check.value == self.value
@@ -779,11 +777,11 @@ class Radios(Field):
         self.choices = choices or {}
         self.small = small
         self.inline = inline
+        if self.choices:
+            self.make_radios()
 
     @property
     async def clean(self):
-        if not self.radios:
-            return self.choices.get(self.value, None)
         for radio in self.radios:
             if radio.value == self.value:
                 return radio.label
@@ -801,8 +799,6 @@ class Radios(Field):
         return self.radios
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
-        if not self.radios:
-            self.make_radios()
         radios = self.insert_divider() or []
         small_cls = " govuk-radios--small" if self.small else ""
         inline_cls = " govuk-radios--inline" if self.inline else ""
