@@ -678,13 +678,6 @@ class Radio(AbstractField):
         self.reveal = reveal
         self.kwargs = kwargs
 
-    name: str
-    value: str
-    label: str
-    hint: str = ""
-    checked: bool = False
-    reveal: Optional[Field] = None
-
     @property
     def _id(self):
         """
@@ -731,8 +724,6 @@ class Radio(AbstractField):
 
     @property
     def _reveal(self):
-        if not self.reveal:
-            return None
         return fh.Div(
             self.reveal,
             cls="govuk-radios__conditional govuk-radios__conditional--hidden",
