@@ -4,6 +4,7 @@ from unittest.mock import Mock
 import pytest
 from bs4 import BeautifulSoup
 from fasthtml import common as fh
+from starlette.testclient import TestClient
 
 from fast_gov_uk.design_system import AbstractField
 from fast_gov_uk.forms import Form
@@ -20,6 +21,11 @@ def fast():
 @pytest.fixture
 def client(fast):
     return fh.Client(fast)
+
+
+@pytest.fixture
+def error_client(fast):
+    return TestClient(fast, raise_server_exceptions=False)
 
 
 @pytest.fixture(scope="function")
