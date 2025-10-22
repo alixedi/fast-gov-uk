@@ -13,6 +13,7 @@ dependencies = [
 dev = [
     "beautifulsoup4>=4.13.4",
     "pytest>=8.4.0",
+    "pytest-asyncio>=1.2.0",
     "pytest-cov>=6.2.1",
 ]
 

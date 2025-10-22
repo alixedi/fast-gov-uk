@@ -91,7 +91,7 @@ def test_field_optional(html):
     "kwargs, expected",
     (
         (
-            {"name": "test", "options": [("1", "Option 1"), ("2", "Option 2")]},
+            {"name": "test", "choices": {"1": "Option 1", "2": "Option 2"}},
             (
                 '<div class="govuk-form-group">'
                     '<select name="test" id="test" class="govuk-select">'
@@ -150,7 +150,7 @@ def test_select_value(html):
     """Test Select with value."""
     select = ds.Select(
         name="test",
-        options=[("yes", "Yes"), ("no", "No")],
+        choices={"yes": "Yes", "no": "No"},
     )
     select.value = "yes"
     assert html(select) == html(
@@ -1454,3 +1454,49 @@ def test_html_attribute(field, html):
     f = field(name="test", label="Test Label", hx_test="foo")
     # TODO: assert exact errors :/
     assert 'hx-test="foo"' in html(f)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "field, value, clean",
+    (
+        (ds.Textarea, "test", "test"),
+        (ds.Textarea, "", None),
+        (ds.PasswordInput, "test", "test"),
+        (ds.PasswordInput, "", None),
+        (ds.CharacterCount, "test", "test"),
+        (ds.CharacterCount, "", None),
+        (ds.TextInput, "test", "test"),
+        (ds.TextInput, "", None),
+        (ds.DateInput, ["10", "10", "1990"], "1990-10-10"),
+        (ds.DateInput, ["", "", ""], None),
+    )
+)
+async def test_clean(field, value, clean):
+    """
+    Test that assigns a value to the field and checks if the
+    clean aatribute returns the right data and type.
+    """
+    f = field(name="test", label="Test Label")
+    f.value = value
+    assert await f.clean == clean
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "field, value, clean",
+    (
+        (ds.Select, "test1", "Test 1"),
+        (ds.Checkboxes, "test1", "Test 1"),
+        (ds.Radios, "test1", "Test 1"),
+    )
+)
+async def test_clean_choice(field, value, clean):
+    """
+    Test that assigns a value to the field and checks if the
+    clean aatribute returns the right data and type.
+    """
+    f = field(name="test", label="Test Label", choices={"test1": "Test 1", "test2": "Test 2"})
+    f.value = value
+    data = await f.clean
+    assert data == clean

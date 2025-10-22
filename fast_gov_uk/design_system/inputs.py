@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import fasthtml.common as fh
 
@@ -107,6 +107,8 @@ class Field(AbstractField):
 
     @property
     async def clean(self):
+        if not self.value:
+            return None
         return self.value
 
     @value.setter
@@ -169,19 +171,26 @@ class Select(Field):
     Select component. Renders the usual dropdown. Inherits from `Field`.
     Args (in addition to Field):
         args (list): Pass on to underlying component.
-        options (list): Tuple with (<value>, <label>) for options.
+        choices (dict): name - labels in a dict
         kwargs (dict): Pass on to underlying component.
     """
 
-    def __init__(self, *args, options: List[Tuple[str, str]] | None = None, **kwargs):
+    def __init__(self, *args, choices: dict | None = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.options = options or []
+        self.choices = choices or {}
 
     @property
     async def clean(self):
-        for val, text in self.options:
+        for val, text in self.choices.items():
             if val == self.value:
                 return text
+
+    @property
+    def options(self):
+        return [
+            fh.Option(text, value=value, selected=(value == self.value))
+            for value, text in self.choices.items()
+        ]
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
@@ -193,10 +202,7 @@ class Select(Field):
         return super().__ft__(
             fh.Select(
                 name=self.name,
-                *[
-                    fh.Option(text, value=value, selected=(value == self.value))
-                    for value, text in self.options
-                ],
+                *self.options,
                 _id=self._id,
                 cls=f"govuk-select{error_cls}",
             ),
@@ -599,11 +605,11 @@ class Checkboxes(Field):
         self.checkboxes = checkboxes or []
         self.choices = choices or {}
         self.small = small
+        if self.choices:
+            self.make_checkboxes()
 
     @property
     async def clean(self):
-        if not self.checkboxes:
-            return self.choices.get(self.value, None)
         for cb in self.checkboxes:
             if cb.value == self.value:
                 return cb.label
@@ -619,8 +625,6 @@ class Checkboxes(Field):
         Returns:
             FT: FastHTML Checkboxes component.
         """
-        if not self.checkboxes:
-            self.make_checkboxes()
         small_cls = " govuk-checkboxes--small" if self.small else ""
         for check in self.checkboxes:
             check.checked = check.value == self.value
@@ -779,11 +783,11 @@ class Radios(Field):
         self.choices = choices or {}
         self.small = small
         self.inline = inline
+        if self.choices:
+            self.make_radios()
 
     @property
     async def clean(self):
-        if not self.radios:
-            return self.choices.get(self.value, None)
         for radio in self.radios:
             if radio.value == self.value:
                 return radio.label
@@ -801,8 +805,6 @@ class Radios(Field):
         return self.radios
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
-        if not self.radios:
-            self.make_radios()
         radios = self.insert_divider() or []
         small_cls = " govuk-radios--small" if self.small else ""
         inline_cls = " govuk-radios--inline" if self.inline else ""
@@ -945,7 +947,7 @@ class DateInput(Field):
     @property
     async def clean(self):
         # Field not required
-        if self.value == ("", "", ""):
+        if self.value == ["", "", ""]:
             return None
         try:
             day, month, year = self.value

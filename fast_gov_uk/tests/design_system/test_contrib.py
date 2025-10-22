@@ -439,3 +439,42 @@ def test_html_attribute(field, html):
     f = field(name="test", label="Test Label", hx_test="foo")
     # TODO: assert exact errors :/
     assert 'hx-test="foo"' in html(f)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "field, value, clean",
+    (
+        (ds.NumberInput, "123", 123),
+        (ds.NumberInput, "", None),
+        (ds.DecimalInput, "12.3", 12.3),
+        (ds.DecimalInput, "", None),
+    )
+)
+async def test_clean(field, value, clean):
+    """
+    Test that assigns a value to the field and checks if the
+    clean aatribute returns the right data and type.
+    """
+    f = field(name="test", label="Test Label")
+    f.value = value
+    assert await f.clean == clean
+
+
+@pytest.mark.parametrize("field, value", (
+    (ds.EmailInput, ""),
+    (ds.NumberInput, ""),
+    (ds.DecimalInput, ""),
+    (ds.GBPInput, ""),
+    (ds.RegexInput, ""),
+    (ds.PastDateInput, ["", "", ""]),
+    (ds.FutureDateInput, ["", "", ""]),
+))
+def test_required_error(field, value):
+    """
+    Test that when we assign no value to a required field,
+    the right error is set.
+    """
+    f = field(name="test", label="Test Label")
+    f.value = value
+    assert f.error == "This field is required."
