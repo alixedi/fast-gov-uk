@@ -941,7 +941,7 @@ class DateInput(Field):
     @property
     async def clean(self):
         # Field not required
-        if self.value == ("", "", ""):
+        if self.value == ["", "", ""]:
             return None
         try:
             day, month, year = self.value
