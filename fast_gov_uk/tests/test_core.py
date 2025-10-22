@@ -79,10 +79,15 @@ def test_form_decorator(fast, client):
     @fast.form("foo")
     def test2(data=None):
         return
+    @fast.form()
+    def test3(data=None):
+        return
     assert "test1" in fast.forms
     assert "foo" in fast.forms
+    assert "test3" in fast.forms
     assert client.get("forms/test1").status_code == 200
     assert client.get("forms/foo").status_code == 200
+    assert client.get("forms/test3").status_code == 200
     assert client.get("bar").status_code == 404
 
 
@@ -93,9 +98,14 @@ def test_wizard_decorator(fast, client):
     @fast.wizard("foo")
     def test2(step=0, data=None):
         return
+    @fast.wizard()
+    def test3(step=0, data=None):
+        return
     assert "test1" in fast.wizards
     assert "foo" in fast.wizards
+    assert "test3" in fast.wizards
     assert client.get("wizards/test1", follow_redirects=True).status_code == 200
     assert client.get("wizards/foo", follow_redirects=True).status_code == 200
+    assert client.get("wizards/test3", follow_redirects=True).status_code == 200
     assert client.get("wizards/foo/not-a-step", follow_redirects=True).status_code == 404
     assert client.get("bar", follow_redirects=True).status_code == 404
