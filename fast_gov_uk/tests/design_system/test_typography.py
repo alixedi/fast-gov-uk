@@ -201,3 +201,13 @@ def test_html_attribute(component, html):
     underlying FT.
     """
     assert 'hx-test="foo"' in html(component)
+
+
+def test_p_error():
+    with pytest.raises(ValueError, match="Cannot set both lead and small to True."):
+        P("test", lead=True, small=True)
+
+
+def test_ul_error():
+    with pytest.raises(ValueError, match="Cannot set both bullet and numbered to True."):
+        Ul("test", bullet=True, numbered=True)
