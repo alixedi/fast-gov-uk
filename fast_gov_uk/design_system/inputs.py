@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import fasthtml.common as fh
 
