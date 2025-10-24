@@ -80,14 +80,8 @@ class EmailBackend(Backend):
         if isawaitable(data):
             data = await data
         formatted_data = await self.format(data)
-        try:
-            resp = await self.notify(form_name=name, form_data=formatted_data)
-            logger.info(f"Email sent for form: {resp}")
-        except HTTPError as e:
-            logger.error(f"Error sending email for form '{name}': {e}")
-            # User should not get the impression that the form
-            # was submitted successfully if email failed
-            raise
+        resp = await self.notify(form_name=name, form_data=formatted_data)
+        logger.info(f"Email sent for form: {resp}")
 
 
 @cache
@@ -112,14 +106,8 @@ class APIBackend(Backend):
             data = await data
         data["form_name"] = name
         data["submitted_on"] = datetime.now()
-        try:
-            client = _client(self.username, self.password)
-            client.post(self.url, data=data)
-        except httpx.HTTPError as e:
-            logger.error(f"Error sending request for form '{name}': {e}")
-            # User should not get the impression that the form
-            # was submitted successfully if email failed
-            raise
+        client = _client(self.username, self.password)
+        client.post(self.url, data=data)
 
 
 class SessionBackend(Backend):
