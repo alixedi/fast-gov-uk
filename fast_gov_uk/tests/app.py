@@ -62,8 +62,7 @@ def profile(data=None):
     )
 
 
-@fast.form
-def email_feedback(data=None):
+def feedback_form(backend, data=None):
     return forms.Form(
         "feedback",
         ds.Radios(
@@ -71,46 +70,39 @@ def email_feedback(data=None):
             label="How satisfied did you feel about the service?",
             choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
         ),
-        backends=[forms.EmailBackend(
-            notify=fast.notify("test", "test@test.com")
-        )],
+        backends=[backend],
         data=data,
         cta="Send feedback",
     )
+
+
+@fast.form
+def log_feedback(data=None):
+    backend = forms.LogBackend()
+    return feedback_form(backend, data=data)
+
+
+@fast.form
+def email_feedback(data=None):
+    notify = fast.notify("test", "test@test.com")
+    backend = forms.EmailBackend(notify)
+    return feedback_form(backend, data=data)
 
 
 @fast.form
 def api_feedback(data=None):
-    return forms.Form(
-        "feedback",
-        ds.Radios(
-            name="satisfaction",
-            label="How satisfied did you feel about the service?",
-            choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
-        ),
-        backends=[forms.APIBackend(
-            url="https://test.com",
-            username="test_user",
-            password="test_password"
-        )],
-        data=data,
-        cta="Send feedback",
+    backend = forms.APIBackend(
+        url="https://test.com",
+        username="test_user",
+        password="test_password"
     )
+    return feedback_form(backend, data=data)
 
 
 @fast.form
 def session_feedback(data=None):
-    return forms.Form(
-        "feedback",
-        ds.Radios(
-            name="satisfaction",
-            label="How satisfied did you feel about the service?",
-            choices={"satisfied": "Satisfied", "dissatisfied": "Dissatisfied"},
-        ),
-        backends=[forms.SessionBackend()],
-        data=data,
-        cta="Send feedback",
-    )
+    backend = forms.SessionBackend()
+    return feedback_form(backend, data=data)
 
 
 @fast.wizard
