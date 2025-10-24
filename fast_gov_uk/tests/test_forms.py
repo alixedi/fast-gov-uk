@@ -157,6 +157,20 @@ def test_form_post_invalid(errors, expected, client, db, picture, html, find):
     assert html(error_p) == expected_html
 
 
+@patch("fast_gov_uk.forms.logger")
+def test_log_form_post_valid(mock_logger, client):
+    data = {"satisfaction": "satisfied"}
+    response = client.post(
+        "/forms/log_feedback",
+        data=data,
+    )
+    assert response.status_code == 303
+    logger_call_args = mock_logger.info.call_args
+    assert logger_call_args == call(
+        "Form: 'feedback' processed with: {'satisfaction': 'Satisfied'}."
+    )
+
+
 def test_email_form_post_valid(fast, db, client):
     data = {"satisfaction": "satisfied"}
     response = client.post(
