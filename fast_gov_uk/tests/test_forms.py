@@ -324,6 +324,13 @@ def test_questions_valid(db, client):
         "sex": "Prefer not to say",
         "gender": "Prefer not to say"
     }
+    # Invalid step
+    response = client.get(
+        "/wizards/mini_equality/20",
+        follow_redirects=True,
+    )
+    assert response.status_code == 404
+
 
 
 def test_error_summary(html, find):
@@ -349,3 +356,12 @@ def test_error_summary(html, find):
 def test_no_fields_at_root():
     with pytest.raises(ValueError):
         forms.Form("test", "test")
+
+
+@patch("fast_gov_uk.forms.httpx")
+def test_client(mock_httpx):
+    _ = forms._client("test", "test")
+    auth = mock_httpx.BasicAuth
+    assert auth.call_args == call(username="test", password="test")
+    client = mock_httpx.Client
+    assert client.called

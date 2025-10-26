@@ -2,11 +2,9 @@ from inspect import isawaitable
 import logging
 from functools import cache
 from datetime import datetime
-from typing import Callable
 
 import httpx
 import fasthtml.common as fh
-from notifications_python_client.errors import HTTPError
 
 from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A, Page
 
@@ -160,7 +158,7 @@ class Form:
         name: str,
         *items,
         backends: list[Backend] | None = None,
-        success_url: str | Callable = "/",
+        success_url: str = "/",
         method: str = "POST",
         action: str = "",
         cta: str = "Submit",
@@ -239,8 +237,6 @@ class Form:
 
     @property
     def success(self):
-        if isinstance(self.success_url, Callable):
-            self.success_url = self.success_url(self.data)
         return fh.Redirect(self.success_url)
 
     async def process(self, req, *args, **kwargs):
@@ -332,7 +328,7 @@ class Wizard:
         name: str,
         *questions: Question,
         backends: list[Backend] | None = None,
-        success_url: str | Callable = "/",
+        success_url: str = "/",
         step: int = 0,
         data: dict | None = None
     ):
@@ -355,8 +351,6 @@ class Wizard:
 
     @property
     def success(self):
-        if isinstance(self.success_url, Callable):
-            self.success_url = self.success_url(self.data)
         return fh.Redirect(self.success_url)
 
     @property
