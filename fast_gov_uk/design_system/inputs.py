@@ -18,11 +18,14 @@ def Label(
 ) -> fh.FT:
     """
     Label component. Generally attached to a Field.
+
     Args:
         field_id (str): HTML id of the field this label is for.
         text (str): Text to be displayed in the label.
-        heading (str): Heading size? Defaults to "".
-        required (book): Is this for a field that is required? Defaults to True.
+        heading (str, optional): Heading size. Defaults to "".
+        required (bool, optional): Is this for a field that is required? Defaults to True.
+        extra_cls (str, optional): Extra CSS classes. Defaults to "".
+
     Returns:
         FT: A FastHTML label component.
     """
@@ -39,9 +42,12 @@ def Label(
 def Hint(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
     """
     Hint component. Generally attached to a Field.
+
     Args:
         field_id (str): HTML id of the field this hint is for.
         text (str): Text to be displayed as hint.
+        extra_cls (str, optional): Extra CSS classes. Defaults to "".
+
     Returns:
         FT: A FastHTML hint component.
     """
@@ -51,9 +57,12 @@ def Hint(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
 def Error(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
     """
     Error component. Generally attached to a Field.
+
     Args:
-        field_id (str): HTML id of the field this hint is for.
-        text (str): Text to be displayed as hint.
+        field_id (str): HTML id of the field this error is for.
+        text (str): Text to be displayed as error.
+        extra_cls (str, optional): Extra CSS classes. Defaults to "".
+
     Returns:
         FT: A FastHTML error component.
     """
@@ -72,14 +81,15 @@ class AbstractField:
 class Field(AbstractField):
     """
     Baseclass for form fields.
+
     Args:
         name (str): The name of the field.
-        label (str): Label for the field.
-        hint (str): Hint for the field. Defaults to "".
-        error (str): Error message for the field. Defaults to "".
-        heading (str): Heading size? Defaults to "".
-        required (book): Is this field required? Defaults to True.
-        kwargs (dict): Pass on to underlying component
+        label (str, optional): Label for the field. Defaults to "".
+        hint (str, optional): Hint for the field. Defaults to "".
+        error (str, optional): Error message for the field. Defaults to "".
+        heading (str, optional): Heading size. Defaults to "".
+        required (bool, optional): Is this field required? Defaults to True.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -114,10 +124,10 @@ class Field(AbstractField):
     @value.setter
     def value(self, value):
         """
-        This setter is how you assign a value to a field. It takes the
-        value, runs some validation to generate errors and then assign the
-        value to the self._value attribute while also assigning any
-        validation errros to self.error.
+        Assigns a value to a field, runs validation, and sets errors.
+
+        Args:
+            value: The value to assign.
         """
         if self.required and not value:
             self.error = "This field is required."
@@ -126,16 +136,20 @@ class Field(AbstractField):
     @property
     def _id(self):
         """
-        Name is a required attribute for fields. We should be able to
-        compute a good id from the name.
+        Computes a good id from the field name.
+
+        Returns:
+            str: Computed id.
         """
         return mkid(self.name)
 
     @property
     def annotations(self):
         """
-        Includes labels, hints and errors - not the field itself but
-        information about the field that makes it usable.
+        Returns label, hint, and error components for the field.
+
+        Returns:
+            tuple: (Label, Hint, Error)
         """
         return (
             (
@@ -149,10 +163,12 @@ class Field(AbstractField):
 
     def __ft__(self, *children: fh.FT, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the field as a FastHTML component.
+
         Args:
-            children (FT): Optional children components to include.
-            extra_cls (str): Additional CSS classes to apply.
+            *children (FT): Optional children components to include.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: A FastHTML component for the field.
         """
@@ -168,11 +184,12 @@ class Field(AbstractField):
 
 class Select(Field):
     """
-    Select component. Renders the usual dropdown. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        choices (dict): name - labels in a dict
-        kwargs (dict): Pass on to underlying component.
+    Select component. Renders a dropdown. Inherits from Field.
+
+    Args:
+        *args: Arguments for Field.
+        choices (dict, optional): Choices for the select. Defaults to None.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(self, *args, choices: dict | None = None, **kwargs):
@@ -194,7 +211,12 @@ class Select(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the select field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML Select component.
         """
@@ -212,11 +234,12 @@ class Select(Field):
 
 class Textarea(Field):
     """
-    Textarea component. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        rows (int): Number of rows in the textarea.
-        kwargs (dict): Pass on to underlying component.
+    Textarea component. Inherits from Field.
+
+    Args:
+        *args: Arguments for Field.
+        rows (int, optional): Number of rows in the textarea. Defaults to 5.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(self, *args, rows: int = 5, **kwargs):
@@ -225,7 +248,12 @@ class Textarea(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the textarea field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML Textarea component.
         """
@@ -245,10 +273,11 @@ class Textarea(Field):
 
 class PasswordInput(Field):
     """
-    PasswordInput component. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        kwargs (dict): Pass on to underlying component.
+    PasswordInput component. Inherits from Field.
+
+    Args:
+        *args: Arguments for Field.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(self, *args, **kwargs):
@@ -286,7 +315,12 @@ class PasswordInput(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the password input field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML component for PasswordInput.
         """
@@ -304,18 +338,15 @@ class PasswordInput(Field):
 
 class CharacterCount(Field):
     """
-    CharacterCount component. Renders a Textarea with a message
-    that display either the number of characters or the number of
-    words left. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        rows (int): Number of rows in the textarea.
-        maxchars (int): Max characters allowed. Defaults to None.
-        maxwords (int): Max words allowed. Defaults to None.
-        threshold (int): Display the count message when the length
-            of text passes a certain threshold in percent.
-            Defaults to None.
-        kwargs (dict): Pass on to underlying component.
+    CharacterCount component. Renders a Textarea with a character/word count message.
+
+    Args:
+        *args: Arguments for Field.
+        rows (int, optional): Number of rows in the textarea. Defaults to 5.
+        maxchars (int, optional): Max characters allowed. Defaults to None.
+        maxwords (int, optional): Max words allowed. Defaults to None.
+        threshold (int, optional): Threshold percent for showing count message. Defaults to None.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -350,7 +381,10 @@ class CharacterCount(Field):
     @property
     def textarea(self):
         """
-        Textarea part of CharacterCount.
+        Returns the textarea part of CharacterCount.
+
+        Returns:
+            FT: FastHTML Textarea component.
         """
         error_cls = " govuk-textarea--error" if self.error else ""
         return fh.Textarea(
@@ -365,7 +399,10 @@ class CharacterCount(Field):
     @property
     def message(self):
         """
-        Message part of CharacterCount.
+        Returns the message part of CharacterCount.
+
+        Returns:
+            FT: FastHTML message component.
         """
         message = (
             f"You can enter up to {self.maxchars} characters."
@@ -380,7 +417,12 @@ class CharacterCount(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the character count field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML component for CharacterCount.
         """
@@ -414,17 +456,18 @@ class InputWidth(Enum):
 
 class TextInput(Field):
     """
-    TextInput component. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        width(InputWidth): Width of TextInput. Defaults to InputWidth.DEFAULT,
-        prefix (str): Prefix to TextInput. Defaults to "",
-        suffix (str): Suffix to TextInput. Defaults to "",
-        autocomplete (str): Set autocomplete. Defaults to "",
-        numeric (bool): Is TextInput numeric? Defaults to False,
-        spellcheck (bool): Turn on spellcheck? Defaults to False,
-        extra_spacing (bool): Make Input with extra space. Defaults to False,
-        kwargs (dict): Pass on to underlying component.
+    TextInput component. Inherits from Field.
+
+    Args:
+        *args: Arguments for Field.
+        width (InputWidth, optional): Width of TextInput. Defaults to InputWidth.DEFAULT.
+        prefix (str, optional): Prefix to TextInput. Defaults to "".
+        suffix (str, optional): Suffix to TextInput. Defaults to "".
+        autocomplete (str, optional): Autocomplete value. Defaults to "".
+        numeric (bool, optional): Is TextInput numeric? Defaults to False.
+        spellcheck (bool, optional): Enable spellcheck. Defaults to False.
+        extra_spacing (bool, optional): Extra letter spacing. Defaults to False.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -481,10 +524,14 @@ class TextInput(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the text input field as a FastHTML component, including prefix/suffix.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
-            FT: FastHTML component for TextInput - including
-            prefix and suffix if defined.
+            FT: FastHTML component for TextInput.
         """
         input = self.input
         if self.prefix:
@@ -504,18 +551,16 @@ class TextInput(Field):
 
 class Checkbox(AbstractField):
     """
-    Checkbox component. This component does not inherit from Field because
-    (at this moment), the primary usage for this is as an API to define
-    individual checkboxes and pass them to the Checkboxes component -
-    which is a Field.
+    Checkbox component. Used to define individual checkboxes.
+
     Args:
         name (str): The name of the checkbox element.
         value (str): The value of the checkbox element.
         label (str): Label for the checkbox element.
-        hint (str): Hint for the checkbox element. Defaults to "".
-        checked (bool): Make this checkbox checked. Defaults to False.
-        exclusive (bool): Make this checkbox eclusive? Defaults to False.
-        kwargs (dict): Pass on to underlying component.
+        hint (str, optional): Hint for the checkbox element. Defaults to "".
+        checked (bool, optional): Make this checkbox checked. Defaults to False.
+        exclusive (bool, optional): Make this checkbox exclusive. Defaults to False.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -540,27 +585,41 @@ class Checkbox(AbstractField):
     @property
     def _id(self):
         """
-        Compute checkbox id from name + value.
+        Computes checkbox id from name and value.
+
+        Returns:
+            str: Computed id.
         """
         return f"{mkid(self.name)}-{self.value}"
 
     @property
     def label_component(self):
         """
-        Returns: Label component.
+        Returns the Label component.
+
+        Returns:
+            FT: Label component.
         """
         return Label(self._id, self.label, extra_cls=" govuk-checkboxes__label")
 
     @property
     def hint_component(self):
         """
-        Returns: Hint component.
+        Returns the Hint component.
+
+        Returns:
+            FT: Hint component.
         """
         return Hint(self._id, self.hint, extra_cls=" govuk-checkboxes__hint")
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the checkbox as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML Checkbox component.
         """
@@ -583,14 +642,14 @@ class Checkbox(AbstractField):
 
 class Checkboxes(Field):
     """
-    Checkboxes component. Renders the usual checkbox group for multiple
-    select. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        checkboxes (list): List of Checkbox components.
-        choices (dict): Shorthand for simple checkboxes.
-        small (bool): Renders small Checkboxes. Defaults to False.
-        kwargs (dict): Pass on to underlying component.
+    Checkboxes component. Renders a checkbox group for multiple select.
+
+    Args:
+        *args: Arguments for Field.
+        checkboxes (List[Checkbox], optional): List of Checkbox components.
+        choices (dict, optional): Shorthand for simple checkboxes.
+        small (bool, optional): Renders small Checkboxes. Defaults to False.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -621,7 +680,12 @@ class Checkboxes(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the checkboxes field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML Checkboxes component.
         """
@@ -645,18 +709,16 @@ class Checkboxes(Field):
 
 class Radio(AbstractField):
     """
-    Radio component. This component does not inherit from Field because
-    (at this moment), the primary usage for this is as an API to define
-    individual radios and pass them to the Radios component -
-    which is a Field.
+    Radio component. Used to define individual radios.
+
     Args:
         name (str): The name of the radio element.
         value (str): The value of the radio element.
         label (str): Label for the radio element.
-        hint (str): Hint for the radio element. Defaults to "".
-        checked (bool): Make this radio checked. Defaults to False.
-        reveal (Field): Field revealed when Radio is selected. Defaults to None.
-        kwargs (dict): Pass on to underlying component.
+        hint (str, optional): Hint for the radio element. Defaults to "".
+        checked (bool, optional): Make this radio checked. Defaults to False.
+        reveal (Field, optional): Field revealed when Radio is selected. Defaults to None.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -681,21 +743,30 @@ class Radio(AbstractField):
     @property
     def _id(self):
         """
-        Compute radio id from the name + value.
+        Computes radio id from name and value.
+
+        Returns:
+            str: Computed id.
         """
         return f"{mkid(self.name)}-{self.value}"
 
     @property
     def label_component(self):
         """
-        Returns: Label component.
+        Returns the Label component.
+
+        Returns:
+            FT: Label component.
         """
         return Label(self._id, self.label, extra_cls=" govuk-radios__label")
 
     @property
     def hint_component(self):
         """
-        Returns: Hint component.
+        Returns the Hint component.
+
+        Returns:
+            FT: Hint component.
         """
         return Hint(self._id, self.hint, extra_cls=" govuk-radios__hint")
 
@@ -732,7 +803,12 @@ class Radio(AbstractField):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the radio as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML Radio component.
         """
@@ -749,15 +825,15 @@ class Radio(AbstractField):
 
 class Radios(Field):
     """
-    Radios component. Renders the usual radio group for single
-    select. Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        radios (list): List of Radio components.
-        choices (list): Labels - shorthand for simple radios
-        small (bool): Renders small Radios. Defaults to False.
-        inline (bool): Renders inline Radios. Defaults to False.
-        kwargs (dict): Pass on to underlying component.
+    Radios component. Renders a radio group for single select.
+
+    Args:
+        *args: Arguments for Field.
+        radios (List[Radio], optional): List of Radio components.
+        choices (dict, optional): Shorthand for simple radios.
+        small (bool, optional): Renders small Radios. Defaults to False.
+        inline (bool, optional): Renders inline Radios. Defaults to False.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(
@@ -796,6 +872,16 @@ class Radios(Field):
         return self.radios
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
+        """
+        Renders the radios field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            FT: FastHTML Radios component.
+        """
         radios = self.insert_divider() or []
         small_cls = " govuk-radios--small" if self.small else ""
         inline_cls = " govuk-radios--inline" if self.inline else ""
@@ -819,10 +905,10 @@ class Radios(Field):
 class FileUpload(Field):
     """
     FileUpload component. Renders a file upload field.
-    Inherits from `Field`.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        kwargs (dict): Pass on to underlying component.
+
+    Args:
+        *args: Arguments for Field.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(self, *args, **kwargs):
@@ -862,7 +948,12 @@ class FileUpload(Field):
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
         """
-        Render the field as a FastHTML component.
+        Renders the file upload field as a FastHTML component.
+
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+
         Returns:
             FT: FastHTML component for FileUpload.
         """
@@ -889,12 +980,14 @@ def _date_input_item(
 ):
     """
     Date Input item e.g. Day, Month, Year.
+
     Args:
         name (str): Name of the parent DateField.
-        suffix (str): Suffix for this field e.g. "day", "month", "year"
-        width (int): Width of the field. Defaults to 2.
-        value (str): Value to assign to the input. Defaults to "".
-        error (bool): Error message. Defaults to False.
+        suffix (str): Suffix for this field e.g. "day", "month", "year".
+        width (int, optional): Width of the field. Defaults to 2.
+        value (str, optional): Value to assign to the input. Defaults to "".
+        error (bool, optional): Error state. Defaults to False.
+
     Returns:
         FT: A FastHTML input component.
     """
@@ -920,12 +1013,11 @@ def _date_input_item(
 
 class DateInput(Field):
     """
-    DateInput component. Renders GDS-style composite field with
-    separate TextInputs for day, month and year. Inherits Field.
-    TODO: Support errors for individual fields.
-    Args (in addition to Field):
-        args (list): Pass on to underlying component.
-        kwargs (dict): Pass on to underlying component.
+    DateInput component. Renders GDS-style composite field with day, month, year.
+
+    Args:
+        *args: Arguments for Field.
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(self, *args, **kwargs):
@@ -965,7 +1057,10 @@ class DateInput(Field):
     @property
     def day_field(self):
         """
-        Returns day field component of DateInput.
+        Returns the day field component of DateInput.
+
+        Returns:
+            FT: Day field component.
         """
         return _date_input_item(
             self.name,
@@ -977,7 +1072,10 @@ class DateInput(Field):
     @property
     def month_field(self):
         """
-        Returns month field component of DateInput.
+        Returns the month field component of DateInput.
+
+        Returns:
+            FT: Month field component.
         """
         return _date_input_item(
             self.name,
@@ -989,7 +1087,10 @@ class DateInput(Field):
     @property
     def year_field(self):
         """
-        Returns year field component of DateInput.
+        Returns the year field component of DateInput.
+
+        Returns:
+            FT: Year field component.
         """
         return _date_input_item(
             self.name,
@@ -1033,12 +1134,14 @@ def Button(
 ) -> fh.FT:
     """
     Button component.
+
     Args:
         text (str): The text on the Button component.
-        style (ButtonStyle): The style of the Button component. Default: ButtonStyle.PRIMARY.
-        disabled (bool): Disable the button. Default: False.
-        prevent_double_click (bool): Prevent accidental double clicks. Default: False.
-        **kwargs (dict): Any extra args to pass to fh.Button.
+        style (ButtonStyle, optional): The style of the Button component. Defaults to ButtonStyle.PRIMARY.
+        disabled (bool, optional): Disable the button. Defaults to False.
+        prevent_double_click (bool, optional): Prevent accidental double clicks. Defaults to False.
+        **kwargs: Any extra args to pass to fh.Button.
+
     Returns:
         FT: A FastHTML Button component.
     """
@@ -1062,12 +1165,13 @@ def Button(
 
 def StartButton(text: str, href: str, **kwargs) -> fh.FT:
     """
-    StartButton component for call-to-actions. StartButtons don't submit
-    any form data.
+    StartButton component for call-to-actions. Does not submit form data.
+
     Args:
         text (str): Text on the Button component.
         href (str): URL of the target page.
-        kwargs (dict): Pass on to underlying component.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML StartButton component.
     """
@@ -1092,9 +1196,11 @@ def StartButton(text: str, href: str, **kwargs) -> fh.FT:
 def ButtonGroup(*buttons: fh.FT, **kwargs) -> fh.FT:
     """
     ButtonGroup component.
+
     Args:
-        buttons (list): List of Button components.
-        kwargs (dict): Pass on to underlying component
+        *buttons (FT): List of Button components.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML component.
     """
@@ -1115,13 +1221,15 @@ def CookieBanner(
 ) -> fh.FT:
     """
     CookieConfirmation component.
+
     Args:
         service_name (str): Name of the service.
-        content (list): Content of the CookieConfirmation component.
-        cookie_page_link (str): Link to the cookie settings page. Defaults to "/cookies".
-        cookie_form_link (str): Link to the cookie form submission page. Defaults to "/".
-        confirmation (bool): If True, the cookie confirmation is shown. Defaults to False.
-        kwargs (dict): Pass on to underlying component
+        *content (FT): Content of the CookieConfirmation component.
+        cookie_page_link (str, optional): Link to the cookie settings page. Defaults to "/cookies".
+        cookie_form_link (str, optional): Link to the cookie form submission page. Defaults to "/".
+        confirmation (bool, optional): If True, the cookie confirmation is shown. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML CookieConfirmation component.
     """
@@ -1168,13 +1276,13 @@ def CookieBanner(
 class Fieldset(AbstractField):
     """
     Fieldset component.
+
     Args:
-        fields (list): Fields to include in the fieldset.
-        name (str): Name of the fieldset. Defaults to "".
-        legend (str): The legend text for the fieldset.
-        kwargs (dict): Pass on to underlying component
-    Returns:
-        FT: A FastHTML Fieldset component.
+        *fields (Field): Fields to include in the fieldset.
+        name (str, optional): Name of the fieldset. Defaults to "".
+        legend (str, optional): The legend text for the fieldset.
+        heading (str, optional): Heading size. Defaults to "l".
+        **kwargs: Additional keyword arguments.
     """
 
     def __init__(self, *fields: Field, name: str = "", legend: str = "", heading: str = "l", **kwargs):
@@ -1185,6 +1293,12 @@ class Fieldset(AbstractField):
         self.kwargs = kwargs
 
     def __ft__(self):
+        """
+        Renders the fieldset as a FastHTML component.
+
+        Returns:
+            FT: A FastHTML Fieldset component.
+        """
         heading_cls = f" govuk-fieldset__legend--{self.heading}" if self.heading else ""
         return fh.Fieldset(
             fh.Legend(

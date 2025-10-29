@@ -3,8 +3,13 @@ import fasthtml.common as fh
 
 def mkid(name: str):
     """
-    We should be able to compute a good id from field name.
-    This function tries to do this.
+    Computes a good id from a field name.
+
+    Args:
+        name (str): The field name.
+
+    Returns:
+        str: The computed id.
     """
     # Google recommends using "-" in ids
     return name.lower().replace(" ", "-")
@@ -12,9 +17,10 @@ def mkid(name: str):
 
 def Logo() -> str:
     """
-    Gov.UK logo
+    GOV.UK logo SVG.
+
     Returns:
-        str: SVG for the logo.
+        str: SVG for the GOV.UK logo.
     """
     return (
         '<svg focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 324 60" height="30" width="162" fill="currentcolor" class="govuk-header__logotype" aria-label="GOV.UK">'
@@ -31,7 +37,8 @@ def Logo() -> str:
 
 def Crown() -> str:
     """
-    Crown logo.
+    Crown logo SVG.
+
     Returns:
         str: SVG for the crown logo.
     """
@@ -54,7 +61,8 @@ def Crown() -> str:
 
 def OGL() -> str:
     """
-    Open Government Licence logo.
+    Open Government Licence logo SVG.
+
     Returns:
         str: SVG for the OGL logo.
     """
@@ -67,7 +75,8 @@ def OGL() -> str:
 
 def Previous() -> str:
     """
-    Previous pagination icon.
+    Previous pagination icon SVG.
+
     Returns:
         str: SVG for the previous icon.
     """
@@ -80,7 +89,8 @@ def Previous() -> str:
 
 def Next() -> str:
     """
-    Next pagination icon.
+    Next pagination icon SVG.
+
     Returns:
         str: SVG for the next icon.
     """
@@ -93,7 +103,8 @@ def Next() -> str:
 
 def Ellipses() -> fh.FT:
     """
-    Ellipses (...) component. Used in pagination.
+    Ellipses (...) component for pagination.
+
     Returns:
         FT: A FastHtml ellipses component.
     """

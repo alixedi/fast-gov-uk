@@ -10,14 +10,16 @@ def A(
     **kwargs,
 ) -> fh.FT:
     """
-    A link component.
+    Link component.
+
     Args:
         text: The text to display in the link.
-        href (str): The URL the link points to. Defaults to "#".
-        visited (bool): If True, applies a visited style. Defaults to False.
-        newtab (bool): If True, opens the link in a new tab. Defaults to False.
-        inverse (bool): If True, applies an inverse style. Defaults to False.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        href (str, optional): The URL the link points to. Defaults to "#".
+        visited (bool, optional): If True, applies a visited style. Defaults to False.
+        inverse (bool, optional): If True, applies an inverse style. Defaults to False.
+        newtab (bool, optional): If True, opens the link in a new tab. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML link component.
     """
@@ -31,11 +33,13 @@ def A(
 def H1(text, size="l", caption="", **kwargs) -> fh.FT:
     """
     H1 component.
+
     Args:
         text: The text to display in the header.
-        size (str): The size of the header. Defaults to "l".
-        caption (str): Caption to go with the heading. Defaults to "".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        size (str, optional): The size of the header. Defaults to "l".
+        caption (str, optional): Caption to go with the heading. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML H1 component.
     """
@@ -49,12 +53,14 @@ def H1(text, size="l", caption="", **kwargs) -> fh.FT:
 
 def H2(text, size="m", caption="", **kwargs) -> fh.FT:
     """
-    H1 component.
+    H2 component.
+
     Args:
         text: The text to display in the header.
-        size (str): The size of the header. Defaults to "l".
-        caption (str): Caption to go with the heading. Defaults to "".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        size (str, optional): The size of the header. Defaults to "m".
+        caption (str, optional): Caption to go with the heading. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML H2 component.
     """
@@ -68,12 +74,14 @@ def H2(text, size="m", caption="", **kwargs) -> fh.FT:
 
 def H3(text, size="s", caption="", **kwargs) -> fh.FT:
     """
-    H1 component.
+    H3 component.
+
     Args:
         text: The text to display in the header.
-        size (str): The size of the header. Defaults to "s".
-        caption (str): Caption to go with the heading. Defaults to "".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        size (str, optional): The size of the header. Defaults to "s".
+        caption (str, optional): Caption to go with the heading. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML H3 component.
     """
@@ -88,11 +96,13 @@ def H3(text, size="s", caption="", **kwargs) -> fh.FT:
 def P(*content, lead=False, small=False, **kwargs) -> fh.FT:
     """
     Paragraph component.
+
     Args:
-        content (list): The list of content to display in the paragraph.
-        lead (bool): If True, applies a lead style. Defaults to False.
-        small (bool): If True, applies a small style. Defaults to False.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        *content: The list of content to display in the paragraph.
+        lead (bool, optional): If True, applies a lead style. Defaults to False.
+        small (bool, optional): If True, applies a small style. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML paragraph component.
     """
@@ -106,9 +116,11 @@ def P(*content, lead=False, small=False, **kwargs) -> fh.FT:
 def Li(*args, **kwargs) -> fh.FT:
     """
     List item component.
+
     Args:
         *args: Items to include in the list.
         **kwargs: Additional attributes for the list.
+
     Returns:
         FT: A FastHTML list item component.
     """
@@ -118,12 +130,14 @@ def Li(*args, **kwargs) -> fh.FT:
 def Ul(*args, bullet=False, numbered=False, spaced=False, **kwargs) -> fh.FT:
     """
     Unordered list component.
+
     Args:
         *args: Items to include in the list.
-        bullet (bool): If True, applies a bullet style. Defaults to False.
-        numbered (bool): If True, applies a numbered style. Defaults to False.
-        spaced (bool): If True, applies a spaced style. Defaults to False.
+        bullet (bool, optional): If True, applies a bullet style. Defaults to False.
+        numbered (bool, optional): If True, applies a numbered style. Defaults to False.
+        spaced (bool, optional): If True, applies a spaced style. Defaults to False.
         **kwargs: Additional attributes for the list.
+
     Returns:
         FT: A FastHTML unordered list component.
     """

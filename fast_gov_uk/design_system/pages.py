@@ -8,10 +8,12 @@ from .utils import OGL, Crown, Logo
 def Header(title: str, homepage: str, **kwargs) -> fh.FT:
     """
     Header component.
+
     Args:
         title (str): The title of the header.
         homepage (str): The URL of the homepage.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Header component.
     """
@@ -42,10 +44,12 @@ def FooterLink(
 ) -> fh.FT:
     """
     Footer link component.
+
     Args:
         text (str): The text to display in the link.
-        href (str): The URL the link points to. Defaults to "#".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        href (str): The URL the link points to.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML FooterLink component.
     """
@@ -60,9 +64,11 @@ def FooterLink(
 def Footer(*links: tuple[str, str], **kwargs) -> fh.FT:
     """
     Footer component.
+
     Args:
-        links (tuples with text and href): Footer links.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        *links (tuple[str, str]): Footer links as (text, href).
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Footer component.
     """
@@ -123,10 +129,12 @@ def PhaseBanner(
 ) -> fh.FT:
     """
     Phase banner component.
+
     Args:
-        content (FT): The content to display in the phase banner.
-        phase (str): The phase of the project. Defaults to "alpha".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        *content (FT): The content to display in the phase banner.
+        phase (str, optional): The phase of the project. Defaults to "Alpha".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML PhaseBanner component.
     """
@@ -153,11 +161,12 @@ def PhaseBanner(
 def Page(*content, navigation=None, sidebar=None) -> fh.FT:
     """
     Page component.
+
     Args:
-        content (list): List of content for the Page.
-        navigation: Navigation component. Defaults to None.
-        sidebar: Sidebar content. Defaults to None.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        *content: List of content for the Page.
+        navigation (optional): Navigation component. Defaults to None.
+        sidebar (optional): Sidebar content. Defaults to None.
+
     Returns:
         FT: A FastHTML Page component.
     """
@@ -201,11 +210,12 @@ def Page(*content, navigation=None, sidebar=None) -> fh.FT:
 def Cookies(*content: fh.FT):
     """
     Cookie page component.
+
     Args:
-        content (list): List of content for the Page.
+        *content (FT): List of content for the Page.
+
     Returns:
         FT: A FastHTML Cookies page component.
-
     """
     return Page(
         H1("Cookies"),

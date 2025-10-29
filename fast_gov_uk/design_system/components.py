@@ -6,9 +6,11 @@ from .utils import mkid
 def Inset(text: str, **kwargs) -> fh.FT:
     """
     Inset text component.
+
     Args:
         text (str): The main text to display.
-        kwargs (dict): Pass on to underlying component
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Inset text component.
     """
@@ -23,11 +25,13 @@ def Detail(
 ) -> fh.FT:
     """
     Detail component.
+
     Args:
         summary (str): The summary text for the detail.
-        content (FT): The content to display when the detail is expanded.
-        open (bool): If True, the detail is initially open. Defaults to False.
-        kwargs (dict): Pass on to underlying component
+        *content (FT or str): The content to display when the detail is expanded.
+        open (bool, optional): If True, the detail is initially open. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Detail component.
     """
@@ -53,10 +57,12 @@ def Panel(
 ) -> fh.FT:
     """
     Panel component.
+
     Args:
-        content (FT): The content to display in the panel.
-        title (str): The title of the panel. Defaults to "".
-        kwargs (dict): Pass on to underlying component
+        *content (FT or str): The content to display in the panel.
+        title (str, optional): The title of the panel. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Panel component.
     """
@@ -75,10 +81,12 @@ def Tag(
 ) -> fh.FT:
     """
     Tag component.
+
     Args:
         text (str): The text to display in the tag.
-        color (str): The color of the tag. Defaults to "blue".
-        kwargs (dict): Pass on to underlying component
+        color (str, optional): The color of the tag. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Tag component.
     """
@@ -104,9 +112,11 @@ def Warning(
 ) -> fh.FT:
     """
     Warning component.
+
     Args:
-        content (FT): The content to display in the warning.
-        kwargs (dict): Pass on to underlying component
+        *content (FT or str): The content to display in the warning.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Warning component.
     """
@@ -133,10 +143,12 @@ def NotificatonLink(
 ) -> fh.FT:
     """
     NotificationLink component.
+
     Args:
         text (str): The text to display in the link.
-        href (str): The URL the link points to. Defaults to "#".
-        kwargs (dict): Pass on to underlying component
+        href (str, optional): The URL the link points to. Defaults to "#".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML NotificationLink component.
     """
@@ -146,10 +158,12 @@ def NotificatonLink(
 
 def NotificatonHeading(*content: fh.FT | str, **kwargs) -> fh.FT:
     """
-    H1 component.
+    Notification heading component.
+
     Args:
-        text (FT): The content to display in the heading.
-        kwargs (dict): Pass on to underlying component
+        *content (FT or str): The content to display in the heading.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML H2 component.
     """
@@ -168,11 +182,13 @@ def Notification(
 ) -> fh.FT:
     """
     Notification banner component.
+
     Args:
-        content (FT): The content to display in the phase banner.
-        title (str): The title of the notification. Defaults to "Important".
-        success (bool): If True, applies a success style. Defaults to False.
-        kwargs (dict): Pass on to underlying component
+        *content (FT): The content to display in the notification banner.
+        title (str, optional): The title of the notification. Defaults to "Important".
+        success (bool, optional): If True, applies a success style. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Notification component.
     """
@@ -198,13 +214,15 @@ def Notification(
 def _accordion_section(accordion_id, n, heading, summary, content, open=False):
     """
     Helper function to create an accordion section.
+
     Args:
         accordion_id (str): Id for accordion.
         n (int): The section number.
         heading (str): The heading of the section.
         summary (str): The summary of the section.
         content (str): The content of the section.
-        open (bool): If True, the section is initially open. Defaults to False.
+        open (bool, optional): If True, the section is initially open. Defaults to False.
+
     Returns:
         FT: A FastHTML accordion section component.
     """
@@ -240,10 +258,12 @@ def _accordion_section(accordion_id, n, heading, summary, content, open=False):
 def Accordion(*sections: dict, accordion_id="accordion", **kwargs) -> fh.FT:
     """
     Accordion component.
+
     Args:
         *sections (dict): Sections to include in the accordion.
-        accordion_id (str): Id for accordion. Defaults to "accordion".
-        kwargs (dict): Pass on to underlying component
+        accordion_id (str, optional): Id for accordion. Defaults to "accordion".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Accordion component.
     """
@@ -268,10 +288,12 @@ def Accordion(*sections: dict, accordion_id="accordion", **kwargs) -> fh.FT:
 def _tab_panel(heading, content, active=False):
     """
     Helper function to create a tab panel.
+
     Args:
         heading (str): The heading of the panel.
         content (str): The content of the panel.
-        active (bool): Tab is active. Defaults to False.
+        active (bool, optional): Tab is active. Defaults to False.
+
     Returns:
         FT: A FastHTML tab section component.
     """
@@ -288,9 +310,11 @@ def _tab_panel(heading, content, active=False):
 def _tab_li(heading, active=False):
     """
     Helper function to create a tab list item.
+
     Args:
         heading (str): The heading of the tab.
-        active (bool): Tab is active. Defaults to False.
+        active (bool, optional): Tab is active. Defaults to False.
+
     Returns:
         FT: A FastHTML tab list item component.
     """
@@ -309,10 +333,12 @@ def _tab_li(heading, active=False):
 def Tab(*panels: dict, title="", **kwargs) -> fh.FT:
     """
     Tab component.
+
     Args:
         *panels (dict): Panels to include in the tab.
-        title (str): Title of the tab. Defaults to "".
-        kwargs (dict): Pass on to underlying component
+        title (str, optional): Title of the tab. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Tab component.
     """
@@ -338,10 +364,12 @@ def Tab(*panels: dict, title="", **kwargs) -> fh.FT:
 def ErrorSummary(title: str, *links: fh.FT, **kwargs) -> fh.FT:
     """
     ErrorSummary component.
+
     Args:
         title (str): The title of the ErrorSummary component.
-        links (A): Links to include in the ErrorSummary component.
-        kwargs (dict): Pass on to underlying component
+        *links (A): Links to include in the ErrorSummary component.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML ErrorSummary component.
     """
@@ -414,14 +442,16 @@ def Table(
 ) -> fh.FT:
     """
     Table component.
+
     Args:
         data (list[dict]): Data for the Table component.
-        caption (str): The caption of the Table component. Defaults to "".
-        headers_cols (list): List of columns that should be headers in each row. Defaults to None.
-        numeric_cols (list): List of columns that are numeric. Defaults to None.
-        col_width (dict): Override column widths. Defaults to False.
-        small_text (bool): Render a more compact table. Defaults to False.
-        kwargs (dict): Pass on to underlying component
+        caption (str, optional): The caption of the Table component. Defaults to "".
+        header_cols (list, optional): List of columns that should be headers in each row. Defaults to None.
+        numeric_cols (list, optional): List of columns that are numeric. Defaults to None.
+        col_width (dict, optional): Override column widths. Defaults to None.
+        small_text (bool, optional): Render a more compact table. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Table component.
     """
@@ -448,12 +478,14 @@ def Task(
 ) -> fh.FT:
     """
     Task component.
+
     Args:
         label (str): Label for the Task item.
         href (str): Link for the Task item.
-        completed (bool): Is the taks completed?
-        hint (str): Hint for the Task item.
-        kwargs (dict): Pass on to underlying component
+        completed (bool, optional): Is the task completed? Defaults to False.
+        hint (str, optional): Hint for the Task item. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Task component.
     """
@@ -503,9 +535,11 @@ def TaskList(
 ) -> fh.FT:
     """
     TaskList component.
+
     Args:
-        tasls (FT): Tasks for the TaskList.
-        kwargs (dict): Pass on to underlying component
+        *tasks (FT): Tasks for the TaskList.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML TaskList component.
     """
@@ -519,11 +553,15 @@ def TaskList(
 def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT, **kwargs):
     """
     SummaryRow component - a list of these goes in to form a SummaryList.
+
     Args:
         key (str): Key for the SummaryRow.
         value (str | fh.FT): Content of the SummaryRow.
-        *actions (fh.FT): Action/s assigned to the SummaryRow.
-        kwargs (dict): Pass on to underlying component
+        *actions (fh.FT): Action(s) assigned to the SummaryRow.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        FT: A FastHTML SummaryRow component.
     """
     for action in actions:
         action.children = (
@@ -561,12 +599,14 @@ def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT, **kwargs):
 def SummaryList(*items: fh.FT, border: bool = True, **kwargs) -> fh.FT:
     """
     SummaryList component.
+
     Args:
-        items (list): List of SummaryItems.
-        border (bool): Choose if a border should be drawn.
-        kwargs (dict): Pass on to underlying component
+        *items (FT): List of SummaryItems.
+        border (bool, optional): Choose if a border should be drawn. Defaults to True.
+        **kwargs: Additional keyword arguments.
+
     Returns:
-        FT: A FastHTML SummaryList component
+        FT: A FastHTML SummaryList component.
     """
     no_border_cls = "" if border else " govuk-summary-list--no-border"
     return fh.Dl(
@@ -581,11 +621,13 @@ def SummaryCard(
 ) -> fh.FT:
     """
     SummaryCard component.
+
     Args:
         title (str): Title of the card.
-        summary_list (list): SummaryList component.
-        actions (list): List of card actions. Defaults to None.
-        kwargs (dict): Pass on to underlying component
+        summary_list (fh.FT): SummaryList component.
+        actions (list[fh.FT], optional): List of card actions. Defaults to None.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML component.
     """
