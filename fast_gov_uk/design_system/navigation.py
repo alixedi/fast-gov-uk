@@ -6,11 +6,13 @@ from .utils import Next, Previous
 def Backlink(href: str, text: str = "Back", inverse: bool = False, **kwargs) -> fh.FT:
     """
     A back link to the previous page.
+
     Args:
         href (str): Link to the previous page.
-        text (str): The text to display in the link. Defaults to "Back".
-        inverse (bool): If True, applies an inverse style. Defaults to False.
-        kwargs (dict): kwargs to be passed in to A.
+        text (str, optional): The text to display in the link. Defaults to "Back".
+        inverse (bool, optional): If True, applies an inverse style. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Backlink component.
     """
@@ -30,10 +32,12 @@ def SkipLink(
 ) -> fh.FT:
     """
     Skip link component.
+
     Args:
         href (str): On-page anchor (e.g. #main) for the main content.
-        text (str): The text to display in the link. Defaults to "Skip to main content".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        text (str, optional): The text to display in the link. Defaults to "Skip to main content".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML SkipLink component.
     """
@@ -49,10 +53,12 @@ def Breadcrumbs(
 ) -> fh.FT:
     """
     Breadcrumbs component.
+
     Args:
         *links (tuple[str, str]): Text & URL for breadcrumb links.
-        collapse_on_mobile (boo): Make breadcrumbls responsive. Defaults to False.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        collapse_on_mobile (bool, optional): Make breadcrumbs responsive. Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Breadcrumbs component.
     """
@@ -83,10 +89,12 @@ def ExitPage(
 ) -> fh.FT:
     """
     Exit Page component.
+
     Args:
-        text (str): The text to display on the ExitPate component. Defaults to "Exit Page".
-        href (str): The URL the link points to. Defaults to BBC weather service.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        text (str, optional): The text to display on the ExitPage component. Defaults to "Exit this page".
+        href (str, optional): The URL the link points to. Defaults to BBC weather service.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML ExitPage component.
     """
@@ -122,11 +130,13 @@ def NavigationLink(
 ) -> fh.FT:
     """
     NavigationLink component.
+
     Args:
         text (str): Text for the NavigationLink.
         href (str): Link for the NavigationLink.
-        active (bool): Is the NavigationLink active?
-        kwargs (dict): kwargs to be passed to the underlying component.
+        active (bool, optional): Is the NavigationLink active? Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML NavigationLink component.
     """
@@ -154,10 +164,12 @@ def Navigation(
 ) -> fh.FT:
     """
     Service Navigation component.
+
     Args:
-        links (NavigationLinks): List of NavigationLink components.
-        service_name (str): Name of the service. Defaults to "".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        *links (FT): List of NavigationLink components.
+        service_name (str, optional): Name of the service. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Navigation component.
     """
@@ -200,10 +212,12 @@ def Navigation(
 def _pagination_prev(href: str) -> fh.FT:
     """
     Previous link for pagination.
+
     Args:
         href (str): URL for the previous page.
+
     Returns:
-        FT: A FastHtml previous page component.
+        FT: A FastHTML previous page component.
     """
     return fh.Div(
         fh.A(
@@ -224,10 +238,12 @@ def _pagination_prev(href: str) -> fh.FT:
 def _pagination_next(href: str) -> fh.FT:
     """
     Next link for pagination.
+
     Args:
         href (str): URL for the next page.
+
     Returns:
-        FT: A FastHtml next page component.
+        FT: A FastHTML next page component.
     """
     return fh.Div(
         fh.A(
@@ -253,13 +269,15 @@ def PaginationLink(
 ) -> fh.FT:
     """
     Link for pagination.
+
     Args:
-        label (str): Lavel for the link
+        label (str): Label for the link.
         href (str): URL for the page.
-        active (book): Is this the current page? Defaults to False.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        active (bool, optional): Is this the current page? Defaults to False.
+        **kwargs: Additional keyword arguments.
+
     Returns:
-        FT: A FastHtml component.
+        FT: A FastHTML component.
     """
     active_cls = " govuk-pagination__item--current" if active else ""
     return fh.Li(
@@ -283,14 +301,15 @@ def Pagination(
 ) -> fh.FT:
     """
     Pagination component.
+
     Args:
-        *links (PaginationLinks): List of PaginationLink components.
-        prev_link (str): Link for previous page. Defaults to "".
-        next_link (str): Link for next page. Defaults to "".
-        kwargs (dict): kwargs to be passed to the underlying component.
+        *links (FT): List of PaginationLink components.
+        prev_link (str, optional): Link for previous page. Defaults to "".
+        next_link (str, optional): Link for next page. Defaults to "".
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Pagination component.
-    # TODO: Add support for ellipses.
     """
     return fh.Nav(
         _pagination_prev(prev_link) if prev_link else "",
@@ -312,10 +331,12 @@ def PaginationBlock(
 ) -> fh.FT:
     """
     PaginationBlock component.
+
     Args:
-        prev_link (tuple): Text and Link for previous page.
-        next_link (tuple): Text and Link for next page.
-        kwargs (dict): kwargs to be passed to the underlying component.
+        prev (tuple): Text and Link for previous page.
+        next (tuple): Text and Link for next page.
+        **kwargs: Additional keyword arguments.
+
     Returns:
         FT: A FastHTML Pagination component.
     """

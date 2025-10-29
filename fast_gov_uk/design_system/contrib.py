@@ -10,9 +10,9 @@ from .navigation import Backlink
 
 class EmailInput(TextInput):
     """
-    EmailInput component - A TextInput field that
-    validates the value as an email and sets the
-    error attribute if invalid.
+    EmailInput component.
+
+    Validates the value as an email and sets the error attribute if invalid.
     """
 
     @TextInput.value.setter
@@ -29,9 +29,9 @@ class EmailInput(TextInput):
 
 class NumberInput(TextInput):
     """
-    NumberInput component - A TextInput field that
-    validates the value as a number and sets the
-    error attribute if invalid.
+    NumberInput component.
+
+    Validates the value as a number and sets the error attribute if invalid.
     """
 
     def __init__(self, *args, numeric: bool = True, **kwargs):
@@ -60,9 +60,9 @@ class NumberInput(TextInput):
 
 class DecimalInput(TextInput):
     """
-    DecimalInput component - A TextInput field that
-    validates the value as a decimal and sets the
-    error attribute if invalid.
+    DecimalInput component.
+
+    Validates the value as a decimal and sets the error attribute if invalid.
     """
 
     def __init__(self, *args, numeric: bool = True, **kwargs):
@@ -91,7 +91,9 @@ class DecimalInput(TextInput):
 
 class GBPInput(DecimalInput):
     """
-    GBPInput because its such a common ask.
+    GBPInput component.
+
+    A DecimalInput with a currency prefix, commonly used for GBP (£).
     """
 
     def __init__(self, *args, prefix: str = "£", **kwargs):
@@ -101,16 +103,23 @@ class GBPInput(DecimalInput):
 
 def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
     """
-    Backlink component based on js
+    Backlink component based on JavaScript.
+
+    Args:
+        text (str, optional): The text for the backlink. Defaults to "Back".
+        inverse (bool, optional): Use inverse style. Defaults to False.
+
+    Returns:
+        FT: A FastHTML Backlink component.
     """
     return Backlink("javascript:history.back()", text=text, inverse=inverse)
 
 
 class RegexInput(TextInput):
     """
-    RegexInput component - A TextInput field that
-    validates the value againt a regex and sets the
-    error attribute if invalid.
+    RegexInput component.
+
+    Validates the value against a regex and sets the error attribute if invalid.
     """
 
     def __init__(self, *args, regex: str = ".*", **kwargs):
@@ -130,6 +139,11 @@ class RegexInput(TextInput):
 
 
 class PastDateInput(DateInput):
+    """
+    PastDateInput component.
+
+    Validates that the date is in the past.
+    """
 
     @DateInput.value.setter
     def value(self, value):
@@ -149,6 +163,11 @@ class PastDateInput(DateInput):
 
 
 class FutureDateInput(DateInput):
+    """
+    FutureDateInput component.
+
+    Validates that the date is in the future.
+    """
 
     @DateInput.value.setter
     def value(self, value):
