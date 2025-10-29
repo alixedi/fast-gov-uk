@@ -20,6 +20,7 @@ author = 'Ali Zaidi'
 extensions = [
     'sphinx.ext.autodoc',
     'myst_parser',
+    'sphinx.ext.napoleon',
 ]
 
 templates_path = ['_templates']
@@ -32,3 +33,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+# Added by Ali
+napoleon_google_docstring = True
+toc_object_entries_show_parents = True
