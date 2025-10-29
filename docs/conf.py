@@ -15,7 +15,7 @@ author = 'Ali Zaidi'
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+    'myst_parser',
 ]
 
 templates_path = ['_templates']
