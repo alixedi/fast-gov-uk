@@ -180,12 +180,12 @@ def test_gbpinput_valid(html):
     ),
 )
 def test_backlinkjs(kwargs, expected, html):
-    """Test BacklinkJS with various parameters.
+    """Test BackLinkJS with various parameters.
     Args:
         kwargs (dict): The arguments to pass to Inset.
         expected (str): The expected HTML output.
     """
-    text = ds.BacklinkJS(**kwargs)
+    text = ds.BackLinkJS(**kwargs)
     assert html(text) == html(expected)
 
 

@@ -5,7 +5,7 @@ import re
 import fasthtml.common as fh
 
 from .inputs import TextInput, DateInput
-from .navigation import Backlink
+from .navigation import BackLink
 
 
 class EmailInput(TextInput):
@@ -101,18 +101,18 @@ class GBPInput(DecimalInput):
         self.prefix = prefix
 
 
-def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
+def BackLinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
     """
-    Backlink component based on JavaScript.
+    BackLink component based on JavaScript.
 
     Args:
         text (str, optional): The text for the backlink. Defaults to "Back".
         inverse (bool, optional): Use inverse style. Defaults to False.
 
     Returns:
-        FT: A FastHTML Backlink component.
+        FT: A FastHTML BackLink component.
     """
-    return Backlink("javascript:history.back()", text=text, inverse=inverse)
+    return BackLink("javascript:history.back()", text=text, inverse=inverse)
 
 
 class RegexInput(TextInput):
