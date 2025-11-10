@@ -1,3 +1,14 @@
+"""
+GOV.UK Design System components for page elements such as Header, Footer and PhaseBanner.
+
+Includes the generic :py:meth:`Page` component that renders a standard GOV.UK Page wth
+a GOV.UK Header, a GOV.UK PhaseBanner and a GOV.UK Footer and of course - whatever content
+you might want to add to it.
+
+Also includes a generic :py:meth:`Cookies` component that renders a standard GOV.UK Cookies
+Page that you can customise for your service.
+"""
+
 import fasthtml.common as fh
 
 from .components import Table
@@ -5,17 +16,32 @@ from .typography import H1, H2, P
 from .utils import OGL, Crown, Logo
 
 
-def Header(title: str, homepage: str, **kwargs) -> fh.FT:
+def Header(title: str = "", homepage: str = "/", **kwargs) -> fh.FT:
     """
-    Header component.
+    `GOV.UK Header`_ component that supports a title (name of your service)
+    that is also a link to your homepage.
+
+    If you are trying to render a standard GOV.UK page, you should probably
+    use the :py:meth:`Page` component - which includes a header.
+
+    Example:
+
+        >>> ds.Header()
+        # The basic GOV.UK header without a title or a link
+        >>> ds.Header("MyService")
+        # GOV.UK header with the title "MyService" that links to the page "/"
+        >>> ds.Header("MyService", "/foo")
+        # GOV.UK header with the title "MyService" that links to the page "/foo"
 
     Args:
-        title (str): The title of the header.
-        homepage (str): The URL of the homepage.
+        title (str, optional): The title of the header. Defaults to "".
+        homepage (str, optional): The URL of the homepage. Defaults to "/".
         **kwargs: Additional keyword arguments.
 
     Returns:
         FT: A FastHTML Header component.
+
+    .. _GOV.UK Header: https://design-system.service.gov.uk/components/header/
     """
     return fh.Header(
         fh.Div(
@@ -43,7 +69,15 @@ def FooterLink(
     **kwargs,
 ) -> fh.FT:
     """
-    Footer link component.
+    A link in the `GOV.UK Footer`_ component.
+
+    Unless you are trying to build your own footer, you should probably use
+    the :py:meth:`Footer` component.
+
+    Examples:
+
+        >>> ds.FooterLink("Home", "/")
+        # Renders a footer link to the home page
 
     Args:
         text (str): The text to display in the link.
@@ -52,6 +86,8 @@ def FooterLink(
 
     Returns:
         FT: A FastHTML FooterLink component.
+
+    .. _GOV.UK Footer: https://design-system.service.gov.uk/components/footer/
     """
     return fh.A(
         text,
@@ -63,7 +99,19 @@ def FooterLink(
 
 def Footer(*links: tuple[str, str], **kwargs) -> fh.FT:
     """
-    Footer component.
+    `GOV.UK Footer`_ component with optional links.
+
+    If you are trying to render a standard GOV.UK page, you should probably
+    use the :py:meth:`Page` component.
+
+    The :py:meth:`Page` component pulls in the `Footer` from the `/footer`
+    endpoint so that there is one and only one place with the definition for
+    the Footer of your service.
+
+    Examples:
+
+        >>> ds.Footer(("Home", "/"), ("Feedback", "/feedback"))
+        # Renders a GOV.UK Footer with links to the home page and the feedback page
 
     Args:
         *links (tuple[str, str]): Footer links as (text, href).
@@ -71,6 +119,8 @@ def Footer(*links: tuple[str, str], **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML Footer component.
+
+    .. _GOV.UK Footer: https://design-system.service.gov.uk/components/footer/
     """
     return fh.Footer(
         fh.Div(
@@ -128,7 +178,21 @@ def PhaseBanner(
     **kwargs,
 ) -> fh.FT:
     """
-    Phase banner component.
+    A `GOV.UK Phase Banner`_ component - specifying if your service is e.g. "Alpha" or "Beta".
+
+    If you are trying to render a standard GOV.UK page, you should probably
+    use the :py:meth:`Page` component.
+
+    The :py:meth:`Page` component pulls in the `PhaseBanner` from the `/phase`
+    endpoint so that there is one and only one place with the definition for
+    the PhaseBanner of your service.
+
+    Examples:
+
+        >>> ds.PhaseBanner("This is a new service")
+        # Renders a GOV.UK PhaseBanner with the message "This is a new service"
+        >>> ds.PhaseBanner("This is a new service", phase="Beta")
+        # Renders the same PhaseBanner but with a "Beta" tag instead of "Alpha"
 
     Args:
         *content (FT): The content to display in the phase banner.
@@ -137,6 +201,8 @@ def PhaseBanner(
 
     Returns:
         FT: A FastHTML PhaseBanner component.
+
+    .. _GOV.UK Phase Banner: https://design-system.service.gov.uk/components/phase-banner/
     """
     return fh.Div(
         fh.Div(
@@ -160,7 +226,27 @@ def PhaseBanner(
 
 def Page(*content, navigation=None, sidebar=None) -> fh.FT:
     """
-    Page component.
+    A standard `GOV.UK Page`_ component with a GOV.UK Header, a GOV.UK Phase Banner,
+    a GOV.UK Footer and - whatever content you might want to add to it.
+
+    The Phase Banner and the Footer are loaded from `/phase` and `/footer` endpoints
+    respectively using `htmx-get` directives.
+
+    This is to ensure that there is one and only one definition of a Phase Banner
+    and a Footer in your codebase.
+
+    Examples:
+
+        >>> ds.Page("Hello World!")
+        # Renders a page with GOV.UK Header and the text "Hello World!"
+        # Footer and Phase Banner are loaded dynamically
+        >>> ds.Page(ds.H1("Hello World!"))
+        # Renders a page with the heading - "Hello World!"
+        >>> nav = ds.Navigation("/", "/feedback")
+        >>> ds.Page(navigation=nav)
+        # Renders a page with the given service navigation component
+        >>> ds.Page(sidebar="Hello World!")
+        # Renders a page with a sidebar that contains the text - "Hello World!"
 
     Args:
         *content: List of content for the Page.
@@ -169,6 +255,8 @@ def Page(*content, navigation=None, sidebar=None) -> fh.FT:
 
     Returns:
         FT: A FastHTML Page component.
+
+    .. _GOV.UK Page: https://design-system.service.gov.uk/styles/page-template/
     """
     return fh.Body(
         fh.Script(
@@ -209,13 +297,33 @@ def Page(*content, navigation=None, sidebar=None) -> fh.FT:
 
 def Cookies(*content: fh.FT):
     """
-    Cookie page component.
+    A standard `GOV.UK Cookie Page`_ component that includes definition of cookies and
+    a table detailing the 2 essential cookies used by fast-gov-uk services.
+
+    Examples:
+
+        >>> ds.Cookies()
+        # Render the Cookies page
+        >>> ds.Cookies(ds.H2("Additional Cookies"), ...)
+        # Renders the Cookies page with additional cookies
+
+    This is just the component. You would probably want to render the Cookies
+    page at the `/cookies` URL. You can do so by adding the following function
+    to your `app.py`:
+
+    .. code-block:: python
+
+        @fast.page
+        def cookies():
+            return ds.Cookies()
 
     Args:
         *content (FT): List of content for the Page.
 
     Returns:
         FT: A FastHTML Cookies page component.
+
+    .. _GOV.UK Cookie Page: https://design-system.service.gov.uk/patterns/cookies-page/
     """
     return Page(
         H1("Cookies"),
