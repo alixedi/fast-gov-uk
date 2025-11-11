@@ -1,3 +1,15 @@
+"""
+These components are not directly part of the GOV.UK Design System but are used often in many
+applications and services.
+
+E.g. EmailInput and GBPInput can be used in forms to collect emails and GBP values. NumberInput
+and DecimalInput can be used to validate if the user filled-in an integer or a decimal number
+in a field. PastDateInput and FutureDateInput can validate if the date entered by the user is
+in the past and the future respectively etc.
+
+This module also serves as an example on how to extend/modify the base fields.
+"""
+
 from datetime import date
 from email.utils import parseaddr
 import re
@@ -5,14 +17,26 @@ import re
 import fasthtml.common as fh
 
 from .inputs import TextInput, DateInput
-from .navigation import Backlink
+from .navigation import BackLink
 
 
 class EmailInput(TextInput):
     """
-    EmailInput component.
+    GOV.UK TextInput component with some basic email validation using Python's
+    built-in `email.utils.parseaddr`.
 
-    Validates the value as an email and sets the error attribute if invalid.
+    If your workflow needs to ensure that the email actually belongs to the user,
+    you might want to send them a confirmation email etc.
+
+    Examples:
+
+        >>> email = ds.EmailInput("email")
+        >>> email.value = "test"
+        >>> email.error
+        'Value is not an email'
+        >>> email.value = "test@test"
+        >>> email.error
+        ''
     """
 
     @TextInput.value.setter
@@ -29,9 +53,20 @@ class EmailInput(TextInput):
 
 class NumberInput(TextInput):
     """
-    NumberInput component.
+    GOV.UK TextInput component that validates number input using the `int()` typecast.
 
-    Validates the value as a number and sets the error attribute if invalid.
+    Examples:
+
+        >>> number = ds.NumberInput("number")
+        >>> number.value = "x"
+        >>> number.error
+        'Value is not an number'
+        >>> number.value = "3.4"
+        >>> number.error
+        'Value is not an number'
+        >>> number.value = "10"
+        >>> number.error
+        ''
     """
 
     def __init__(self, *args, numeric: bool = True, **kwargs):
@@ -60,9 +95,20 @@ class NumberInput(TextInput):
 
 class DecimalInput(TextInput):
     """
-    DecimalInput component.
+    GOV.UK TextInput component that validates decimal input using the `float()` typecast.
 
-    Validates the value as a decimal and sets the error attribute if invalid.
+    Examples:
+
+        >>> decimal = ds.DecimalInput("decimal")
+        >>> decimal.value = "x"
+        >>> decimal.error
+        'Value is not an number'
+        >>> decimal.value = "10"
+        >>> decimal.error
+        ''
+        >>> decimal.value = "3.4"
+        >>> decimal.error
+        ''
     """
 
     def __init__(self, *args, numeric: bool = True, **kwargs):
@@ -91,9 +137,22 @@ class DecimalInput(TextInput):
 
 class GBPInput(DecimalInput):
     """
-    GBPInput component.
+    A DecimalInput with a currency prefix, commonly used for GBP (£) field
+    in GOV.UK services.
 
-    A DecimalInput with a currency prefix, commonly used for GBP (£).
+    Examples:
+
+        >>> gbp = ds.GBPInput("gbp")
+        # Input with £ prefix: £ ____
+        >>> gbp.value = "x"
+        >>> gbp.error
+        'Value is not an number'
+        >>> gbp.value = "10"
+        >>> gbp.error
+        ''
+        >>> gbp.value = "3.4"
+        >>> gbp.error
+        ''
     """
 
     def __init__(self, *args, prefix: str = "£", **kwargs):
@@ -101,25 +160,49 @@ class GBPInput(DecimalInput):
         self.prefix = prefix
 
 
-def BacklinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
+def BackLinkJS(text: str = "Back", inverse: bool = False) -> fh.FT:
     """
-    Backlink component based on JavaScript.
+    An implmentation of `GOV.UK back link`_ component that uses JavaScript to go back one page
+    in the browser.
+
+    This is often useful in cases where it is clunky to maintain state for the current step
+    in a multi-step journey on the server.
+
+    Note that this would not work if a user has `javascript` disabled in their browser.
+
+    Examples:
+
+        >>> back = ds.BackLinkJS()
+        >>> str(back)
+        '<a href="javascript:history.back()" class="govuk-back-link">Back</a>'
 
     Args:
         text (str, optional): The text for the backlink. Defaults to "Back".
         inverse (bool, optional): Use inverse style. Defaults to False.
 
     Returns:
-        FT: A FastHTML Backlink component.
+        FT: A FastHTML BackLink component.
+
+    .. _GOV.UK back link: https://design-system.service.gov.uk/components/back-link/
     """
-    return Backlink("javascript:history.back()", text=text, inverse=inverse)
+    return BackLink("javascript:history.back()", text=text, inverse=inverse)
 
 
 class RegexInput(TextInput):
     """
-    RegexInput component.
+    GOV.UK TextInput component that accepts a `regex` string to validate user input.
 
-    Validates the value against a regex and sets the error attribute if invalid.
+    This can be handy for e.g. postcodes - https://stackoverflow.com/a/69806181/1182202.
+
+    Examples:
+
+        >>> re = ds.RegexInput("postcode", regex="(blue|white|red)")
+        >>> re.value="white"
+        >>> re.error
+        ''
+        >>> re.value="green"
+        >>> re.error
+        'Value does not match the required format.'
     """
 
     def __init__(self, *args, regex: str = ".*", **kwargs):
@@ -140,9 +223,19 @@ class RegexInput(TextInput):
 
 class PastDateInput(DateInput):
     """
-    PastDateInput component.
+    GOV.UK DateInput component that only accepts a date in the past.
 
-    Validates that the date is in the past.
+    This is useful for collecting date of birth etc.
+
+    Examples:
+
+        >>> past = ds.PastDateInput("past")
+        >>> past.value=["1", "1", "2000"]
+        >>> past.error
+        ''
+        >>> past.value = ["1", "1", "3000"]
+        >>> past.error
+        'The date must be in the past.'
     """
 
     @DateInput.value.setter
@@ -164,9 +257,19 @@ class PastDateInput(DateInput):
 
 class FutureDateInput(DateInput):
     """
-    FutureDateInput component.
+    GOV.UK DateInput component that only accepts a date in the future.
 
-    Validates that the date is in the future.
+    This is useful for when a service allows users to e.g. booking something in advance.
+
+    Examples:
+
+        >>> future = ds.FutureDateInput("future")
+        >>> future.value = ["1", "1", "3000"]
+        >>> future.error
+        ''
+        >>> future.value=["1", "1", "2000"]
+        >>> future.error
+        'The date must be in the future.'
     """
 
     @DateInput.value.setter

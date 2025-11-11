@@ -33,7 +33,7 @@ def test_backlink(kwargs, expected, html):
         kwargs (dict): The arguments to pass to backlink.
         expected (str): The expected HTML output.
     """
-    backlink = ds.Backlink(**kwargs)
+    backlink = ds.BackLink(**kwargs)
     assert html(backlink) == html(expected)
 
 
@@ -319,7 +319,7 @@ def test_pagination(kwargs, expected, html):
 
 
 @pytest.mark.parametrize("component", (
-    ds.Backlink("/", hx_test="foo"),
+    ds.BackLink("/", hx_test="foo"),
     ds.SkipLink("/", hx_test="foo"),
     ds.Breadcrumbs(("test", "/"), hx_test="foo"),
     ds.ExitPage(hx_test="foo"),

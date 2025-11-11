@@ -5,7 +5,7 @@ def test_backlink(html):
     """
     Link: https://design-system.service.gov.uk/components/back-link/
     """
-    backlink = ds.Backlink("#")
+    backlink = ds.BackLink("#")
     assert html(backlink) == html(
         '<a href="#" class="govuk-back-link">' \
             'Back'
@@ -17,7 +17,7 @@ def test_backlink_dark(html):
     """
     Link: https://design-system.service.gov.uk/components/back-link/
     """
-    backlink = ds.Backlink("#", inverse=True)
+    backlink = ds.BackLink("#", inverse=True)
     assert html(backlink) == html(
         '<a href="#" class="govuk-back-link govuk-back-link--inverse">'
             'Back'

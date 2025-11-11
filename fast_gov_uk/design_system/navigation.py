@@ -1,11 +1,23 @@
+"""
+GOV.UK Design System components for navigation elements such as back link, skip link, exit this page
+as well as breadcrumbs, service navigation and pagination.
+"""
+
 import fasthtml.common as fh
 
 from .utils import Next, Previous
 
 
-def Backlink(href: str, text: str = "Back", inverse: bool = False, **kwargs) -> fh.FT:
+def BackLink(href: str, text: str = "Back", inverse: bool = False, **kwargs) -> fh.FT:
     """
-    A back link to the previous page.
+    The `GOV.UK back link`_ component to help users navigate to the previous page
+    in a multi-page transaction.
+
+    Examples:
+
+        >>> backlink = ds.BackLink(href="/back", text="Go back")
+        >>> str(backlink)
+        '<a href="/back" class="govuk-back-link">Go back</a>'
 
     Args:
         href (str): Link to the previous page.
@@ -14,7 +26,9 @@ def Backlink(href: str, text: str = "Back", inverse: bool = False, **kwargs) -> 
         **kwargs: Additional keyword arguments.
 
     Returns:
-        FT: A FastHTML Backlink component.
+        FT: A FastHTML BackLink component.
+
+    .. _GOV.UK back link: https://design-system.service.gov.uk/components/back-link/
     """
     inverse_cls = " govuk-back-link--inverse" if inverse else ""
     return fh.A(
@@ -31,7 +45,12 @@ def SkipLink(
     **kwargs,
 ) -> fh.FT:
     """
-    Skip link component.
+    `GOV.UK skip link`_ component to help keyboard-only users skip to the main content on a page.
+
+    Examples:
+        >>> skip_link = ds.SkipLink(href="#main")
+        >>> str(skip_link)
+        '<a href="#main" data-module="govuk-skip-link" class="govuk-skip-link">Skip to main content</a>'
 
     Args:
         href (str): On-page anchor (e.g. #main) for the main content.
@@ -40,6 +59,8 @@ def SkipLink(
 
     Returns:
         FT: A FastHTML SkipLink component.
+
+    .. _GOV.UK skip link: https://design-system.service.gov.uk/components/skip-link/
     """
     return fh.A(
         text, href=href, cls="govuk-skip-link", data_module="govuk-skip-link", **kwargs
@@ -52,7 +73,16 @@ def Breadcrumbs(
     **kwargs,
 ) -> fh.FT:
     """
-    Breadcrumbs component.
+    `GOV.UK breadcrumbs`_ component to help users understand where they are within a website's structure
+    and move between levels.
+
+    Examples:
+
+        >>> ds.Breadcrumbs(
+        ...     ("Home", "/"),
+        ...     ("Section", "/section"),
+        ... )
+        # Home > Section
 
     Args:
         *links (tuple[str, str]): Text & URL for breadcrumb links.
@@ -61,6 +91,8 @@ def Breadcrumbs(
 
     Returns:
         FT: A FastHTML Breadcrumbs component.
+
+    .. _GOV.UK Breadcrumbs: https://design-system.service.gov.uk/components/breadcrumbs/
     """
     collapse_cls = (
         " govuk-breadcrumbs--collapse-on-mobile" if collapse_on_mobile else ""
@@ -88,7 +120,15 @@ def ExitPage(
     **kwargs,
 ) -> fh.FT:
     """
-    Exit Page component.
+    `GOV.UK exit page`_ component to give users a way to quickly and safely exit a service,
+    website or application.
+
+    Examples:
+
+        >>> ds.ExitPage()
+        # An Exit this page button linking to BBC weather service.
+        >>> ds.ExitPage(text="Leave now", href="https://google.com")
+        # An Exit this page button with the text "Leave now" linking to Google.
 
     Args:
         text (str, optional): The text to display on the ExitPage component. Defaults to "Exit this page".
@@ -97,6 +137,8 @@ def ExitPage(
 
     Returns:
         FT: A FastHTML ExitPage component.
+
+    .. _GOV.UK exit page: https://design-system.service.gov.uk/components/exit-this-page/
     """
     return fh.Div(
         fh.A(
@@ -129,7 +171,15 @@ def NavigationLink(
     **kwargs,
 ) -> fh.FT:
     """
-    NavigationLink component.
+    Navigation link to pass into the :py:meth:`Navigation` component.
+
+    Examples:
+
+        >>> nav_link = ds.NavigationLink(text="Home", href="/")
+        >>> str(nav_link)
+        '<li class="govuk-service-navigation__item">'
+            '<a href="/" class="govuk-service-navigation__link">home</a>'
+        '</li>'
 
     Args:
         text (str): Text for the NavigationLink.
@@ -163,7 +213,23 @@ def Navigation(
     **kwargs,
 ) -> fh.FT:
     """
-    Service Navigation component.
+    `GOV.UK Service Navigation`_ component to help users understand that they're using
+    your service and lets them navigate around your service.
+
+    You can pass it a list of :py:meth:`NavigationLink` components to build the
+    navigation menu.
+
+    Optionally, you can provide a `service_name` to display the name of your service
+    on the navigation menu.
+
+    Examples:
+
+        >>> nav = ds.Navigation(
+        ...     ds.NavigationLink(text="Home", href="/", active=True),
+        ...     ds.NavigationLink(text="About", href="/about"),
+        ...     service_name="My Service",
+        ... )
+        # *Home* | About
 
     Args:
         *links (FT): List of NavigationLink components.
@@ -172,6 +238,8 @@ def Navigation(
 
     Returns:
         FT: A FastHTML Navigation component.
+
+    .. _GOV.UK Service Navigation: https://design-system.service.gov.uk/components/service-navigation/
     """
     return fh.Section(
         fh.Div(
@@ -211,7 +279,7 @@ def Navigation(
 
 def _pagination_prev(href: str) -> fh.FT:
     """
-    Previous link for pagination.
+    Previous link for pagination that looks like a left arrow.
 
     Args:
         href (str): URL for the previous page.
@@ -237,7 +305,7 @@ def _pagination_prev(href: str) -> fh.FT:
 
 def _pagination_next(href: str) -> fh.FT:
     """
-    Next link for pagination.
+    Next link for pagination that looks like a right arrow.
 
     Args:
         href (str): URL for the next page.
@@ -268,7 +336,15 @@ def PaginationLink(
     **kwargs,
 ) -> fh.FT:
     """
-    Link for pagination.
+    Pagination link to pass into the :py:meth:`Pagination` component.
+
+    Examples:
+
+        >>> page_link = ds.PaginationLink(label="2", href="/page/2")
+        >>> str(page_link)
+        '<li class="govuk-pagination__item">'
+            '<a href="/2" aria-label="Page 1" class="govuk-link govuk-pagination__link">1</a>'
+        '</li>'
 
     Args:
         label (str): Label for the link.
@@ -300,7 +376,25 @@ def Pagination(
     **kwargs,
 ) -> fh.FT:
     """
-    Pagination component.
+    `GOV.UK Pagination`_ component to help users navigate forwards and backwards
+    through a series of pages.
+
+    You can pass it a list of :py:meth:`PaginationLink` components to build the
+    Pagination.
+
+    `prev_link` and `next_link` are optional links for previous and next pages.
+
+
+    Examples:
+
+        >>> pagination = ds.Pagination(
+        ...     ds.PaginationLink(label="1", href="/page/1"),
+        ...     ds.PaginationLink(label="2", href="/page/2", active=True),
+        ...     ds.PaginationLink(label="3", href="/page/3"),
+        ...     prev_link="/page/1",
+        ...     next_link="/page/3",
+        ... )
+        # ← Previous 1 *2* 3 Next →
 
     Args:
         *links (FT): List of PaginationLink components.
@@ -310,6 +404,8 @@ def Pagination(
 
     Returns:
         FT: A FastHTML Pagination component.
+
+    .. _GOV.UK Pagination: https://design-system.service.gov.uk/components/pagination/
     """
     return fh.Nav(
         _pagination_prev(prev_link) if prev_link else "",
@@ -330,7 +426,17 @@ def PaginationBlock(
     **kwargs,
 ) -> fh.FT:
     """
-    PaginationBlock component.
+    `GOV.UK block-style pagination`_ component to let users navigate through related content
+    that has been split across multiple pages.
+
+    Examples:
+
+        >>> pagination = ds.PaginationBlock(
+        ...     prev=("Previous page", "/previous"),
+        ...     next=("Next page", "/next"),
+        ... )
+        # ← Previous: Previous page
+        #   Next: Next page →
 
     Args:
         prev (tuple): Text and Link for previous page.
@@ -339,6 +445,8 @@ def PaginationBlock(
 
     Returns:
         FT: A FastHTML Pagination component.
+
+    .. _GOV.UK block-style pagination: https://design-system.service.gov.uk/components/pagination/
     """
     prev_label, prev_link = prev
     prev_component = fh.Div(

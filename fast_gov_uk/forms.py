@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class BackendError(Exception):
+    """
+    Exception raised for errors in backend processing.
+    """
     pass
 
 
@@ -21,17 +24,33 @@ class Backend:
     """
 
     async def process(self, request, name, data, *args, **kwargs):
-        """Process the form using the backend function."""
+        """
+        Process the form using the backend function.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         raise NotImplementedError("Subclasses must implement this method.")
 
 
 class LogBackend(Backend):
     """
-    Backend that logs form data.
+    Backend that logs form data. This is mainly useful for debugging.
     """
 
     async def process(self, request, name, data, *args, **kwargs):
-        """Log the form data."""
+        """
+        Log the form data.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         if isawaitable(data):
             data = await data
         logger.info(f"Form: '{name}' processed with: {data}.")
@@ -39,7 +58,10 @@ class LogBackend(Backend):
 
 class DBBackend(Backend):
     """
-    Backend that stores data in the DB.
+    Backend that stores data in the DB. Requires a `db` instance.
+
+    Args:
+        db: Database instance.
     """
 
     def __init__(self, db, *args, **kwargs):
@@ -47,12 +69,26 @@ class DBBackend(Backend):
         self.db = db
 
     def get_table(self):
+        """
+        Get or create the forms table.
+        Returns:
+            Table: The forms table.
+        """
         forms = self.db.t.forms
         if forms not in self.db.t:
             forms.create(id=int, name=str, created_on=datetime, data=dict, pk="id")
         return forms
 
     async def process(self, request, name, data, *args, **kwargs):
+        """
+        Store the form data in the DB.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         if isawaitable(data):
             data = await data
         forms = self.get_table()
@@ -65,6 +101,8 @@ class DBBackend(Backend):
 class EmailBackend(Backend):
     """
     Backend that sends submitted forms to admin email.
+    Args:
+        notify: Notification function to send emails.
     """
 
     def __init__(self, notify, *args, **kwargs):
@@ -72,9 +110,21 @@ class EmailBackend(Backend):
         self.notify = notify
 
     async def format(self, data):
+        """
+        Format the form data for email.
+        """
         return "\n".join(f"* {key}: {val}" for key, val in data.items())
 
     async def process(self, request, name, data, *args, **kwargs):
+        """
+        Send the form data via email.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         if isawaitable(data):
             data = await data
         formatted_data = await self.format(data)
@@ -84,6 +134,14 @@ class EmailBackend(Backend):
 
 @cache
 def _client(username, password):
+    """
+    Create an HTTP client with basic auth.
+    Args:
+        username (str): Username for basic auth.
+        password (str): Password for basic auth.
+    Returns:
+        httpx.Client: HTTP client with basic auth.
+    """
     auth = httpx.BasicAuth(username=username, password=password)
     return httpx.Client(auth=auth)
 
@@ -91,6 +149,10 @@ def _client(username, password):
 class APIBackend(Backend):
     """
     Backend that sends submitted forms to an API.
+    Args:
+        url (str): API endpoint URL.
+        username (str): Username for basic auth.
+        password (str): Password for basic auth.
     """
 
     def __init__(self, url, username, password, *args, **kwargs):
@@ -100,6 +162,15 @@ class APIBackend(Backend):
         self.password = password
 
     async def process(self, request, name, data, *args, **kwargs):
+        """
+        Send the form data to the API.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         if isawaitable(data):
             data = await data
         data["form_name"] = name
@@ -114,6 +185,15 @@ class SessionBackend(Backend):
     """
 
     async def process(self, request, name, data, *args, **kwargs):
+        """
+        Store the form data in the session.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         if isawaitable(data):
             data = await data
         session = request.session
@@ -128,6 +208,15 @@ class QuestionBackend(Backend):
     """
 
     async def process(self, request, name, data, *args, **kwargs):
+        """
+        Append the question data in the session.
+        Args:
+            request: The HTTP request object.
+            name (str): Name of the form.
+            data (dict|awaitable): Cleaned form data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        """
         if isawaitable(data):
             data = await data
         session = request.session
@@ -140,6 +229,18 @@ class QuestionBackend(Backend):
 class Form:
     """
     Wrapper around fh Form for consistency.
+
+    Examples:
+
+        >>> form = Form(
+        ...     "contact-form",
+        ...     Field("name", label="Name"),
+        ...     Field("email", label="Email", type="email"),
+        ...     backends=[LogBackend()],
+        ...     success_url="/thank-you",
+        ...     cta="Send",
+        ... )
+
     Args:
         name (str): Name of the Form.
         backends (list): List of backends to process submitted data.
@@ -184,10 +285,18 @@ class Form:
 
     @property
     def fields(self):
+        """
+        Get all Field and Fieldset items in the form.
+        """
         return [item for item in self.items if isinstance(item, (Field, Fieldset))]
 
     @property
     def form_fields(self):
+        """
+        Get all Field items in the form, including those inside Fieldsets.
+        Yields:
+            Field: Field items in the form.
+        """
         for item in self.fields:
             if isinstance(item, Fieldset):
                 for fitem in item.fields:
@@ -237,6 +346,11 @@ class Form:
 
     @property
     def success(self):
+        """
+        Get the success redirect response.
+        Returns:
+            fh.Redirect: Redirect response to success URL.
+        """
         return fh.Redirect(self.success_url)
 
     async def process(self, req, *args, **kwargs):
@@ -251,6 +365,11 @@ class Form:
         return self.success
 
     def error_summary(self):
+        """
+        Generate an error summary if there are field errors.
+        Returns:
+            ErrorSummary|None: Error summary component or None if no errors.
+        """
         fields_with_errors = [f for f in self.form_fields if f.error]
         if not fields_with_errors:
             return
@@ -260,6 +379,11 @@ class Form:
 
     @property
     def render(self) -> fh.FT:
+        """
+        Render the form with error summary and submit button.
+        Returns:
+            fh.FT: Rendered form component.
+        """
         return fh.Form(
             self.error_summary(),
             *self.items,
@@ -270,6 +394,11 @@ class Form:
         )
 
     def __ft__(self) -> fh.FT:
+        """
+        Render the form, optionally wrapped in a Page.
+        Returns:
+            fh.FT: Rendered form or page component.
+        """
         return Page(self.render) if self.page else self.render
 
 
@@ -279,6 +408,20 @@ class Question:
     b/c all the Question objects that belong to the same flow will have the
     same name and so if we insist on directlry using _Question, the user will
     have to pass in the same name for each _Question which can be erorr-prone.
+
+    Examples:
+
+        >>> Question(
+        ...     ds.H1("Thank you for your interest"),
+        ...     ds.P("Please answer the following questions:"),
+        ...     ds.NumberInput("age", label="What is your age?"),
+        ... )
+
+    Args:
+        args: Positional arguments for the _Question.
+        predicates (dict|None): Predicates to determine if this question
+            should be shown based on previous answers.
+        kwargs: Keyword arguments for the _Question.
     """
 
     def __init__(self, *args, predicates: dict | None = None, **kwargs):
@@ -291,6 +434,14 @@ class _Question(Form):
     """
     Subclass of Form to be used as a single Question page in GDS-style
     question pages.
+
+    You should not instantiate this class directly but rather use
+    the Question interface.
+
+    Args:
+        args: Positional arguments for the Form.
+        cta (str): Label for Submit button.
+        kwargs: Keyword arguments for the Form.
     """
 
     def __init__(self, *args, cta: str = "Continue", **kwargs):
@@ -314,6 +465,9 @@ class _Question(Form):
 
 
 class QuestionsFinished(Exception):
+    """
+    Exception raised when there are no more questions left in the wizard.
+    """
     pass
 
 
@@ -321,6 +475,30 @@ class Wizard:
     """
     Implements the question-protocol aka Wizard i.e. forms that step
     through the fields one at a time.
+
+    Examples:
+        >>> wizard = Wizard(
+        ...     "example-wizard",
+        ...     Question(
+        ...         ds.H1("Thank you for your interest"),
+        ...         ds.P("Please answer the following questions:"),
+        ...         ds.NumberInput("age", label="What is your age?"),
+        ...     ),
+        ...     Question(
+        ...         ds.TextInput("name", label="What is your name?"),
+        ...         predicates={"age": "18"},
+        ...     ),
+        ...     backends=[LogBackend()],
+        ...     success_url="/thank-you",
+        ... )
+
+    Args:
+        name (str): Name of the Wizard.
+        questions (list): List of Question objects.
+        backends (list): List of backends to process submitted data.
+        success_url (str): Redirect URL after wizard is completed.
+        step (int): Current step in the wizard. Default: 0.
+        data (dict|None): Initial data for the current question. Default: None.
     """
 
     def __init__(
@@ -351,13 +529,28 @@ class Wizard:
 
     @property
     def success(self):
+        """
+        Get the success redirect response.
+        """
         return fh.Redirect(self.success_url)
 
     @property
     def step_valid(self):
+        """
+        Check if the current step/question is valid.
+        """
         return self.question.valid
 
     async def process(self, req, *args, **kwargs):
+        """
+        Call the process methods on wizard backends.
+        Args:
+            req: The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        Returns:
+            fh.Redirect: Redirect response to success URL.
+        """
         data = req.session[self.name]["data"]
         try:
             for backend in self.backends:
@@ -367,6 +560,14 @@ class Wizard:
         return self.success
 
     async def next_step(self, req):
+        """
+        Process the current question and determine the next step
+        in the wizard based on predicates.
+        Args:
+            req: The HTTP request object.
+        Returns:
+            fh.Redirect: Redirect response to the next question or success URL.
+        """
         await self.question.process(req)
         data = req.session[self.name]["values"]
         next_step = self.step + 1
@@ -384,4 +585,9 @@ class Wizard:
 
 
     def __ft__(self) -> _Question:
+        """
+        Render the current question.
+        Returns:
+            _Question: The current question form.
+        """
         return self.question

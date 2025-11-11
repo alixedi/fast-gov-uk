@@ -1,3 +1,12 @@
+"""
+GOV.UK Design System form input components including TextInput, Textarea,
+Select, Checkboxes, Radios etc.
+
+These components are subclasses of :py:class:`Field` which provides common
+functionality like rendering labels, hints, errors, setting values, and
+validating required fields.
+"""
+
 from datetime import date
 from enum import Enum
 from pathlib import Path
@@ -17,7 +26,11 @@ def Label(
     extra_cls: str = "",
 ) -> fh.FT:
     """
-    Label component. Generally attached to a Field.
+    Used by the :py:class:`Field` component to render a label.
+
+    Handles whether the label is a heading, whether the field is required etc.
+
+    Use this if you are creating a custom field.
 
     Args:
         field_id (str): HTML id of the field this label is for.
@@ -41,7 +54,9 @@ def Label(
 
 def Hint(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
     """
-    Hint component. Generally attached to a Field.
+    Used by the :py:class:`Field` component to render a hint.
+
+    Use this if you are creating a custom field.
 
     Args:
         field_id (str): HTML id of the field this hint is for.
@@ -56,7 +71,9 @@ def Hint(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
 
 def Error(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
     """
-    Error component. Generally attached to a Field.
+    Used by the :py:class:`Field` component to render error message.
+
+    Use this if you are creating a custom field.
 
     Args:
         field_id (str): HTML id of the field this error is for.
@@ -75,12 +92,29 @@ def Error(field_id: str, text: str, extra_cls: str = "") -> fh.FT:
 
 
 class AbstractField:
+    """
+    Every form field is a subclass of this type.
+
+    This is useful when e.g. we are having to distinguish fields in a
+    form that contains fields as well as non-field elements like H1 and P.
+
+    These types of mixed forms are quite common in question pages.
+    """
     pass
 
 
 class Field(AbstractField):
     """
-    Baseclass for form fields.
+    Baseclass for form inputs. Provides scaffolding for -
+
+        - rendering labels
+        - rendering hints
+        - rendering errors
+        - setting field values
+        - validation for required fields
+
+    If you are want to implement a custom GOV.UK input, this is a good
+    base class to inherit from.
 
     Args:
         name (str): The name of the field.
@@ -117,6 +151,10 @@ class Field(AbstractField):
 
     @property
     async def clean(self):
+        """
+        Get "clean" data from a field when a form is being processed
+        by a form Backend.
+        """
         if not self.value:
             return None
         return self.value
@@ -184,12 +222,25 @@ class Field(AbstractField):
 
 class Select(Field):
     """
-    Select component. Renders a dropdown. Inherits from Field.
+    `GOV.UK Select`_ component. Renders a dropdown. Inherits from Field.
+
+    This component should only be used as a last resort in public-facing services because research
+    shows that some users find selects very difficult to use.
+
+    Use Checkbox or Radio components instead.
+
+    Examples:
+
+        >>> ds.Select("question", choices={"yes": "Yes", "no": "No"})
+        # Renders a dropdown select with the given options - "Yes" and "No.
+        # Note the values for these options are "yes" and "no" respectively
 
     Args:
         *args: Arguments for Field.
         choices (dict, optional): Choices for the select. Defaults to None.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Select: https://design-system.service.gov.uk/components/select/
     """
 
     def __init__(self, *args, choices: dict | None = None, **kwargs):
@@ -198,12 +249,20 @@ class Select(Field):
 
     @property
     async def clean(self):
+        """
+        Get "clean" data from a field when a form is being processed
+        by a form Backend.
+        """
         for val, text in self.choices.items():
             if val == self.value:
                 return text
 
     @property
     def options(self):
+        """
+        Convert the choices dict into a list of <option> to be
+        inserted into the Select component.
+        """
         return [
             fh.Option(text, value=value, selected=(value == self.value))
             for value, text in self.choices.items()
@@ -234,12 +293,21 @@ class Select(Field):
 
 class Textarea(Field):
     """
-    Textarea component. Inherits from Field.
+    `GOV.UK Textarea`_ component. Inherits from Field.
+
+    Use this component when you need to let users enter more than a single line of text.
+
+    Examples:
+
+        >>> ds.Textarea('test')
+        # Renders a text area with the default 5 rows
 
     Args:
         *args: Arguments for Field.
         rows (int, optional): Number of rows in the textarea. Defaults to 5.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Textarea: https://design-system.service.gov.uk/components/textarea/
     """
 
     def __init__(self, *args, rows: int = 5, **kwargs):
@@ -273,11 +341,20 @@ class Textarea(Field):
 
 class PasswordInput(Field):
     """
-    PasswordInput component. Inherits from Field.
+    `GOV.UK Password input`_ component. Inherits from Field.
+
+    Use this component when you need users to type a password.
+
+    Examples:
+
+        >>> ds.PasswordInput('test')
+        # Renders a password input
 
     Args:
         *args: Arguments for Field.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Password input: https://design-system.service.gov.uk/components/password-input/
     """
 
     def __init__(self, *args, **kwargs):
@@ -285,6 +362,9 @@ class PasswordInput(Field):
 
     @property
     def input(self):
+        """
+        Input part for this component.
+        """
         return fh.Input(
             type="password",
             name=self.name,
@@ -299,6 +379,9 @@ class PasswordInput(Field):
 
     @property
     def button(self):
+        """
+        Button part for this component
+        """
         return fh.Button(
             "Show",
             type="button",
@@ -338,7 +421,25 @@ class PasswordInput(Field):
 
 class CharacterCount(Field):
     """
-    CharacterCount component. Renders a Textarea with a character/word count message.
+    `GOV.UK Character count`_ component. Renders a Textarea with a character/word count message.
+
+    Help users know how much text they can enter when there is a limit on the number of characters.
+
+    It is recommended to always test your service without a character count first and to only use the
+    character count component when there is a good reason for limiting the number of characters users
+    can enter.
+
+    Examples:
+
+        >>> ds.CharacterCount('test')
+        # Renders a text area
+        >>> ds.CharacterCount('test', maxchars=100)
+        # Renders a text area with a limit of 100 characters max
+        >>> ds.CharacterCount('test', maxwords=10)
+        # Renders a text area with a limit of 10 words max
+        >>> ds.CharacterCount('test', maxwords=10, threshold=50)
+        # Renders a text area with a limit of 10 words max but the message that says
+        # "You have X words left" only appears after 50% of the limit is crossed.
 
     Args:
         *args: Arguments for Field.
@@ -347,6 +448,8 @@ class CharacterCount(Field):
         maxwords (int, optional): Max words allowed. Defaults to None.
         threshold (int, optional): Threshold percent for showing count message. Defaults to None.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Character count: https://design-system.service.gov.uk/components/character-count/
     """
 
     def __init__(
@@ -366,6 +469,9 @@ class CharacterCount(Field):
 
     @Field.value.setter
     def value(self, value):
+        """
+        Assign error if user have exceeded maxchars or maxwords.
+        """
         self._value = value
         if self.required and not value:
             self.error = "This field is required."
@@ -381,10 +487,7 @@ class CharacterCount(Field):
     @property
     def textarea(self):
         """
-        Returns the textarea part of CharacterCount.
-
-        Returns:
-            FT: FastHTML Textarea component.
+        Textarea part of CharacterCount.
         """
         error_cls = " govuk-textarea--error" if self.error else ""
         return fh.Textarea(
@@ -399,10 +502,7 @@ class CharacterCount(Field):
     @property
     def message(self):
         """
-        Returns the message part of CharacterCount.
-
-        Returns:
-            FT: FastHTML message component.
+        Message part of CharacterCount.
         """
         message = (
             f"You can enter up to {self.maxchars} characters."
@@ -439,6 +539,10 @@ class CharacterCount(Field):
 
 
 class InputWidth(Enum):
+    """
+    Enum to define GOV.UK supported input widths to be passed into
+    :py:class:`TextInput` as `width` param.
+    """
     DEFAULT = 0
     W20 = 1
     W10 = 2
@@ -456,7 +560,31 @@ class InputWidth(Enum):
 
 class TextInput(Field):
     """
-    TextInput component. Inherits from Field.
+    `GOV.UK Text Input`_ component. Inherits from Field.
+
+    Use the text input component when you need to let users enter text that is no longer than a
+    single line, such as their name or email address.
+
+    Examples:
+
+        >>> ds.TextInput('test')
+        # Renders a standard text input
+        >>> ds.TextInput('test', width=InputWidth.W50)
+        # Renders a text input with a width of 50%
+        >>> ds.TextInput('test', prefix="£")
+        # Renders a text input with a prefix of "£"
+        >>> ds.TextInput('test', suffix="%")
+        # Renders a text input with a suffix of "%"
+        >>> ds.TextInput('test', autocomplete="postal-code")
+        # Renders a text input that uses the autocomplete features in
+        # modern browsers to fill-in the postcode
+        >>> ds.TextInput('test', numeric=True)
+        # Renders a text input that uses the numeric keypad on devices
+        # with on-screen keyboards.
+        >>> ds.TextInput('test', spellcheck=True)
+        # Renders a text input with the spellcheck turned on
+        >>> ds.TextInput('test', extraspacing=True)
+        # Renders a text input with extra spacing
 
     Args:
         *args: Arguments for Field.
@@ -468,6 +596,8 @@ class TextInput(Field):
         spellcheck (bool, optional): Enable spellcheck. Defaults to False.
         extra_spacing (bool, optional): Extra letter spacing. Defaults to False.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Text Input: https://design-system.service.gov.uk/components/text-input/
     """
 
     def __init__(
@@ -508,6 +638,9 @@ class TextInput(Field):
 
     @property
     def input(self):
+        """
+        Input part of this component.
+        """
         error_cls = " govuk-input--error" if self.error else ""
         spacing_cls = " govuk-input--extra-letter-spacing" if self.extra_spacing else ""
         return fh.Input(
@@ -551,7 +684,24 @@ class TextInput(Field):
 
 class Checkbox(AbstractField):
     """
-    Checkbox component. Used to define individual checkboxes.
+    Checkbox component. Used to define individual checkboxes to be passed into
+    the :py:class:`Checkboxes` component.
+
+    Note that this inherits from :py:class:`AbstractField` instead of :py:class:`Field` because
+    it is only meant to be used inside the :py:class:`Checkboxes` component - which inherits from
+    :py:class:`Field`.
+
+    Examples:
+
+        >>> cb = ds.Checkbox('test', 'test', 'Test Label')
+        # Renders a Checkbox called "test" with a label "Test Label"
+        >>> cb = ds.Checkbox('test', 'test', 'Test Label', checked=True)
+        # Renders the same Checkbox but its checked by default
+        >>> cb = ds.Checkbox('test', 'test', 'Test Label', checked=True)
+        # Renders the same Checkbox but its checked by default
+        >>> cb = ds.Checkbox('test', 'test', 'Test Label', exclusive=True)
+        # Renders the same Checkbox when this checkbox it clicked, it unchecks all other
+        # checkboxes - handy for options like "None of the above"
 
     Args:
         name (str): The name of the checkbox element.
@@ -585,30 +735,21 @@ class Checkbox(AbstractField):
     @property
     def _id(self):
         """
-        Computes checkbox id from name and value.
-
-        Returns:
-            str: Computed id.
+        Checkbox id from name and value.
         """
         return f"{mkid(self.name)}-{self.value}"
 
     @property
     def label_component(self):
         """
-        Returns the Label component.
-
-        Returns:
-            FT: Label component.
+        Label component.
         """
         return Label(self._id, self.label, extra_cls=" govuk-checkboxes__label")
 
     @property
     def hint_component(self):
         """
-        Returns the Hint component.
-
-        Returns:
-            FT: Hint component.
+        Hint component.
         """
         return Hint(self._id, self.hint, extra_cls=" govuk-checkboxes__hint")
 
@@ -642,7 +783,26 @@ class Checkbox(AbstractField):
 
 class Checkboxes(Field):
     """
-    Checkboxes component. Renders a checkbox group for multiple select.
+    `GOV.UK Checkboxes`_ component. Let users select one or more options by using the checkboxes
+    component.
+
+    Use the checkboxes component when you need to help users: select multiple options from a list
+    or to toggle a single option on or off.
+
+    Use the handy "choices" parameter as a shortcut to quickly define standard checkbox groups.
+
+    Examples:
+
+        >>> ds.Checkboxes("question", choices={"yes": "Yes!", "no": "Maybe later.."})
+        # Renders checkboxes called "question" with values "yes" and "no" with texts
+        # "Yes!" and "Maybe later.." respectively
+        >>> ds.Checkboxes("question", choices={"yes": "Yes!", "no": "Maybe later.."}, small=True)
+        # Renders the same checkbox with more compact styling
+        >>> cb_yes = ds.Checkbox("question", "yes", "Yes!")
+        >>> cb_no = ds.Checkbox("question", "no", "Maybe later..")
+        >>> ds.Checkboxes("question", cb_yes, cb_no)
+        # Renders the same checkboxes but by defining individual components, we can use
+        # all of the underlying configurations
 
     Args:
         *args: Arguments for Field.
@@ -650,6 +810,8 @@ class Checkboxes(Field):
         choices (dict, optional): Shorthand for simple checkboxes.
         small (bool, optional): Renders small Checkboxes. Defaults to False.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Checkboxes: https://design-system.service.gov.uk/components/checkboxes/
     """
 
     def __init__(
@@ -669,11 +831,18 @@ class Checkboxes(Field):
 
     @property
     async def clean(self):
+        """
+        Get "clean" data from a field when a form is being processed
+        by a form Backend.
+        """
         for cb in self.checkboxes:
             if cb.value == self.value:
                 return cb.label
 
     def make_checkboxes(self):
+        """
+        Make checkboxes from choices.
+        """
         for value, label in self.choices.items():
             cb = Checkbox(self.name, value, label)
             self.checkboxes.append(cb)
@@ -709,7 +878,21 @@ class Checkboxes(Field):
 
 class Radio(AbstractField):
     """
-    Radio component. Used to define individual radios.
+    Radio component. Used to define individual radioes to be passed into
+    the :py:class:`Radios` component.
+
+    Note that this inherits from :py:class:`AbstractField` instead of :py:class:`Field` because
+    it is only meant to be used inside the :py:class:`Radios` component - which inherits from
+    :py:class:`Field`.
+
+    Examples:
+
+        >>> cb = ds.Radio('test', 'test', 'Test Label')
+        # Renders a radio called "test" with a label "Test Label"
+        >>> cb = ds.Radio('test', 'test', 'Test Label', checked=True)
+        # Renders the same radio but its checked by default
+        >>> cb = ds.Radio('test', 'test', 'Test Label', checked=True)
+        # Renders the same radio but its checked by default
 
     Args:
         name (str): The name of the radio element.
@@ -744,40 +927,37 @@ class Radio(AbstractField):
     def _id(self):
         """
         Computes radio id from name and value.
-
-        Returns:
-            str: Computed id.
         """
         return f"{mkid(self.name)}-{self.value}"
 
     @property
     def label_component(self):
         """
-        Returns the Label component.
-
-        Returns:
-            FT: Label component.
+        Label component.
         """
         return Label(self._id, self.label, extra_cls=" govuk-radios__label")
 
     @property
     def hint_component(self):
         """
-        Returns the Hint component.
-
-        Returns:
-            FT: Hint component.
+        Hint component.
         """
         return Hint(self._id, self.hint, extra_cls=" govuk-radios__hint")
 
     @property
     def data_aria_controls(self):
+        """
+        Aria-controls component.
+        """
         if self.reveal:
             return f"conditional-{self._id}"
         return None
 
     @property
     def base_radio(self):
+        """
+        Base radio component.
+        """
         return fh.Div(
             fh.Input(
                 self.label_component,
@@ -795,6 +975,9 @@ class Radio(AbstractField):
 
     @property
     def _reveal(self):
+        """
+        Reveal component.
+        """
         return fh.Div(
             self.reveal,
             cls="govuk-radios__conditional govuk-radios__conditional--hidden",
@@ -825,7 +1008,25 @@ class Radio(AbstractField):
 
 class Radios(Field):
     """
-    Radios component. Renders a radio group for single select.
+    `GOV.UK Radios`_ component. Use the radios component when users can only select one option
+    from a list.
+
+    Use the handy "choices" parameter as a shortcut to quickly define standard radio groups.
+
+    Examples:
+
+        >>> ds.Radios("question", choices={"yes": "Yes!", "no": "Maybe later.."})
+        # Renders radios called "question" with values "yes" and "no" with texts
+        # "Yes!" and "Maybe later.." respectively
+        >>> ds.Radios("question", choices={"yes": "Yes!", "no": "Maybe later.."}, small=True)
+        # Renders the same checkbox with more compact styling
+        >>> ds.Radios("question", choices={"yes": "Yes!", "no": "Maybe later.."}, inline=True)
+        # Renders the same checkbox with inline styling
+        >>> yes = ds.Radio("question", "yes", "Yes!")
+        >>> no = ds.Radio("question", "no", "Maybe later..")
+        >>> ds.Radios("question", yes, no)
+        # Renders the same radios but by defining individual components, we can use
+        # all of the underlying configurations
 
     Args:
         *args: Arguments for Field.
@@ -834,6 +1035,8 @@ class Radios(Field):
         small (bool, optional): Renders small Radios. Defaults to False.
         inline (bool, optional): Renders inline Radios. Defaults to False.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Radios: https://design-system.service.gov.uk/components/radios/
     """
 
     def __init__(
@@ -855,16 +1058,26 @@ class Radios(Field):
 
     @property
     async def clean(self):
+        """
+        Get "clean" data from a field when a form is being processed
+        by a form Backend.
+        """
         for radio in self.radios:
             if radio.value == self.value:
                 return radio.label
 
     def make_radios(self):
+        """
+        Make radios from choices.
+        """
         for value, label in self.choices.items():
             radio = Radio(self.name, value, label)
             self.radios.append(radio)
 
     def insert_divider(self):
+        """
+        Insert "or" if there are more than 2 radios.
+        """
         if len(self.radios) <= 2:
             return self.radios
         divider = fh.Div("or", cls="govuk-radios__divider")
@@ -904,11 +1117,25 @@ class Radios(Field):
 
 class FileUpload(Field):
     """
-    FileUpload component. Renders a file upload field.
+    `GOV.UK File upload`_ component. Renders a file upload field to help users select and
+    upload a file.
+
+    To upload a file, the user can either: use the "Choose file" button or drag and drop a
+    file into the file upload input area.
+
+    It is recommended that you should only ask users to upload something if it's critical to
+    the delivery of your service.
+
+    Examples:
+
+        >>> ds.FileUpload("test")
+        # Renders a file upload field called "test"
 
     Args:
         *args: Arguments for Field.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK File upload: https://design-system.service.gov.uk/components/radios/
     """
 
     def __init__(self, *args, **kwargs):
@@ -916,11 +1143,17 @@ class FileUpload(Field):
 
     @property
     def valid_file(self):
+        """
+        Is the uploaded file valid?
+        """
         filename = getattr(self.value, "filename", None)
         return filename is not None
 
     @Field.value.setter
     def value(self, value):
+        """
+        Checks if the file is valid and assign error accordingly.
+        """
         self._value = value
         if self.required and not self.valid_file:
             self.error = "This field is required."
@@ -928,6 +1161,10 @@ class FileUpload(Field):
 
     @property
     async def clean(self):
+        """
+        Get "clean" data from a field when a form is being processed
+        by a form Backend.
+        """
         # field was not required
         if not self.value:
             return None
@@ -979,7 +1216,10 @@ def _date_input_item(
     name: str, suffix: str, width: int = 2, value: str = "", error: bool = False
 ):
     """
-    Date Input item e.g. Day, Month, Year.
+    Date Input item e.g. Day, Month or Year used to produce underlying inputs
+    in the composite field that is the :py:class:`DateInput` component.
+
+    TODO: This should probably be a property in DateInput.
 
     Args:
         name (str): Name of the parent DateField.
@@ -1013,11 +1253,25 @@ def _date_input_item(
 
 class DateInput(Field):
     """
-    DateInput component. Renders GDS-style composite field with day, month, year.
+    `GOV.UK Date input`_ component. Renders GDS-style composite field with day, month, year.
+
+    You should use the date input component to help users enter a memorable date or one they
+    can easily look up.
+
+    Examples:
+
+        >>> ds.DateInput("dob")
+        # Renders the classic GOV.UK 3-input - Day, Month, Year - date field.
+
+    See :py:class:`fast_gov_uk.design_system.contrib.PastDateInput` and
+    :py:class:`fast_gov_uk.design_system.contrib.FutureDateInput` for fields
+    that validate whether the date should be in the past or future respectively.
 
     Args:
         *args: Arguments for Field.
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Date input: https://design-system.service.gov.uk/components/date-input/
     """
 
     def __init__(self, *args, **kwargs):
@@ -1029,6 +1283,10 @@ class DateInput(Field):
 
     @property
     async def clean(self):
+        """
+        Get "clean" data from a field when a form is being processed
+        by a form Backend.
+        """
         # Field not required
         if self.value == ["", "", ""]:
             return None
@@ -1042,6 +1300,9 @@ class DateInput(Field):
 
     @value.setter
     def value(self, value):
+        """
+        Sets date value as well as error if the date value is invalid.
+        """
         self._value = value or ("", "", "")
         day, month, year = self._value
         if self.required:
@@ -1057,10 +1318,7 @@ class DateInput(Field):
     @property
     def day_field(self):
         """
-        Returns the day field component of DateInput.
-
-        Returns:
-            FT: Day field component.
+        Day field component.
         """
         return _date_input_item(
             self.name,
@@ -1072,10 +1330,7 @@ class DateInput(Field):
     @property
     def month_field(self):
         """
-        Returns the month field component of DateInput.
-
-        Returns:
-            FT: Month field component.
+        Month field component.
         """
         return _date_input_item(
             self.name,
@@ -1087,10 +1342,7 @@ class DateInput(Field):
     @property
     def year_field(self):
         """
-        Returns the year field component of DateInput.
-
-        Returns:
-            FT: Year field component.
+        Year field component.
         """
         return _date_input_item(
             self.name,
@@ -1101,6 +1353,14 @@ class DateInput(Field):
         )
 
     def __ft__(self, *children, **kwargs) -> fh.FT:
+        """
+        Renders the date input field as a FastHTML component.
+        Args:
+            *children: Optional children components.
+            **kwargs: Additional keyword arguments.
+        Returns:
+            FT: FastHTML component for DateInput.
+        """
         return super().__ft__(
             fh.Fieldset(
                 fh.Div(
@@ -1119,6 +1379,10 @@ class DateInput(Field):
 
 
 class ButtonStyle(Enum):
+    """
+    Enum to define GOV.UK supported button styles to be passed into
+    :py:class:`Button` as `style` param.
+    """
     PRIMARY = 1
     SECONDARY = 2
     WARNING = 3
@@ -1133,7 +1397,32 @@ def Button(
     **kwargs,
 ) -> fh.FT:
     """
-    Button component.
+    `GOV.UK Button`_ component used to help users carry out an action like starting an
+    application or saving their information.
+
+    Write button text in sentence case, describing the action it performs. For example:
+
+    - "Start now" at the start of your service
+    - "Sign in" to an account a user has already created
+    - "Continue" when the service does not save a user"s information
+    - "Save and continue" when the service does save a user"s information
+    - "Save and come back later" when a user can save their information and come back later
+    - "Add another" to add another item to a list or group
+    - "Pay" to make a payment
+    - "Confirm and send" on a Check answers page that does not have any legal content a user must agree to
+    - "Accept and send" on a Check answers page that has legal content a user must agree to
+    - "Sign out" when a user is signed in to an account
+
+    Examples:
+
+        >>> ds.Button("Submit")
+        # Renders a default button called "Submit"
+        >>> ds.Button("Cancel", ButtonStyle.WARNING)
+        # Renders a warning button
+        >>> ds.Button("Cancel", disabled=True)
+        # Renders a disabled button
+        >>> ds.Button("Cancel", prevent_double_click=True)
+        # Renders a button with some js that prevents double clicks - useful for payments
 
     Args:
         text (str): The text on the Button component.
@@ -1144,6 +1433,8 @@ def Button(
 
     Returns:
         FT: A FastHTML Button component.
+
+    .. _GOV.UK Button: https://design-system.service.gov.uk/components/button/
     """
     btn_cls = {
         ButtonStyle.PRIMARY: "govuk-button",
@@ -1165,7 +1456,13 @@ def Button(
 
 def StartButton(text: str, href: str, **kwargs) -> fh.FT:
     """
-    StartButton component for call-to-actions. Does not submit form data.
+    `GOV.UK Start Button`_ component for call-to-actions. Does not submit form data.
+
+    Examples:
+
+        >>> ds.StartButton("Lets go")
+        # Renders a start button with the label "Lets go"
+        # This button acts more like a link - it results in a GET request instead of POST
 
     Args:
         text (str): Text on the Button component.
@@ -1174,6 +1471,8 @@ def StartButton(text: str, href: str, **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML StartButton component.
+
+    .. _GOV.UK Start Button: https://design-system.service.gov.uk/components/button/
     """
     icon = fh.NotStr(
         '<svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" '
@@ -1195,7 +1494,16 @@ def StartButton(text: str, href: str, **kwargs) -> fh.FT:
 
 def ButtonGroup(*buttons: fh.FT, **kwargs) -> fh.FT:
     """
-    ButtonGroup component.
+    `GOV.UK Button Group`_ component.
+
+    Use a button group when two or more buttons are placed together.
+
+    Examples:
+
+        >>> continue = ds.Button("Continue")
+        >>> cancel = ds.Button("Cancel")
+        >>> ds.ButtonGroup(contiue, cancel)
+        # Renders a button group
 
     Args:
         *buttons (FT): List of Button components.
@@ -1203,6 +1511,8 @@ def ButtonGroup(*buttons: fh.FT, **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML component.
+
+    .. _GOV.UK Button Group: https://design-system.service.gov.uk/components/button/
     """
     return fh.Div(
         *buttons,
@@ -1215,12 +1525,30 @@ def CookieBanner(
     service_name: str,
     *content: fh.FT,
     cookie_page_link: str = "/cookies",
-    cookie_form_link: str = "/",
+    cookie_form_link: str = "/cookie-banner",
     confirmation: bool = False,
     **kwargs,
 ) -> fh.FT:
     """
-    CookieConfirmation component.
+    `GOV.UK Cookie Banner`_ component.
+
+    Allow users to accept or reject cookies which are not essential to making your service work.
+
+    This component needs links to 2 endpoints on the service -
+
+        1. `cookie_page_link` is a link to the cookies page for your service.
+        2. `cookie_form_link` is a link to the cookies form that processes the data when a user submits their cookie preferences through this component.
+
+    Fast-gov-uk comes out of the box with default, minimal implementations of both. In fact,
+    fast-gov-uk comes out of the box with a cookie banner for essentail cookies.
+
+    In view of the above, you would only use this component if you are creating a custom cookie
+    banner for your service.
+
+    Examples:
+
+        >>> ds.CookieBanner("Test")
+        # Renders a standard cookie banner for essential cookies that works out of the box
 
     Args:
         service_name (str): Name of the service.
@@ -1232,6 +1560,8 @@ def CookieBanner(
 
     Returns:
         FT: A FastHTML CookieConfirmation component.
+
+    .. _GOV.UK Cookie Banner: https://design-system.service.gov.uk/components/cookie-banner/
     """
     banner_buttons = ButtonGroup(
         Button("Accept additional cookies", value="yes", name="cookies[additional]"),
@@ -1275,7 +1605,20 @@ def CookieBanner(
 
 class Fieldset(AbstractField):
     """
-    Fieldset component.
+    `GOV.UK Fieldset`_ component used to group related form fields.
+
+    Use the fieldset component when you need to show a relationship between multiple form inputs.
+    For example, you may need to group a set of text inputs into a single fieldset when asking for
+    an address in your service.
+
+    Examples:
+
+        >>> address1 = ds.TextInput("address1", label="Address line 1")
+        >>> address2 = ds.TextInput("address2", label="Address line 2")
+        >>> town = ds.TextInput("town", label="Town or city")
+        >>> postcode = ds.TextInput("postcode", label="Postcode")
+        >>> ds.Fieldset(address1, address2, town, postcode)
+        # Renders an address fieldset containing multiple, related fields
 
     Args:
         *fields (Field): Fields to include in the fieldset.
@@ -1283,6 +1626,8 @@ class Fieldset(AbstractField):
         legend (str, optional): The legend text for the fieldset.
         heading (str, optional): Heading size. Defaults to "l".
         **kwargs: Additional keyword arguments.
+
+    .. _GOV.UK Fieldset: https://design-system.service.gov.uk/components/fieldset/
     """
 
     def __init__(self, *fields: Field, name: str = "", legend: str = "", heading: str = "l", **kwargs):

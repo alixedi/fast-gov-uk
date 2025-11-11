@@ -36,4 +36,4 @@ html_static_path = ['_static']
 
 # Added by Ali
 napoleon_google_docstring = True
-toc_object_entries_show_parents = True
+toc_object_entries_show_parents = 'all'
