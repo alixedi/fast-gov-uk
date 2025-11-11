@@ -1,3 +1,7 @@
+"""
+This includes simple, static, SVG components e.g. GOV.UK Logo.
+"""
+
 import fasthtml.common as fh
 
 
