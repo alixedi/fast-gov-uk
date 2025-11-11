@@ -5,7 +5,15 @@ from .utils import mkid
 
 def Inset(text: str, **kwargs) -> fh.FT:
     """
-    Inset text component.
+    `GOV.UK Inset text`_ component. Use the inset text component to differentiate
+    a block of text from the content that surrounds it, for example: quotes, examples
+    and additional information about the page.
+
+    Examples:
+
+        >>> inset = ds.Inset("This is an inset text")
+        # Renders inset text -
+        # | This is an inset text
 
     Args:
         text (str): The main text to display.
@@ -13,6 +21,8 @@ def Inset(text: str, **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML Inset text component.
+
+    .. _GOV.UK Inset text: https://design-system.service.gov.uk/components/inset-text/
     """
     return fh.Div(text, cls="govuk-inset-text", **kwargs)
 
@@ -24,7 +34,15 @@ def Detail(
     **kwargs,
 ) -> fh.FT:
     """
-    Detail component.
+    `GOV.UK Detail`_ component to make a page easier to scan by letting users reveal
+    more detailed information only if they need it.
+
+    Examples:
+
+        >>> detail = ds.Detail("More details", "This is the detailed content.")
+        # Renders detail component with summary and content.
+        # ▼ More details
+        # | This is the detailed content.
 
     Args:
         summary (str): The summary text for the detail.
@@ -34,6 +52,8 @@ def Detail(
 
     Returns:
         FT: A FastHTML Detail component.
+
+    .. _GOV.UK Detail: https://design-system.service.gov.uk/components/details/
     """
     return fh.Details(
         fh.Summary(
@@ -56,7 +76,17 @@ def Panel(
     **kwargs,
 ) -> fh.FT:
     """
-    Panel component.
+    `GOV.UK Panel`_ component - a visible container used on confirmation or
+    results pages to highlight important content.
+
+    Examples:
+
+        >>> panel = ds.Panel("Panel content.", title="Test")
+        # Renders panel component with title and content.
+        # -----------------------
+        # | Test
+        # | Panel content.
+        # -----------------------
 
     Args:
         *content (FT or str): The content to display in the panel.
@@ -65,6 +95,8 @@ def Panel(
 
     Returns:
         FT: A FastHTML Panel component.
+
+    .. _GOV.UK Panel: https://design-system.service.gov.uk/components/panel/
     """
     return fh.Div(
         fh.H1(title, cls="govuk-panel__title") if title else "",
@@ -80,7 +112,13 @@ def Tag(
     **kwargs,
 ) -> fh.FT:
     """
-    Tag component.
+    `GOV.UK Tag`_ component used to show users the status of something.
+
+    Examples:
+
+        >>> tag = ds.Tag("In progress", color="blue")
+        # Renders tag component with blue color.
+        # [ In progress ]
 
     Args:
         text (str): The text to display in the tag.
@@ -89,6 +127,8 @@ def Tag(
 
     Returns:
         FT: A FastHTML Tag component.
+
+    .. _GOV.UK Tag: https://design-system.service.gov.uk/components/tag/
     """
     colors = {
         "": "",
@@ -111,7 +151,15 @@ def Warning(
     **kwargs,
 ) -> fh.FT:
     """
-    Warning component.
+    `GOV.UK Warning`_ text component used when you need to warn users about
+    something important, such as legal consequences of an action, or lack
+    of action, that they might take.
+
+    Examples:
+
+        >>> warning = ds.Warning("This is a warning message.")
+        # Renders warning component with content.
+        # ! This is a warning message.
 
     Args:
         *content (FT or str): The content to display in the warning.
@@ -119,6 +167,8 @@ def Warning(
 
     Returns:
         FT: A FastHTML Warning component.
+
+    .. _GOV.UK Warning: https://design-system.service.gov.uk/components/warning-text/
     """
     return fh.Div(
         fh.Span(
@@ -142,7 +192,13 @@ def NotificatonLink(
     **kwargs,
 ) -> fh.FT:
     """
-    NotificationLink component.
+    NotificationLink component used in :py:meth:`Notification`.
+
+    Examples:
+
+        >>> link = ds.NotificatonLink("Click here", href="/more-info")
+        >>> str(link)
+        <a class="govuk-notification-banner__link" href="/more-info">Click here</a>
 
     Args:
         text (str): The text to display in the link.
@@ -158,7 +214,13 @@ def NotificatonLink(
 
 def NotificatonHeading(*content: fh.FT | str, **kwargs) -> fh.FT:
     """
-    Notification heading component.
+    Notification heading component usef in :py:meth:`Notification`.
+
+    Examples:
+
+        >>> heading = ds.NotificatonHeading("Important update")
+        >>> str(heading)
+        <p class="govuk-notification-banner__heading">Important update</p>
 
     Args:
         *content (FT or str): The content to display in the heading.
@@ -181,7 +243,31 @@ def Notification(
     **kwargs,
 ) -> fh.FT:
     """
-    Notification banner component.
+    `GOV.UK Notification banner`_ component used to tell the user about something
+    they need to know about, but that's not directly related to the page content.
+
+    A notification banner lets you tell the user about something that's not directly
+    relevant to the thing they're trying to do on that page of the service.
+
+    For example:
+
+        - telling the user about a problem that's affecting the service as a whole
+        - telling the user about something that affects them in particular
+        - telling the user about the outcome of something they've just done on a previous page
+
+    Examples:
+
+        >>> notification = ds.Notification(
+        ...     ds.NotificatonHeading("Service update"),
+        ...     "Our service will be down for maintenance on Saturday.",
+        ...     title="Important",
+        ... )
+        # Renders notification banner with heading and content.
+        # ------------------------------
+        # | Important
+        # | Service update
+        # | Our service will be down for maintenance on Saturday.
+        # ------------------------------
 
     Args:
         *content (FT): The content to display in the notification banner.
@@ -191,6 +277,8 @@ def Notification(
 
     Returns:
         FT: A FastHTML Notification component.
+
+    .. _GOV.UK Notification banner: https://design-system.service.gov.uk/components/notification-banner/
     """
     success_cls = " govuk-notification-banner--success" if success else ""
     return fh.Div(
@@ -213,7 +301,7 @@ def Notification(
 
 def _accordion_section(accordion_id, n, heading, summary, content, open=False):
     """
-    Helper function to create an accordion section.
+    Helper function to create an accordion section for :py:meth:`Accordion`.
 
     Args:
         accordion_id (str): Id for accordion.
@@ -257,7 +345,31 @@ def _accordion_section(accordion_id, n, heading, summary, content, open=False):
 
 def Accordion(*sections: dict, accordion_id="accordion", **kwargs) -> fh.FT:
     """
-    Accordion component.
+    `GOV.UK Accordion`_ component - lets users show and hide sections of
+    related content on a page.
+
+    Only use an accordion if there's evidence it's helpful for the user to:
+
+        - see an overview of multiple, related sections of content
+        - choose to show and hide sections that are relevant to them
+        - look across information that might otherwise be on different pages
+
+    Examples:
+
+        >>> accordion = ds.Accordion(
+        ...     {"heading": "Section 1", "content": "Content 1.", "open": True},
+        ...     {"heading": "Section 2", "summary": "Summary 2.", "content": "Content 2."},
+        ... )
+        # Renders accordion with two sections, second section is open by default.
+        # ------------------------------
+        # | Section 1
+        # | ▲ Hide
+        # | Content for section 1.
+        # ------------------------------
+        # | Section 2
+        # | Summary for section 2.
+        # | ▼ Show
+        # ------------------------------
 
     Args:
         *sections (dict): Sections to include in the accordion.
@@ -266,6 +378,8 @@ def Accordion(*sections: dict, accordion_id="accordion", **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML Accordion component.
+
+    .. _GOV.UK Accordion: https://design-system.service.gov.uk/components/accordion/
     """
     return fh.Div(
         *[
@@ -287,7 +401,7 @@ def Accordion(*sections: dict, accordion_id="accordion", **kwargs) -> fh.FT:
 
 def _tab_panel(heading, content, active=False):
     """
-    Helper function to create a tab panel.
+    Helper function to create a tab panel for :py:meth:`Tab`.
 
     Args:
         heading (str): The heading of the panel.
@@ -309,7 +423,7 @@ def _tab_panel(heading, content, active=False):
 
 def _tab_li(heading, active=False):
     """
-    Helper function to create a tab list item.
+    Helper function to create a tab list item for :py:meth:`Tab`.
 
     Args:
         heading (str): The heading of the tab.
@@ -332,7 +446,29 @@ def _tab_li(heading, active=False):
 
 def Tab(*panels: dict, title="", **kwargs) -> fh.FT:
     """
-    Tab component.
+    `GOV.UK Tab`_ componen - lets users navigate between related sections
+    of content, displaying one section at a time.
+
+    Tabs can be a helpful way of letting users quickly switch between related
+    information if:
+
+        - your content can be usefully separated into clearly labelled sections
+        - the first section is more relevant than the others for most users
+        - users will not need to view all the sections at once
+
+    Examples:
+
+        >>> tab = ds.Tab(
+        ...     {"heading": "Tab 1", "content": "Content 1."},
+        ...     {"heading": "Tab 2", "content": "Content 2."},
+        ...     title="Example Tabs",
+        ... )
+        # Renders tab component with two panels.
+        # ------------------------------
+        # | Example Tabs
+        # | [Tab 1] Tab 2
+        # | Content 1.
+        # ------------------------------
 
     Args:
         *panels (dict): Panels to include in the tab.
@@ -341,6 +477,8 @@ def Tab(*panels: dict, title="", **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML Tab component.
+
+    .. _GOV.UK Tab: https://design-system.service.gov.uk/components/tabs/
     """
     return fh.Div(
         fh.H2(title, cls="govuk-tabs__title"),
@@ -363,7 +501,22 @@ def Tab(*panels: dict, title="", **kwargs) -> fh.FT:
 
 def ErrorSummary(title: str, *links: fh.FT, **kwargs) -> fh.FT:
     """
-    ErrorSummary component.
+    `GOV.UK Error Summary`_ component used at the top of a page to summarise
+    any errors a user has made.
+
+    Examples:
+
+        >>> error_summary = ds.ErrorSummary(
+        ...     "There is a problem",
+        ...     ds.A("Error 1", href="#error1"),
+        ...     ds.A("Error 2", href="#error2"),
+        ... )
+        # Renders error summary component with title and links.
+        # ------------------------------
+        # | There is a problem
+        # | - Error 1
+        # | - Error 2
+        # ------------------------------
 
     Args:
         title (str): The title of the ErrorSummary component.
@@ -372,6 +525,8 @@ def ErrorSummary(title: str, *links: fh.FT, **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML ErrorSummary component.
+
+    .. _GOV.UK Error Summary: https://design-system.service.gov.uk/components/error-summary/
     """
     return fh.Div(
         fh.Div(
@@ -395,6 +550,9 @@ def ErrorSummary(title: str, *links: fh.FT, **kwargs) -> fh.FT:
 
 
 def _table_head(headers, numeric_cols, col_width):
+    """
+    Helper function to create a table head for :py:meth:`Table`.
+    """
     ths = []
     for header in headers:
         cls = "govuk-table__header"
@@ -412,6 +570,9 @@ def _table_head(headers, numeric_cols, col_width):
 
 
 def _table_body(data, header_cols, numeric_cols):
+    """
+    Helper function to create a table body for :py:meth:`Table`.
+    """
     trs = []
     for row in data:
         tds = []
@@ -441,7 +602,30 @@ def Table(
     **kwargs,
 ) -> fh.FT:
     """
-    Table component.
+    `GOV.UK Table`_ component - use this component to make information easier to compare
+    and scan for users.
+
+    Examples:
+
+        >>> table = ds.Table(
+        ...     data=[
+        ...         {"Name": "Alice", "Age": 30, "City": "London"},
+        ...         {"Name": "Bob", "Age": 25, "City": "Manchester"},
+        ...     ],
+        ...     caption="User Information",
+        ...     header_cols=["Name"],
+        ...     numeric_cols=["Age"],
+        ...     col_width={"Name": "one-third", "Age": "one-sixth", "City": "half"},
+        ...     small_text=True,
+        ... )
+        # Renders table component with caption, header columns, numeric columns, column widths, and small text.
+        # ----------------------------------------------
+        # | User Information
+        # | Name       |  Age  |      City
+        # | ----------------------------------------------
+        # | Alice      |   30  |     London
+        # | Bob        |   25  |  Manchester
+        # ----------------------------------------------
 
     Args:
         data (list[dict]): Data for the Table component.
@@ -454,6 +638,8 @@ def Table(
 
     Returns:
         FT: A FastHTML Table component.
+
+    .. _GOV.UK Table: https://design-system.service.gov.uk/components/table/
     """
     header_cols = header_cols or []
     numeric_cols = numeric_cols or []
@@ -477,7 +663,7 @@ def Task(
     **kwargs,
 ) -> fh.FT:
     """
-    Task component.
+    Task component used in :py:meth:`TaskList`.
 
     Args:
         label (str): Label for the Task item.
@@ -534,7 +720,28 @@ def TaskList(
     **kwargs,
 ) -> fh.FT:
     """
-    TaskList component.
+    `GOV.UK TaskList`_ component.
+
+    The task list component displays all the tasks a user needs to do, and allows users
+    to easily identify which ones are done and which they still need to do.
+
+    Use the task list if there's evidence that users:
+
+        - do not want to, or cannot, complete all the tasks in one sitting
+        - need to be able to choose the order they complete the tasks in
+
+    Examples:
+
+        >>> task_list = ds.TaskList(
+        ...     ds.Task("Task 1", href="/task-1", completed=True),
+        ...     ds.Task("Task 2", href="/task-2", completed=False, hint="This is a hint."),
+        ... )
+        # Renders task list component with two tasks.
+        # ------------------------------
+        # | Task 1            | Completed
+        # | Task 2            | Incomplete
+        # | This is a hint.
+        # ------------------------------
 
     Args:
         *tasks (FT): Tasks for the TaskList.
@@ -542,6 +749,8 @@ def TaskList(
 
     Returns:
         FT: A FastHTML TaskList component.
+
+    .. _GOV.UK TaskList: https://design-system.service.gov.uk/components/task-list/
     """
     return fh.Ul(
         *[task for task in tasks],
@@ -552,7 +761,7 @@ def TaskList(
 
 def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT, **kwargs):
     """
-    SummaryRow component - a list of these goes in to form a SummaryList.
+    SummaryRow component - a list of these goes in to form a :py:meth:`SummaryList`.
 
     Args:
         key (str): Key for the SummaryRow.
@@ -598,7 +807,25 @@ def SummaryItem(key: str, value: str | fh.FT, *actions: fh.FT, **kwargs):
 
 def SummaryList(*items: fh.FT, border: bool = True, **kwargs) -> fh.FT:
     """
-    SummaryList component.
+    `GOV.UK Summary List`_ component.
+
+    Use a summary list to summarise information, for example, a user's responses at
+    the end of a form.
+
+    :py:meth:`SummaryItem` represents a single row in the summary list, and
+    :py:meth:`SummaryCard` is a higher-level component that uses :py:meth:`SummaryList`.
+
+    Examples:
+
+        >>> summary_list = ds.SummaryList(
+        ...     ds.SummaryItem("Name", "Alice", ds.A("Change", href="/change-name")),
+        ...     ds.SummaryItem("Age", "30", ds.A("Change", href="/change-age")),
+        ... )
+        # Renders summary list component with two items.
+        # ------------------------------
+        # | Name       | Alice        | Change
+        # | Age        | 30           | Change
+        # ------------------------------
 
     Args:
         *items (FT): List of SummaryItems.
@@ -607,6 +834,8 @@ def SummaryList(*items: fh.FT, border: bool = True, **kwargs) -> fh.FT:
 
     Returns:
         FT: A FastHTML SummaryList component.
+
+    .. _GOV.UK Summary List: https://design-system.service.gov.uk/components/summary-list/
     """
     no_border_cls = "" if border else " govuk-summary-list--no-border"
     return fh.Dl(
@@ -620,7 +849,28 @@ def SummaryCard(
     title: str, summary_list: fh.FT, actions: list[fh.FT] | None = None, **kwargs
 ) -> fh.FT:
     """
-    SummaryCard component.
+    `GOV.UK Summary Card`_ component.
+
+    If you're showing multiple summary lists on a page, you can show each list within a
+    summary card. This lets you visually separate each summary list and give each a title
+    and some actions.
+
+    Examples:
+
+        >>> summary_card = ds.SummaryCard(
+        ...     title="Your details",
+        ...     summary_list=ds.SummaryList(
+        ...         ds.SummaryItem("Name", "Alice", ds.A("Change", href="/change-name")),
+        ...         ds.SummaryItem("Age", "30", ds.A("Change", href="/change-age")),
+        ...     ),
+        ...     actions=[ds.A("Delete", href="/delete")],
+        ... )
+        # Renders summary card component with title, summary list, and actions.
+        # ------------------------------
+        # | Your details         | Delete
+        # | Name       | Alice        | Change
+        # | Age        | 30           | Change
+        # ------------------------------
 
     Args:
         title (str): Title of the card.
@@ -630,6 +880,8 @@ def SummaryCard(
 
     Returns:
         FT: A FastHTML component.
+
+    .. _GOV.UK Summary List: https://design-system.service.gov.uk/components/summary-list/
     """
     actions = actions or []
 
