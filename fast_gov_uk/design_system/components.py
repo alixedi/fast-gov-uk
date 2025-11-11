@@ -1,3 +1,12 @@
+"""
+GOV.UK Design System components such as Inset, Detail, Panel, Tag, Warning,
+Notification, Accordion, Tab, ErrorSummary, Table, TaskList, SummaryList,
+and SummaryCard.
+
+Each component is implemented as a function that returns a FastHTML
+component with the appropriate GOV.UK classes and structure.
+"""
+
 import fasthtml.common as fh
 
 from .utils import mkid

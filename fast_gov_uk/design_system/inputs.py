@@ -1,3 +1,12 @@
+"""
+GOV.UK Design System form input components including TextInput, Textarea,
+Select, Checkboxes, Radios etc.
+
+These components are subclasses of :py:class:`Field` which provides common
+functionality like rendering labels, hints, errors, setting values, and
+validating required fields.
+"""
+
 from datetime import date
 from enum import Enum
 from pathlib import Path
