@@ -890,7 +890,7 @@ def SummaryCard(
     Returns:
         FT: A FastHTML component.
 
-    .. _GOV.UK Summary List: https://design-system.service.gov.uk/components/summary-list/
+    .. _GOV.UK Summary Card: https://design-system.service.gov.uk/components/summary-list/
     """
     actions = actions or []
 
