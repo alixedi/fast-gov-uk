@@ -246,7 +246,7 @@ wheels = [
 [[package]]
 name = "fast-gov-uk"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "notifications-python-client" },
     { name = "python-fasthtml" },
