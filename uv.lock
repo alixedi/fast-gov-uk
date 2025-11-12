@@ -245,7 +245,7 @@ wheels = [
 
 [[package]]
 name = "fast-gov-uk"
-version = "0.1.0"
+version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "notifications-python-client" },
