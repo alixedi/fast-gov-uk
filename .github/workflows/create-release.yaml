@@ -30,11 +30,11 @@ jobs:
         with:
           bump: ${{ steps.label.outputs.match }}
           prefix: v
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PAT_FOR_RELEASES }}
 
       - name: Create release
         id: create-release
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.next_version.outputs.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_FOR_RELEASES }}
