@@ -1,0 +1,20 @@
+name: Check pull request label
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize, labeled]
+
+jobs:
+  check_pull_request_label:
+    name: Check pull request label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v5
+
+      - name: Check for the PR label
+        uses: zwaldowski/match-label-action@v5
+        with:
+          allowed: major,minor,patch
