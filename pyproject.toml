@@ -1,9 +1,13 @@
 [project]
 name = "fast-gov-uk"
 version = "0.1.0"
-description = "Add your description here"
+description = "A toolkit for rapid development of simple gov.uk services"
 readme = "README.md"
 requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Ali Zaidi", email = "alixedi@gmail.com" }
+]
 dependencies = [
     "notifications-python-client>=10.0.1",
     "python-fasthtml>=0.12.19",
@@ -25,3 +29,12 @@ extend-exclude = ["fast_gov_uk/design_system/__init__.py"]
 [tool.ruff.format]
 quote-style = "double"
 exclude = ["fast_gov_uk/tests/*"]
+
+[project.urls]
+Homepage = "https://github.com/alixedi/fast-gov-uk"
+Repository = "https://github.com/alixedi/fast-gov-uk"
+Issues = "https://github.com/alixedi/fast-gov-uk/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
