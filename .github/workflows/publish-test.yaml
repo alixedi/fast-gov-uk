@@ -1,11 +1,13 @@
-name: Publish to TestPyPI on Release
+name: Publish to TestPyPI on Tag
 
 on:
-  release:
-    types: [published]  # Trigger when a new release is published
+  push:
+    tags:
+      - "v*"  # Trigger whenever a version tag is pushed
 
 permissions:
   contents: read
+  id-token: write  # Needed for OIDC trusted publishing
 
 jobs:
   publish:
@@ -20,7 +22,7 @@ jobs:
         id: get_version
         run: |
           TAG_NAME="${GITHUB_REF##*/}"
-          VERSION="${TAG_NAME#v}"  # Remove leading 'v' if present
+          VERSION="${TAG_NAME#v}"  # Strip leading 'v'
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Detected version: $VERSION"
 
@@ -38,9 +40,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Build package with uv
+      - name: Build package
         run: uv build
 
-      - name: Publish to TestPyPI
-        run: |
-          uv publish --repository-url https://test.pypi.org/fast-gov-uk/
+      - name: Publish to TestPyPI (trusted publishing)
+        run: uv publish --repository fast-gov-uk
