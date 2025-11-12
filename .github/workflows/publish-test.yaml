@@ -44,4 +44,4 @@ jobs:
         run: uv build
 
       - name: Publish to TestPyPI (trusted publishing)
-        run: uv publish --repository fast-gov-uk
+        run: uv publish --publish-url https://test.pypi.org/legacy/ --trusted-publishing always
