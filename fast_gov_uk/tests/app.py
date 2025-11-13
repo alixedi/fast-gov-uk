@@ -1,8 +1,8 @@
 import fasthtml.common as fh
 
-import fast_gov_uk.design_system as ds
+from fast_gov_uk import Fast
 from fast_gov_uk import forms
-from fast_gov_uk.core import Fast
+import fast_gov_uk.design_system as ds
 
 
 fast = Fast({

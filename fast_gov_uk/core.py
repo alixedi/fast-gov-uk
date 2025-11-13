@@ -67,12 +67,12 @@ class Fast(fh.FastHTML):
             max_age=24*60*60,
         )
         # Service name
-        self.service_name = settings["SERVICE_NAME"]
+        self.service_name = settings.get("SERVICE_NAME", "Fast")
         # Set up Database
-        db_url = settings["DATABASE_URL"]
+        db_url = settings.get("DATABASE_URL", ":memory:")
         self.db = fh.database(db_url)
         # Set up flag for whether we are in dev mode
-        self.dev = settings["DEV_MODE"]
+        self.dev = settings.get("DEV_MODE", True)
         # Initialize form registry
         self.forms = {}
         # Initialise wizard registry
@@ -88,7 +88,7 @@ class Fast(fh.FastHTML):
         self.route("/cookie-banner", methods=["GET", "POST"])(self.cookie_banner)
         self.route("/notifications")(self.notifications)
         # Initialise notify client
-        notify_key = settings["NOTIFY_API_KEY"]
+        notify_key = settings.get("NOTIFY_API_KEY", "")
         if notify_key:
             self.notify_client = notify.NotificationsAPIClient(notify_key)
 
