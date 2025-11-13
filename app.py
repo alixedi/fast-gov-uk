@@ -1,10 +1,8 @@
 from os import environ as env
 
-from fasthtml import common as fh
-
-import fast_gov_uk.design_system as ds
+from fast_gov_uk import Fast, serve
 from fast_gov_uk import forms
-from fast_gov_uk.core import Fast
+import fast_gov_uk.design_system as ds
 
 # This is your settings. They are set for development on your
 # own computer by default. When you are deploying your service,
@@ -429,4 +427,4 @@ def footer():
 
 
 # Serves the app
-fh.serve(app="fast")
+serve(app="fast")
