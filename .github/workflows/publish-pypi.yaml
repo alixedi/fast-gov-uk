@@ -1,4 +1,4 @@
-name: Publish to TestPyPI on Tag
+name: Publish to PyPI on Tag
 
 on:
   push:
@@ -44,4 +44,4 @@ jobs:
         run: uv build
 
       - name: Publish to TestPyPI (trusted publishing)
-        run: uv publish --publish-url https://test.pypi.org/legacy/ --trusted-publishing always
+        run: uv publish --trusted-publishing always
