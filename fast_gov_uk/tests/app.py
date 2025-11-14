@@ -173,20 +173,5 @@ def mini_equality(step=0, data=None):
 
 
 @fast.page
-def cookies():
-    return ds.Cookies()
-
-
-@fast.page
-def phase():
-    return ds.PhaseBanner(
-        ds.Span(
-            "This is a new service. Help us improve it and ",
-            ds.A("give your feedback.", href="/forms/feedback"),
-        ),
-        phase="Alpha",
-    )
-
-@fast.page
 def session(session):
     return fh.JSONResponse(session)

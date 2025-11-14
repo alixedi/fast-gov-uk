@@ -2,7 +2,7 @@ import fasthtml.common as fh
 from notifications_python_client import notifications as notify
 
 import fast_gov_uk.design_system as ds
-from fast_gov_uk.demo import demo
+from fast_gov_uk import forms
 
 
 GOV_UK_HTTP_HEADERS = [
@@ -53,6 +53,114 @@ def assets(fname: str, ext: str):
     return fh.FileResponse(f"assets/{fname}.{ext}")
 
 
+def footer():
+    """
+    Footer that will be rendered on every `Page` in the service.
+
+    You can override this like so -
+
+        @fast.page
+        def footer():
+            return ds.Footer(("My custom footer link", "/link"), ..)
+    """
+    return ds.Footer(("Cookies", "/cookies"))
+
+
+def phase():
+    """
+    Returns a phase banner snippet that is inserted into every
+    `Page` of the service using htmx.
+
+    You can override this like so -
+
+        @fast.page
+        def phase():
+            return ds.PhaseBanner(
+                ds.Span("This is a slightly older service.")
+                phase="Beta",
+            )
+    """
+    return ds.PhaseBanner(
+        ds.Span(
+            "This is a new service. Help us improve it and ",
+            ds.A("give your feedback.", href="/forms/feedback"),
+        ),
+        phase="Alpha",
+    )
+
+
+def cookies():
+    """
+    This returns the standard GDS cookies page. E.g. -
+    https://design-system.service.gov.uk/patterns/cookies-page/full-page/
+
+    It is preset to Essential cookies but if you are using more cookies,
+    you can override this as follows -
+
+        @fast.page
+        def cookies():
+            return ds.Cookies(
+                ds.H2("Analytical cookies")
+                ds.P("...")
+                ds.Table(...)
+            )
+    """
+    return ds.Cookies()
+
+
+def feedback(data=None):
+    """
+    Feedback form is common and recommended in gov.uk services. This form
+    is an attempt to reproduce -
+
+    https://www.gov.uk/service-manual/service-assessments/get-feedback-page
+
+    This forms logs the feedback. If you want to change this form or change
+    the Backend so that you get an email when a user submits feedback -
+
+        @fast.form
+        def feedback(data=None):
+            return forms.Form(
+                "feedback",
+                ...
+                backends=[forms.EmailBackend(...)]
+            )
+    """
+    # A DBForm gets saved to the database when its valid
+    return forms.Form(
+        "feedback",
+        ds.H1("Give feedback on Fast GOV UK"),
+        ds.H2("Satisfaction survey"),
+        ds.Radios(
+            name="satisfaction",
+            label="Overall, how satisfied did you feel about Fast Gov UK?",
+            choices={
+                "very-satisfied": "Very Satisfied",
+                "satisfied": "Satisfied",
+                "neutral": "Neither satisfied not dissatisfied",
+                "dissatisfied": "Dissatisfied",
+                "very-dissatisfied": "Very dissatisfied",
+            },
+            heading="s",
+        ),
+        ds.CharacterCount(
+            name="comments",
+            label="How could we improve this service?",
+            maxchars=1200,
+            required=False,
+            hint=(
+                "Do not include any personal or financial information, "
+                "for example your national insurance number."
+            ),
+            heading="s",
+        ),
+        backends=[forms.LogBackend()],
+        success_url="/",
+        data=data,
+        cta="Send feedback",
+    )
+
+
 class Fast(fh.FastHTML):
     def __init__(self, settings, *args, **kwargs):
         super().__init__(
@@ -78,14 +186,16 @@ class Fast(fh.FastHTML):
         # Initialise wizard registry
         self.wizards = {}
         # Set up routes
-        if self.dev:
-            self.route("/demo")(demo)
         self.route("/{fname:path}.{ext:static}")(assets)
         self.route("/forms/{name}", methods=["GET", "POST"])(self.process_form)
         self.route("/wizards/{name}/{step}", methods=["GET", "POST"])(
             self.process_wizard
         )
         self.route("/cookie-banner", methods=["GET", "POST"])(self.cookie_banner)
+        self.route()(footer)
+        self.route()(phase)
+        self.route()(cookies)
+        self.form()(feedback)
         self.route("/notifications")(self.notifications)
         # Initialise notify client
         notify_key = settings.get("NOTIFY_API_KEY", "")
