@@ -4,7 +4,7 @@ version = "0.0.0" # Will be replaced by GitHub Action tag
 description = "A toolkit for rapid development of simple gov.uk services"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Ali Zaidi", email = "alixedi@gmail.com" }
 ]
