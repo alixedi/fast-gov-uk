@@ -26,6 +26,7 @@ class Backend:
     async def process(self, request, name, data, *args, **kwargs):
         """
         Process the form using the backend function.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
@@ -44,6 +45,7 @@ class LogBackend(Backend):
     async def process(self, request, name, data, *args, **kwargs):
         """
         Log the form data.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
@@ -71,6 +73,7 @@ class DBBackend(Backend):
     def get_table(self):
         """
         Get or create the forms table.
+
         Returns:
             Table: The forms table.
         """
@@ -82,6 +85,7 @@ class DBBackend(Backend):
     async def process(self, request, name, data, *args, **kwargs):
         """
         Store the form data in the DB.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
@@ -101,6 +105,7 @@ class DBBackend(Backend):
 class EmailBackend(Backend):
     """
     Backend that sends submitted forms to admin email.
+
     Args:
         notify: Notification function to send emails.
     """
@@ -118,6 +123,7 @@ class EmailBackend(Backend):
     async def process(self, request, name, data, *args, **kwargs):
         """
         Send the form data via email.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
@@ -136,9 +142,11 @@ class EmailBackend(Backend):
 def _client(username, password):
     """
     Create an HTTP client with basic auth.
+
     Args:
         username (str): Username for basic auth.
         password (str): Password for basic auth.
+
     Returns:
         httpx.Client: HTTP client with basic auth.
     """
@@ -149,6 +157,7 @@ def _client(username, password):
 class APIBackend(Backend):
     """
     Backend that sends submitted forms to an API.
+
     Args:
         url (str): API endpoint URL.
         username (str): Username for basic auth.
@@ -164,6 +173,7 @@ class APIBackend(Backend):
     async def process(self, request, name, data, *args, **kwargs):
         """
         Send the form data to the API.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
@@ -187,6 +197,7 @@ class SessionBackend(Backend):
     async def process(self, request, name, data, *args, **kwargs):
         """
         Store the form data in the session.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
@@ -210,6 +221,7 @@ class QuestionBackend(Backend):
     async def process(self, request, name, data, *args, **kwargs):
         """
         Append the question data in the session.
+
         Args:
             request: The HTTP request object.
             name (str): Name of the form.
