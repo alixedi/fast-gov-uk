@@ -40,6 +40,19 @@ class Backend:
 class LogBackend(Backend):
     """
     Backend that logs form data. This is mainly useful for debugging.
+
+    Example:
+
+        .. code-block:: python
+
+            @fast.form
+            def email(data=None):
+                forms.Form(
+                    "email",
+                    ds.EmailInput("email"),
+                    backends=[forms.LogBackend()],
+                    data=data,
+                )
     """
 
     async def process(self, request, name, data, *args, **kwargs):
@@ -61,6 +74,27 @@ class LogBackend(Backend):
 class DBBackend(Backend):
     """
     Backend that stores data in the DB. Requires a `db` instance.
+
+    Example:
+
+        .. code-block:: python
+
+            @fast.form
+            def email(data=None):
+                forms.Form(
+                    "email",
+                    ds.EmailInput("email"),
+                    backends=[forms.DBBackend(db=fast.db)],
+                    data=data,
+                )
+
+    The data is stored in the "forms" table in the given database.
+    It has the following format -
+
+        - **name (str)**: name of the form e.g. "email" for our example
+        - **created_on (datetime)**: Timestamp for when the form was processed
+        - **data (dict)**: JSON blob of the form data e.g. ``{"email": ".."}`` for our example
+
 
     Args:
         db: Database instance.
@@ -104,7 +138,45 @@ class DBBackend(Backend):
 
 class EmailBackend(Backend):
     """
-    Backend that sends submitted forms to admin email.
+    Backend that sends submitted forms to the given email address.
+
+    Example:
+
+        .. code-block:: python
+
+            @fast.form
+            def email(data=None):
+                forms.Form(
+                    "email",
+                    ds.EmailInput("email"),
+                    backends=[forms.EmailBackend(
+                        fast.notify("<notify_template_id>", "test@test.com")
+                    )],
+                    data=data,
+                )
+
+    In order to use this backend, you need to -
+
+    1. create an account for your service in `GOV.UK Notify <https://www.notifications.service.gov.uk>`_
+    2. create an API key under "API Integration" and finally
+    3. pass-in your API key when instantiating ``Fast`` using environment variables like so -
+
+    .. code-block:: python
+
+        from os import environ as env
+
+        fast = Fast({
+            "NOTIFY_API_KEY": env.get("NOTIFY_API_KEY"),
+        })
+
+    You would also need to create an email template in your GOV.UK Notify service
+    account -
+
+    ::
+
+        ((service_name))
+        Someone submitted the form: “((form_name))” with the following data -
+        ((form_data))
 
     Args:
         notify: Notification function to send emails.
@@ -158,6 +230,40 @@ class APIBackend(Backend):
     """
     Backend that sends submitted forms to an API.
 
+    Example:
+
+        .. code-block:: python
+
+            @fast.form
+            def email(data=None):
+                forms.Form(
+                    "email",
+                    ds.EmailInput("email"),
+                    backends=[forms.APIBackend(
+                        url="https://test.com",
+                        username="test_user",
+                        password="test_password"
+                    )],
+                    data=data,
+                )
+
+    The format of the payload is -
+
+    ::
+
+        {
+            "form_name": "email",
+            "submitted_on": <datetime when the form was processed>,
+            "email": <email address submitted by the user>,
+            ...
+        }
+
+    This implementation is more-or-less a placeholder, an exemplar of how
+    you would implement an API backend for an API with basic HTTP auth. It
+    is likely that **your** API might use different authentication or indeed
+    a different format for the payload. If this is the case, rip-off this
+    code to write your own API backend.
+
     Args:
         url (str): API endpoint URL.
         username (str): Username for basic auth.
@@ -191,7 +297,27 @@ class APIBackend(Backend):
 
 class SessionBackend(Backend):
     """
-    Backend that stores form data to the session.
+    Backend that stores form data to the session cookie.
+
+    Example:
+
+        .. code-block:: python
+
+            @fast.form
+            def email(data=None):
+                forms.Form(
+                    "email",
+                    ds.EmailInput("email"),
+                    backends=[forms.SessionBackend()],
+                    data=data,
+                )
+
+    The format for data persisted in the session cookie for our example would be -
+
+    ::
+
+        {"email": {"email": "test@test.com"}}
+
     """
 
     async def process(self, request, name, data, *args, **kwargs):
