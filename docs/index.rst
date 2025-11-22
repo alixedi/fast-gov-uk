@@ -61,7 +61,7 @@ Next Steps
 ----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    design_system/index
    scaffolding/index
