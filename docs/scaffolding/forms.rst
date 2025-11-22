@@ -1,7 +1,7 @@
 Forms
 =====
 
-Fast-gov-uk have some handy features to build forms using the GDS design patterns.
+Fast-gov-uk have some handy features to build GDS forms.
 
 
 An Example
@@ -14,7 +14,7 @@ of every GDS service -
 .. image:: https://raw.githubusercontent.com/alixedi/fast-gov-uk/refs/heads/main/docs/_static/feedback.png
    :alt: Screenshot of the simple example
 
-The following is how you would build this form in fast-gov-uk -
+The following is how you would build this feedback form in fast-gov-uk -
 
 .. code-block:: python
     :linenos:
@@ -61,8 +61,7 @@ The following is how you would build this form in fast-gov-uk -
 
 2. The ``feedback`` function must return a ``Form`` object (see below) and it must accept
 a ``data`` argument because forms can be empty or filled and when they are filled, the
-``data`` argument would contain the values and we shall pass them in to the ``Form`` so
-that the fields can be populated with these values.
+``data`` argument would contain the values to populate the fields in our form.
 
 3. The ``Form`` class is used to define a form. A Form can have any number of fast-gov-uk
 components but it is expected that at least some of these would be ``Field`` components
@@ -70,8 +69,8 @@ as defined in ``fast_gov_uk.design_system.inputs.py`` module. Here we have a ``R
 field and a ``CharacterCount`` field.
 
 30. The ``Backend`` class defines what happens when a form is processed upon submission.
-Here we are using the ``LogBackend`` which - as the name suggests - logs the values in
-the form.
+Here we are using the ``LogBackend`` which - as the name suggests - logs the values that
+were submitted in our form.
 
 31. The ``success_url`` parameter defines the URL that we redirect to after a form is
 processed.

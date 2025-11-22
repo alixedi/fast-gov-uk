@@ -84,18 +84,18 @@ The following is a simplified implementation of the
 2. The ``equality`` function must return a ``Wizard`` object (see below) and it must accept
 ``step`` and ``data`` arguments. You can think of Wizards as a series of Forms. The ``step``
 argument identifies a form within a ``Wizard``. Each Form can be empty or filled and when
-they are filled, the ``data`` argument would contain the values and we shall pass them in
-to the ``Form`` so that the fields can be populated with these values.
+they are filled, the ``data`` argument would contain the values that we can use to populate
+our form fields.
 
 3. The ``Wizard`` class is used to define a wizard. A Wizard comprises of one or more
-``Question`` objects - which are a subclass of ``Form`` - they look like forms and they
-work like forms.
+``Question`` objects - which are a subclass of ``Form`` - and so they look like forms and
+they work like forms.
 
 25. Except, unlike ``Form`` objects, ``Question`` objects accept an argument called
-``predicates``. This is a dictionary that defines names of fields (from  previous
-steps)and the values they must have if this ``Question`` is to be showed to our user.
-In our example, we are saying that each ``Question`` following the first "permission"
-question would render only if the value of the permission question is "yes".
+``predicates``. This is a dictionary that defines the names of fields and the values they must
+have if this particular ``Question`` is to be shown to our user. In our example, we are saying
+that each ``Question`` following the first "permission" question would render only if the user
+clicked "Yes, answer the equality questions".
 
 62. Like ``Form`` objects, ``Wizard`` objects accepts a list of backends that define
 what happens when a ``Wizard`` is processed upon submission. These backends are the same

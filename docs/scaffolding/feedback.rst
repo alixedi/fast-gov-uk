@@ -15,12 +15,12 @@ Point your browser to: ``http://localhost:5001/forms/feedback``
 .. image:: https://raw.githubusercontent.com/alixedi/fast-gov-uk/refs/heads/main/docs/_static/feedback.png
    :alt: Screenshot of the simple example
 
-If you would like to over-ride the built-in form with your own, you can it easily by defining your own
+If you want to modify the built-in feedback form, you can do by defining your own
 feedback form in ``app.py``, which should override the default.
 
-In the following example, we are removing the ``comments`` field and replacing the default ``LogBackend``
-with ``EmailBackend`` - which uses GOV.UK Notify to send the contents of your form to a specified email
-address -
+In the following example, we are removing the ``comments`` field and replacing the ``LogBackend``
+with ``EmailBackend`` - which uses GOV.UK Notify to send the contents of your form to a given
+email address -
 
 .. code-block:: python
 
