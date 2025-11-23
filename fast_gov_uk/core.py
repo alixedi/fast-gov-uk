@@ -161,6 +161,22 @@ def feedback(data=None):
     )
 
 
+def notifications(session):
+    notifications = session.get("notifications", [])
+    banners = ds.Div(
+        *[
+            ds.Notification(
+                n["content"],
+                title=n["title"],
+                success=(n["title"] == "Success")
+            )
+            for n in notifications
+        ]
+    )
+    session.pop("notifications", None)
+    return banners
+
+
 class Fast(fh.FastHTML):
     def __init__(self, settings, *args, **kwargs):
         super().__init__(
@@ -196,7 +212,7 @@ class Fast(fh.FastHTML):
         self.route()(phase)
         self.route()(cookies)
         self.form()(feedback)
-        self.route("/notifications")(self.notifications)
+        self.route("/notifications")(notifications)
         # Initialise notify client
         notify_key = settings.get("NOTIFY_API_KEY", "")
         if notify_key:
@@ -293,6 +309,8 @@ class Fast(fh.FastHTML):
         return wizard
 
     def cookie_banner(self, req, post: dict, cookie_policy: str = ""):
+        # TODO: Use @fast.form decorator for this with a custom
+        # cookie backend
         banner = ds.CookieBanner(
             self.service_name,
             ds.P("We use some essential cookies to make this service work."),
@@ -316,18 +334,3 @@ class Fast(fh.FastHTML):
         notifications = session.get("notifications", [])
         notifications.append({"title": "Success" if success else "Important", "content": content})
         session["notifications"] = notifications
-
-    def notifications(self, session):
-        notifications = session.get("notifications", [])
-        banners = ds.Div(
-            *[
-                ds.Notification(
-                    n["content"],
-                    title=n["title"],
-                    success=(n["title"] == "Success")
-                )
-                for n in notifications
-            ]
-        )
-        session.pop("notifications", None)
-        return banners
