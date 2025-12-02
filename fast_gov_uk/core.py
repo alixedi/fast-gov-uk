@@ -178,7 +178,7 @@ def notifications(session):
 
 
 class Fast(fh.FastHTML):
-    def __init__(self, settings, *args, **kwargs):
+    def __init__(self, settings=None, *args, **kwargs):
         super().__init__(
             pico=False,
             hdrs=GOV_UK_HTTP_HEADERS,
@@ -190,6 +190,7 @@ class Fast(fh.FastHTML):
             session_cookie="session_cookie",
             max_age=24*60*60,
         )
+        settings = settings or {}
         # Service name
         self.service_name = settings.get("SERVICE_NAME", "Fast")
         # Set up Database
