@@ -66,7 +66,10 @@ def footer():
         def footer():
             return ds.Footer(("My custom footer link", "/link"), ..)
     """
-    return ds.Footer(("Cookies", "/cookies"))
+    return ds.Footer(
+        ("Cookies", "/cookies"),
+        ("Give feedback", "/forms/feedback"),
+    )
 
 
 def phase():
