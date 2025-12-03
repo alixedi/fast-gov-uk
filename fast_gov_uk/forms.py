@@ -95,6 +95,17 @@ class DBBackend(Backend):
         - **created_on (datetime)**: Timestamp for when the form was processed
         - **data (dict)**: JSON blob of the form data e.g. ``{"email": ".."}`` for our example
 
+    In order to use this backend, you need to pass in ``DATABASE_URL`` in your settings
+    when instantiating ``Fast`` object, like so -
+
+    .. code-block:: python
+
+        fast = Fast({
+            "DATABASE_URL": "service.db",
+        })
+
+    This will create a sqlite database called ``service.db`` in your root directory and the
+    ``DBBackend`` will store the data submitted in forms to the same database.
 
     Args:
         db: Database instance.
