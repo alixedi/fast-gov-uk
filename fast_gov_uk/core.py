@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import fasthtml.common as fh
 from notifications_python_client import notifications as notify
 
@@ -50,7 +52,8 @@ def problem_with_service(req, exc):
 
 def assets(fname: str, ext: str):
     """Serve static assets from the assets directory."""
-    return fh.FileResponse(f"assets/{fname}.{ext}")
+    assets = Path(__file__).parent / "assets"
+    return fh.FileResponse(f"{assets}/{fname}.{ext}")
 
 
 def footer():
