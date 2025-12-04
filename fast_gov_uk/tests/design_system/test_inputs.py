@@ -1527,3 +1527,15 @@ async def test_clean_with_invalid_values(field, value):
         f = field(name="test", label="Test Label", choices={"test1": "Test 1", "test2": "Test 2"})
         f.value = value
         await f.clean
+
+
+@pytest.mark.parametrize("field", (
+    ds.Textarea,
+    ds.CharacterCount,
+
+))
+def test_value(field, html):
+    """Test that textarea fields can be assigned values."""
+    f = field(name="test", label="Test Label", required=False)
+    f.value = "test"
+    assert f">test</textarea>" in html(f)
