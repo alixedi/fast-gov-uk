@@ -33,7 +33,7 @@ def not_found(req, exc):
         ds.P("If you pasted the web address, check you copied the entire address."),
         ds.P(
             "If the web address is correct or you selected a link or button, ",
-            ds.A("contact us", "/contact-us"),
+            ds.A("contact us", "/forms/contact-us"),
             "to speak to someone and get help.",
         ),
     )
@@ -44,7 +44,7 @@ def problem_with_service(req, exc):
         ds.H1("Sorry, there is a problem with this service"),
         ds.P("Try again later."),
         ds.P(
-            ds.A("Contact us", "/contact-us"),
+            ds.A("Contact us", "/forms/contact-us"),
             " if you need to speak to someone about this.",
         ),
     )
