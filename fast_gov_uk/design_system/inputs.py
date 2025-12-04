@@ -328,9 +328,9 @@ class Textarea(Field):
         error_cls = " govuk-textarea--error" if self.error else ""
         return super().__ft__(
             fh.Textarea(
+                self.value,
                 name=self.name,
                 rows=self.rows,
-                value=self.value,
                 id=self._id,
                 aria_describedby=f"{self._id}-hint {self._id}-error",
                 cls=f"govuk-textarea{error_cls}",
@@ -491,9 +491,9 @@ class CharacterCount(Field):
         """
         error_cls = " govuk-textarea--error" if self.error else ""
         return fh.Textarea(
+            self.value,
             name=self.name,
             rows=self.rows,
-            value=self.value,
             id=self._id,
             aria_describedby=f"{self._id}-hint {self._id}-error",
             cls=f"govuk-textarea govuk-js-character-count{error_cls}",
