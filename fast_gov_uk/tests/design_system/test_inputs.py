@@ -1538,4 +1538,4 @@ def test_value(field, html):
     """Test that textarea fields can be assigned values."""
     f = field(name="test", label="Test Label", required=False)
     f.value = "test"
-    assert f">test</textarea>" in html(f)
+    assert ">test</textarea>" in html(f)
