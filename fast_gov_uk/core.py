@@ -255,7 +255,9 @@ class Fast(fh.FastHTML):
 
     def form(self, url=None):
         def form_decorator(func):
-            _url = url or func.__name__
+            _url = url or f"/{func.__name__}"
+            if not _url.startswith("/"):
+                raise ValueError("Routes must start with '/'")
             self.forms[_url] = func
             return func
 
@@ -269,7 +271,9 @@ class Fast(fh.FastHTML):
 
     def wizard(self, url=None):
         def wizard_decorator(func):
-            _url = url or func.__name__
+            _url = url or f"/{func.__name__}"
+            if not _url.startswith("/"):
+                raise ValueError("Routes must start with '/'")
             self.wizards[_url] = func
             return func
 
@@ -282,7 +286,7 @@ class Fast(fh.FastHTML):
         return wizard_decorator
 
     async def process_form(self, req, name: str, post: dict):
-        mkform = self.forms.get(name, None)
+        mkform = self.forms.get(f"/{name}", None)
         if not mkform:
             raise fh.HTTPException(status_code=404)
         # If GET, just return the form
@@ -300,7 +304,7 @@ class Fast(fh.FastHTML):
         self, req, session: dict, name: str, step: str, post: dict
     ):
         try:
-            mkwizard = self.wizards[name]
+            mkwizard = self.wizards[f"/{name}"]
             _step = int(step or "0")
         except (KeyError, ValueError):
             raise fh.HTTPException(status_code=404)
