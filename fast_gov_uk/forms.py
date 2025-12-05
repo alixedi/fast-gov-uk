@@ -8,7 +8,7 @@ import fasthtml.common as fh
 
 from fast_gov_uk.design_system import Button, Field, Fieldset, ErrorSummary, A, Page
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 
 class BackendError(Exception):
