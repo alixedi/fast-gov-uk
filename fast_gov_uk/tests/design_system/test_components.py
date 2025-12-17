@@ -82,43 +82,43 @@ def test_detail(content, expected, html):
     "kwargs, expected",
     (
         (
-            {"content": [ds.P("Test Content")]},
+            {"content": "Test Content"},
             (
                 '<div class="govuk-panel govuk-panel--confirmation">'
                     '<div class="govuk-panel__body">'
-                        '<p class="govuk-body">Test Content</p>'
+                        'Test Content'
                     '</div>'
                 '</div>'
             ),
         ),
         (
-            {"title": "Test", "content": [ds.P("Test Content")]},
+            {"title": "Test", "content": "Test Content"},
             (
                 '<div class="govuk-panel govuk-panel--confirmation">'
                     '<h1 class="govuk-panel__title">Test</h1>'
                     '<div class="govuk-panel__body">'
-                        '<p class="govuk-body">Test Content</p>'
+                        'Test Content'
                     '</div>'
                 '</div>'
             ),
         ),
         (
-            {"content": [ds.A("Test Link")]},
+            {"content": ds.Safe("<a href='#'>Test Link</a>")},
             (
                 '<div class="govuk-panel govuk-panel--confirmation">'
                     '<div class="govuk-panel__body">'
-                        '<a href="#" class="govuk-link">Test Link</a>'
+                        '<a href="#">Test Link</a>'
                     '</div>'
                 '</div>'
             ),
         ),
         (
-            {"content": [ds.A("Test Link"), ds.P("Test Content")]},
+            {"content": ds.Safe("<a href='#'>Test Link</a> Test Content")},
             (
                 '<div class="govuk-panel govuk-panel--confirmation">'
                     '<div class="govuk-panel__body">'
-                        '<a href="#" class="govuk-link">Test Link</a>'
-                        '<p class="govuk-body">Test Content</p>'
+                        '<a href="#">Test Link</a>'
+                        'Test Content'
                     '</div>'
                 '</div>'
             ),
@@ -132,7 +132,7 @@ def test_panel(kwargs, expected, html):
         expected (str): The expected HTML output.
     """
     content = kwargs.pop("content")
-    panel = ds.Panel(*content, **kwargs)
+    panel = ds.Panel(content, **kwargs)
     assert html(panel) == html(expected)
 
 
@@ -654,7 +654,7 @@ def test_summary_card(args, expected, html):
 @pytest.mark.parametrize("component", (
     ds.Inset("test", hx_test="foo"),
     ds.Detail("test", hx_test="foo"),
-    ds.Panel(hx_test="foo"),
+    ds.Panel("test", hx_test="foo"),
     ds.Tag("test", hx_test="foo"),
     ds.Warning(hx_test="foo"),
     ds.Notification(hx_test="foo"),
