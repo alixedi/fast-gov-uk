@@ -390,6 +390,12 @@ class Form:
         ...     cta="Send",
         ... )
 
+    If you are using a ``@fast.form`` decorator on a method that returns
+    a form, the form will be rendered at ``/forms/<function_name>``.
+
+    If you are specifying a url in your decorator e.g. ``@fast.form("test")``,
+    the form will be rendered at ``/forms/test``.
+
     Args:
         name (str): Name of the Form.
         backends (list): List of backends to process submitted data.
@@ -624,6 +630,12 @@ class Wizard:
     """
     Implements the question-protocol aka Wizard i.e. forms that step
     through the fields one at a time.
+
+    If you are using a ``@fast.wizard`` decorator on a method that returns
+    a wizard, the wizard will be rendered at ``/wizards/<function_name>``.
+
+    If you are specifying a url in your decorator e.g. ``@fast.wizard("test")``,
+    the wizard will be rendered at ``/wizards/test``.
 
     Examples:
         >>> wizard = Wizard(

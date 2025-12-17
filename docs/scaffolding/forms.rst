@@ -57,7 +57,7 @@ The following is how you would build this feedback form in fast-gov-uk -
 
 1. The ``form`` decorator "registers" feedback function as a form rendered at
 ``/forms/feeback``. You can easily render this form at a different url -
-``@fast.form("/not-feedback")``.
+``@fast.form("/not-feedback")`` will render the form at ``/forms/not-feedback``.
 
 2. The ``feedback`` function must return a ``Form`` object (see below) and it must accept
 a ``data`` argument because forms can be empty or filled and when they are filled, the
