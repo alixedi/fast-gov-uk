@@ -80,7 +80,7 @@ def Detail(
 
 
 def Panel(
-    *content: fh.FT | str,
+    content: str,
     title: str = "",
     **kwargs,
 ) -> fh.FT:
@@ -97,8 +97,18 @@ def Panel(
         # | Panel content.
         # -----------------------
 
+    The Panel content argument is a string but sometimes, it is useful to
+    have HTML tags in there. Here is an example on how to do that -
+
+        >>> panel = ds.Panel(ds.Safe"<strong>Panel content</strong>"), title="Test")
+        # Renders panel component with title and bold content.
+        # -----------------------
+        # | Test
+        # | *Panel content*
+        # -----------------------
+
     Args:
-        *content (FT or str): The content to display in the panel.
+        content (str): The content to display in the panel.
         title (str, optional): The title of the panel. Defaults to "".
         **kwargs: Additional keyword arguments.
 
@@ -109,7 +119,7 @@ def Panel(
     """
     return fh.Div(
         fh.H1(title, cls="govuk-panel__title") if title else "",
-        fh.Div(*content, cls="govuk-panel__body"),
+        fh.Div(content, cls="govuk-panel__body"),
         cls="govuk-panel govuk-panel--confirmation",
         **kwargs,
     )
