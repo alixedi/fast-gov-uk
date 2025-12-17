@@ -79,7 +79,7 @@ The following is a simplified implementation of the
 
 1. The ``wizard`` decorator "registers" this function as a wizard rendered at
 ``/wizards/equality``. You can easily render this at a different url -
-``@fast.wizard("/not-equality")``.
+``@fast.wizard("/not-equality")`` would render the wizard at ``/wizards/not-equality``.
 
 2. The ``equality`` function must return a ``Wizard`` object (see below) and it must accept
 ``step`` and ``data`` arguments. You can think of Wizards as a series of Forms. The ``step``
