@@ -712,7 +712,9 @@ class Wizard:
         Returns:
             fh.Redirect: Redirect response to success URL.
         """
+        # Save the data and clean up the session
         data = req.session[self.name]["data"]
+        del req.session[self.name]
         try:
             for backend in self.backends:
                 await backend.process(req, self.name, data, *args, **kwargs)
