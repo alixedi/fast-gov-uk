@@ -365,3 +365,36 @@ def test_client(mock_httpx):
     assert auth.call_args == call(username="test", password="test")
     client = mock_httpx.Client
     assert client.called
+
+
+def test_wizard_no_permission(db, client):
+    """
+    There is a regression in mini_euqality - when I don't give permission
+    for the survey and the wizard gets processed, I am seeing what are
+    presumably default values for fields that follow permission whereas
+    actually, these fields should be empty.
+
+    I've done some manual testing and apparently, the problem is following -
+
+    1) I fill the equality survey with permission = "yes"
+    2) The session gets filled with values
+    3) I re-do the equality survey but with permission = "no"
+    4) It overrides the new value for permission but picks
+    up stale values from the session from the last time I filled
+    the survey.
+    """
+    # First go -
+    client.post("/wizards/mini_equality/", data={"permission": "yes"})
+    client.post("/wizards/mini_equality/1", data={"health": "no"})
+    client.post("/wizards/mini_equality/3", data={"sex": "skip", "gender": "skip"})
+    # Second go
+    client.post("/wizards/mini_equality", data={"permission": "no"}, follow_redirects=True)
+    # Check DB - second submission should not have stale data
+    forms = db.t.forms()
+    form = forms[1]
+    form_json = asdict(form)
+    form_data = form_json["data"]
+    form_dict = json.loads(form_data)
+    assert form_dict == {
+        "permission": "No, skip the equality questions",
+    }
